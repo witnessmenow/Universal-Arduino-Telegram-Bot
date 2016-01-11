@@ -15,19 +15,15 @@
 
 
 // Initialize Wifi connection to the router
-char ssid[] = "FASTWEB-1-ddufVHRPqndR_EXT";              // your network SSID (name)
-char pass[] = "0123456789";                              // your network key
+char ssid[] = "xxxxxxxxxxxxxxxxxxxxxx";              // your network SSID (name)
+char pass[] = "yyyyyyyy";                              // your network key
 
 
 
 // Initialize Telegram BOT
 
-// #define BOTtoken "77330665:AAEIHv4RJxPnygoKD8nZqLnlpmd4hq7iR7s"  //token of TestBOT
-// #define BOTname "EchoBot"
-// #define BOTusername "EchoBot_bot"
-
 #define BOTtoken "134745667:AAETzUWRQdb9xbMX_s-q_50U6ffgXcW3ldg"  //token of FlashledBOT
-#define BOTname "FlahledBot"
+#define BOTname "FlashledBot"
 #define BOTusername "FlashledBot_bot"
 
 TelegramBOT bot(BOTtoken, BOTname, BOTusername);

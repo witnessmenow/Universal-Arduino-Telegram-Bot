@@ -15,8 +15,8 @@
 
 
 // Initialize Wifi connection to the router
-char ssid[] = "FASTWEB-1-ddufVHRPqndR_EXT";              // your network SSID (name)
-char password[] = "0123456789";                              // your network key
+char ssid[] = "xxxxxxxxxxxxxxxxxxxxxxxx";              // your network SSID (name)
+char password[] = "yyyyyyyyy";                              // your network key
 
 
 
