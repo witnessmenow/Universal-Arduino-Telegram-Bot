@@ -30,6 +30,18 @@ int Bot_mtbs = 1000; //mean time between scan messages
 long Bot_lasttime;   //last time messages' scan has been done
 
 
+/********************************************
+ * EchoMessages - function to Echo messages *
+ ********************************************/
+void Bot_EchoMessages() {
+
+  for (int i = 1; i < bot.message[0][0].toInt() + 1; i++)      {
+    bot.sendMessage(bot.message[i][4], bot.message[i][5], "");
+  }
+  bot.message[0][0] = "";   // All messages have been replied - reset new messages
+}
+
+
 void setup() {
 
   Serial.begin(115200);
@@ -61,20 +73,6 @@ void loop() {
     Bot_lasttime = millis();
   }
 }
-
-
-/********************************************
- * EchoMessages - function to Echo messages *
- ********************************************/
-void Bot_EchoMessages() {
-
-  for (int i = 1; i < bot.message[0][0].toInt() + 1; i++)      {
-    bot.sendMessage(bot.message[i][4], bot.message[i][5], "");
-  }
-  bot.message[0][0] = "";   // All messages have been replied - reset new messages
-}
-
-
 
 
 

@@ -1,7 +1,9 @@
 /*
   Copyright (c) 2015 Giancarlo Bacchio. All right reserved.
 
-  TelegramBot - Library to create your own Telegram Bot using ARDUINO WiFiShield101.
+  TelegramBot - Library to create your own Telegram Bot using 
+  ESP8266 on Arduino IDE.
+  Ref. Library at https:github/esp8266/Arduino
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public

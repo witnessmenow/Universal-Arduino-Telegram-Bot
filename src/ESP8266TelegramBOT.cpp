@@ -2,8 +2,10 @@
 /*
   Copyright (c) 2015 Giancarlo Bacchio. All right reserved.
 
-  TelegramBot - Library to create your own Telegram Bot using ARDUINO WiFiShield101.
-
+  TelegramBot - Library to create your own Telegram Bot using 
+  ESP8266 on Arduino IDE.
+  Ref. Library at https:github/esp8266/Arduino
+  
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -49,7 +51,7 @@ String TelegramBOT::connectToTelegram(String command)  {
     // Connect with api.telegram.org       
     IPAddress server(149,154,167,198);
     if (client.connect(server, 443)) {  
-        Serial.println(".... connected to server");
+        //Serial.println(".... connected to server");
         String a="";
         char c;
 	int ch_count=0;
@@ -149,7 +151,7 @@ void TelegramBOT::getUpdates(String offset)  {
 void TelegramBOT::sendMessage(String chat_id, String text, String reply_markup)  {
 
     bool sent=false;
-    Serial.println("SEND Message ");
+   // Serial.println("SEND Message ");
     long sttime=millis();
     if (text!="") {
 	    while (millis()<sttime+8000) {    // loop for a while to send the message
@@ -164,18 +166,18 @@ void TelegramBOT::sendMessage(String chat_id, String text, String reply_markup) 
 		    }
 		}
 		if (sent==true)   {
-		  Serial.print("Message delivred: \"");
-		  Serial.print(text);
-		  Serial.println("\"");
-		  Serial.println();
+		//  Serial.print("Message delivred: \"");
+		//  Serial.print(text);
+		//  Serial.println("\"");
+		//  Serial.println();
 		  break;
 		}
 		delay(1000);
-		Serial.println("Retry");
+	//	Serial.println("Retry");
 
 	    }
     }
-    if (sent==false) Serial.println("Message not delivered");
+   // if (sent==false) Serial.println("Message not delivered");
 }
 
 
@@ -209,7 +211,7 @@ void TelegramBOT::analizeMessages(void)     {
           rif[4]=m;
         }
         if (a.substring(m-8,m)=="\"text\":\"")         { //Search for "text" pointer start
-          rif[5]=m;
+	  rif[5]=m;
         }
         for (int n=0; n<2; n++)     {                    //Search for "update_id" and "from" pointers end
             if (a.substring(m-1,m)==",")  {
@@ -237,15 +239,25 @@ void TelegramBOT::analizeMessages(void)     {
               }
           rif[4]=0;
         }
-	if (a.substring(m-2,m)=="\"}")  {               //Search for "text" pointer end
+        if (a.substring(m-2,m)=="\",")  {               //Search for "text" pointer end
               if (rif[5]!=0)  {
                 message[i][5]=a.substring(rif[5],m-2);    //Write value into dedicated slot
             }
           rif[5]=0;
         }
+	if (a.substring(m-2,m)=="\"}")  {               //Search for "text" pointer end
+              if (rif[5]!=0)  {
+                message[i][5]=a.substring(rif[5],m-2);    //Write value into dedicated slot
+            }
+          rif[5]=0;
+        }    
     }
     int id=message[message[0][0].toInt()][0].toInt()+1;
     message[0][1]=id;                                   //Write id of last read message
+    
+  //  for (int j=0; j<6; j++)	{
+  //	Serial.println(message[i][j]);                                //print parsed data
+  //  }
   }
 }
 
