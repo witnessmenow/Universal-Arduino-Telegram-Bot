@@ -1,7 +1,7 @@
 /*
   Copyright (c) 2015 Giancarlo Bacchio. All right reserved.
 
-  TelegramBot - Library to create your own Telegram Bot using 
+  TelegramBot - Library to create your own Telegram Bot using
   ESP8266 on Arduino IDE.
   Ref. Library at https:github/esp8266/Arduino
 
@@ -25,26 +25,50 @@
 #define ESP8266TelegramBOT_h
 
 #include <Arduino.h>
+#include <ArduinoJson.h>
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
+
+#define HOST "api.telegram.org"
+#define SSL_PORT 443
+#define HANDLE_MESSAGES 1
+
+struct telegramMessage{
+  String text;
+  String chat_id;
+  String sender;
+  String date;
+  int update_id;
+};
 
 class TelegramBOT
 {
   public:
-    TelegramBOT (String, String, String);
-  	String message[3][6];  // amount of messages read per time  (update_id, name_id, name, lastname, chat_id, text)
+    TelegramBOT (String);
+    virtual String sendGetToTelegram(String command) = 0;
   	void begin(void);
-  	void analizeMessages(void);
+    bool getMe();
   	void sendMessage(String chat_id, String text, String reply_markup);
-  	void getUpdates(String offset);
-	const char* fingerprint = "37:21:36:77:50:57:F3:C9:28:D0:F7:FA:4C:05:35:7F:60:C1:20:44";  //Telegram.org Certificate 
+  	int getUpdates(int offset);
+    telegramMessage messages[HANDLE_MESSAGES];
+    int last_message_recived;
+    String name;
+    String userName;
+	  const char* fingerprint = "37:21:36:77:50:57:F3:C9:28:D0:F7:FA:4C:05:35:7F:60:C1:20:44";  //Telegram.org Certificate
 
   private:
-    String connectToTelegram(String command);
     String _token;
-    String _name;
-    String _username;
+};
+
+class ESP8266TelegramBOT: public TelegramBOT
+{
+  public:
+    ESP8266TelegramBOT (String);
+    String sendGetToTelegram(String command);
+
+  private:
     WiFiClientSecure client;
+
 };
 
 #endif
