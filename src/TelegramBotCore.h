@@ -1,4 +1,3 @@
-
 /*
 Copyright (c) 2015 Giancarlo Bacchio. All right reserved.
 
@@ -22,41 +21,42 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
 
-#include "ESP8266TelegramBOT.h"
+#ifndef TelegramBotCore_h
+#define TelegramBotCore_h
 
-ESP8266TelegramBOT::ESP8266TelegramBOT(String token) :TelegramBotCore(token) {
-}
+#include <Arduino.h>
+#include <ArduinoJson.h>
 
-String ESP8266TelegramBOT::sendGetToTelegram(String command) {
-	String mess="";
-	long now;
-	bool avail;
-	// Connect with api.telegram.org
-	if (client.connect(HOST, SSL_PORT)) {
-		// Serial.println(".... connected to server");
-		String a="";
-		char c;
-		int ch_count=0;
-		client.println("GET /"+command);
-		now=millis();
-		avail=false;
-		while (millis()-now<1500) {
-			while (client.available()) {
-				char c = client.read();
-				//Serial.write(c);
-				if (ch_count < maxMessageLength)  {
-					mess=mess+c;
-					ch_count++;
-				}
-				avail=true;
-			}
-			if (avail) {
-				// Serial.println();
-				// Serial.println(mess);
-				// Serial.println();
-				break;
-			}
-		}
-	}
-	return mess;
-}
+#define HOST "api.telegram.org"
+#define SSL_PORT 443
+#define HANDLE_MESSAGES 1
+#define MAX_BUFFER_SIZE 1000
+
+struct telegramMessage{
+  String text;
+  String chat_id;
+  String sender;
+  String date;
+  int update_id;
+};
+
+class TelegramBotCore
+{
+  public:
+    TelegramBotCore (String);
+    virtual String sendGetToTelegram(String command) = 0;
+    void begin(void);
+    bool getMe();
+    void sendMessage(String chat_id, String text, String reply_markup);
+    int getUpdates(int offset);
+    telegramMessage messages[HANDLE_MESSAGES];
+    int last_message_recived;
+    String name;
+    String userName;
+    const char* fingerprint = "37:21:36:77:50:57:F3:C9:28:D0:F7:FA:4C:05:35:7F:60:C1:20:44";  //Telegram.org Certificate
+
+  private:
+    String _token;
+};
+
+#endif

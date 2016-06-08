@@ -28,39 +28,11 @@
 #include <ArduinoJson.h>
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
+#include <TelegramBotCore.h>
 
-#define HOST "api.telegram.org"
-#define SSL_PORT 443
-#define HANDLE_MESSAGES 1
+#define MAX_BUFFER_SIZE 1000
 
-struct telegramMessage{
-  String text;
-  String chat_id;
-  String sender;
-  String date;
-  int update_id;
-};
-
-class TelegramBOT
-{
-  public:
-    TelegramBOT (String);
-    virtual String sendGetToTelegram(String command) = 0;
-  	void begin(void);
-    bool getMe();
-  	void sendMessage(String chat_id, String text, String reply_markup);
-  	int getUpdates(int offset);
-    telegramMessage messages[HANDLE_MESSAGES];
-    int last_message_recived;
-    String name;
-    String userName;
-	  const char* fingerprint = "37:21:36:77:50:57:F3:C9:28:D0:F7:FA:4C:05:35:7F:60:C1:20:44";  //Telegram.org Certificate
-
-  private:
-    String _token;
-};
-
-class ESP8266TelegramBOT: public TelegramBOT
+class ESP8266TelegramBOT: public TelegramBotCore
 {
   public:
     ESP8266TelegramBOT (String);
@@ -68,6 +40,7 @@ class ESP8266TelegramBOT: public TelegramBOT
 
   private:
     WiFiClientSecure client;
+    const int maxMessageLength = 1000;
 
 };
 
