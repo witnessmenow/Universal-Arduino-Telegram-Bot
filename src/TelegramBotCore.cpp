@@ -112,7 +112,7 @@ int TelegramBotCore::getUpdates(int offset)  {
 * SendMessage - function to send message to telegram                  *
 * (Arguments to pass: chat_id, text to transmit and markup(optional)) *
 ***********************************************************************/
-void TelegramBotCore::sendMessage(String chat_id, String text, String reply_markup)  {
+bool TelegramBotCore::sendMessage(String chat_id, String text, String reply_markup)  {
 
   bool sent=false;
   // Serial.println("SEND Message ");
@@ -141,5 +141,45 @@ void TelegramBotCore::sendMessage(String chat_id, String text, String reply_mark
 
     }
   }
+
+  return sent;
+  // if (sent==false) Serial.println("Message not delivered");
+}
+
+/***********************************************************************
+* SendPostMessage - function to send message to telegram                  *
+* (Arguments to pass: chat_id, text to transmit and markup(optional)) *
+***********************************************************************/
+bool TelegramBotCore::sendPostMessage(JsonObject& payload)  {
+
+  bool sent=false;
+  // Serial.println("SEND Message ");
+  long sttime=millis();
+  if (payload.containsKey("text")) {
+    while (millis()<sttime+8000) {    // loop for a while to send the message
+      String command="bot"+_token+"/sendMessage";
+      String mess=sendPostToTelegram(command, payload);
+      //Serial.println(mess);
+      int messageLenght=mess.length();
+      for (int m=5; m<messageLenght+1; m++)  {
+        if (mess.substring(m-10,m)=="{\"ok\":true")     {  //Chek if message has been properly sent
+          sent=true;
+          break;
+        }
+      }
+      if (sent==true)   {
+        //  Serial.print("Message delivred: \"");
+        //  Serial.print(text);
+        //  Serial.println("\"");
+        //  Serial.println();
+        break;
+      }
+      delay(1000);
+      //	Serial.println("Retry");
+
+    }
+  }
+
+  return sent;
   // if (sent==false) Serial.println("Message not delivered");
 }

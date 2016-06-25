@@ -37,6 +37,7 @@ class ESP8266TelegramBOT: public TelegramBotCore
   public:
     ESP8266TelegramBOT (String);
     String sendGetToTelegram(String command);
+    String sendPostToTelegram(String command, JsonObject& payload);
 
   private:
     WiFiClientSecure client;

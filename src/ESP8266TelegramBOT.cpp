@@ -60,3 +60,53 @@ String ESP8266TelegramBOT::sendGetToTelegram(String command) {
 	}
 	return mess;
 }
+
+String ESP8266TelegramBOT::sendPostToTelegram(String command, JsonObject& payload){
+
+  String response = "";
+	long now;
+	bool responseRecieved;
+	// Connect with api.telegram.org
+	if (client.connect(HOST, SSL_PORT)) {
+    // POST URI
+    client.print("POST /" + command); client.println(" HTTP/1.1");
+    // Host header
+    client.print("Host:"); client.println(HOST);
+    // JSON content type
+    client.println("Content-Type: application/json");
+    // Content length
+    int length = payload.measureLength();
+    client.print("Content-Length:"); client.println(length);
+    // End of headers
+    client.println();
+    // POST message body
+    //json.printTo(client); // very slow ??
+    String out;
+    payload.printTo(out);
+    client.println(out);
+
+    int ch_count=0;
+    char c;
+    now=millis();
+		responseRecieved=false;
+		while (millis()-now<1500) {
+			while (client.available()) {
+				char c = client.read();
+				//Serial.write(c);
+				if (ch_count < maxMessageLength)  {
+					response=response+c;
+					ch_count++;
+				}
+				responseRecieved=true;
+			}
+			if (responseRecieved) {
+				// Serial.println();
+				// Serial.println(response);
+				// Serial.println();
+				break;
+			}
+		}
+  }
+
+  return response;
+}

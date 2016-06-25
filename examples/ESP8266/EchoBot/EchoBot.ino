@@ -1,11 +1,9 @@
 /*******************************************************************
- *  this is a basic example how to program a Telegram Bot          *
- *  using TelegramBOT library on ESP8266                           *
+ *  An example of bot that echos back any messages received        *
+ *  using ESP8266TelegramBot.                                      *
  *                                                                 *
- *  Open a conversation with the bot, it will echo your messages   *
- *  https://web.telegram.org/#/im?p=@EchoBot_bot                   *
- *                                                                 *
- *  written by Giacarlo Bacchio                                    *
+ *  written by Giacarlo Bacchio (Gianbacchio on Github)            *
+ *  adapted by Brian Lough                                         *
  *******************************************************************/
 
 
@@ -21,7 +19,7 @@ char password[] = "yyyyyyyyy";                              // your network key
 
 
 // Initialize Telegram BOT
-#define BOTtoken "77330665:AAEIHv4RJxPnygoKD8nZqLnlpmd4hq7iR7s"  //token of TestBOT
+#define BOTtoken "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  // your Bot Token (Get off Botfather)
 ESP8266TelegramBOT bot(BOTtoken);
 
 int Bot_mtbs = 1000; //mean time between scan messages

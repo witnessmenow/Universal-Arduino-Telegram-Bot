@@ -23,8 +23,7 @@ char pass[] = "yyyyyyyy";                              // your network key
 const int ledPin = 13;
 
 // Initialize Telegram BOT
-
-#define BOTtoken "134745667:AAETzUWRQdb9xbMX_s-q_50U6ffgXcW3ldg"  //token of FlashledBOT
+#define BOTtoken "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  // your Bot Token (Get off Botfather)
 
 ESP8266TelegramBOT bot(BOTtoken);
 
