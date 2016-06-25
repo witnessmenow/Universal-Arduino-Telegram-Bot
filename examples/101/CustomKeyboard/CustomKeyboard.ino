@@ -1,14 +1,12 @@
 /*******************************************************************
- *  An example of bot that receives commands and turns on and off  *
- *  an led using using ESP8266TelegramBot.                         *
+ *  An example of how to use a custom reply keyboard using         *
+ *  101TelegramBOT.                                                *
  *                                                                 *
- *  written by Giacarlo Bacchio (Gianbacchio on Github)            *
- *  adapted by Brian Lough                                         *
+ *  written by Brian Lough                                         *
  *******************************************************************/
 
-#include <ESP8266WiFi.h>
-#include <WiFiClientSecure.h>
-#include <ESP8266TelegramBOT.h>
+#include <WiFi101.h>
+#include <101TelegramBOT.h>
 
 
 // Initialize Wifi connection to the router
@@ -22,11 +20,10 @@ const int ledPin = 13;
 // Initialize Telegram BOT
 #define BOTtoken "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  // your Bot Token (Get off Botfather)
 
-ESP8266TelegramBOT bot(BOTtoken);
+101TelegramBOT bot(BOTtoken);
 
 int Bot_mtbs = 1000; //mean time between scan messages
 long Bot_lasttime;   //last time messages' scan has been done
-bool Start = false;
 int ledStatus = 0;
 
 void handleNewMessages(int numNewMessages) {
@@ -52,16 +49,37 @@ void handleNewMessages(int numNewMessages) {
         bot.sendMessage(chat_id, "Led is OFF", "");
       }
     }
+    if (text == "\/options") {
+      StaticJsonBuffer<500> jsonBuffer;
+      JsonObject& payload = jsonBuffer.createObject();
+      payload["chat_id"] = chat_id;
+      payload["text"] = "Choose from one of the following options";
+      JsonObject& replyMarkup = payload.createNestedObject("reply_markup");
+
+      // Reply keyboard is an array of arrays.
+      // Outer array represents rows
+      // Inner arrays represents columns
+      // This example "ledon" and "ledoff" are two buttons on the top row
+      // and "status is a single button on the next row"
+      StaticJsonBuffer<200> keyboardBuffer;
+      char keyboardJson[] = "[[\"/ledon\", \"/ledoff\"],[\"/status\"]]";
+      replyMarkup["keyboard"] = keyboardBuffer.parseArray(keyboardJson);
+      replyMarkup["resize_keyboard"] = true;
+
+      bot.sendPostMessage(payload);
+    }
+
     if (text == "\/start") {
-      String wellcome = "Wellcome from FlashLedBot, your personal Bot on ESP8266 board";
+      String wellcome = "The custom keyboard example for ESP8266TelegramBot";
       String wellcome1 = "/ledon : to switch the Led ON";
       String wellcome2 = "/ledoff : to switch the Led OFF";
       String wellcome3 = "/status : Returns current status of LED";
+      String wellcome4 = "/options : returns the custom keyboard";
       bot.sendMessage(chat_id, wellcome, "");
       bot.sendMessage(chat_id, wellcome1, "");
       bot.sendMessage(chat_id, wellcome2, "");
       bot.sendMessage(chat_id, wellcome3, "");
-      Start = true;
+      bot.sendMessage(chat_id, wellcome4, "");
     }
   }
 }
@@ -95,10 +113,10 @@ void setup() {
 void loop() {
   if (millis() > Bot_lasttime + Bot_mtbs)  {
 
-    int numNewMessages = bot.getUpdates(bot.last_message_recived + 1);   // launch API GetUpdates up to xxx message
+    int numNewMessages = bot.getUpdates(bot.last_message_recived + 1);
     if(numNewMessages) {
       Serial.println("got response");
-      handleNewMessages(numNewMessages);   // reply to message with Echo
+      handleNewMessages(numNewMessages);
     }
     Bot_lasttime = millis();
   }

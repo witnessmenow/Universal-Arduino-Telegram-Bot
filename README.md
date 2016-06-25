@@ -9,7 +9,13 @@ Forked from [ESP8266-TelegramBot](https://github.com/Gianbacchio/ESP8266-Telegra
 
 This library provides an interface for [Telegram Bot API](https://core.telegram.org/bots/api).
 
-It is possible to define your personal Bot, make it able to read and write messages, receive orders and report data collected from the field.
+Telegram is a instant messaging app that allows for the creation of bots. Bots can be configured to send and receive messages. This is useful for Arduino projects as you can receive updates from your project or issue it commands via your Telegram app.
+
+As mentioned, this is a library forked from [one library](https://github.com/Gianbacchio/ESP8266-TelegramBot) and inspired by [another](https://github.com/CasaJasmina/TelegramBot-Library)
+
+Each library only supported a single type of Arduino and had different features implemented. The only thing that needs to be different for each board is the actual sending of requests to Telegram so I thought a library that additional architectures or boards could be configured easily would be useful, although this springs to mind:
+
+![alt text](https://imgs.xkcd.com/comics/standards.png "standards")
 
 
 ## Installing
@@ -21,6 +27,15 @@ The downloaded code can be included as a new library into the IDE selecting the 
 You also have to install the ArduinoJson library written by [Benoît Blanchon](https://github.com/bblanchon).
 Available [here](https://github.com/bblanchon/ArduinoJson).
 
+If your board is ESP8266 (e.g. WeMos v2 Mini) based include the following:
+
+    #include <ESP8266TelegramBOT.h>
+
+or if its 101 based include:
+
+     #include <101TelegramBOT.h>
+
+*NOTE:* 101TelegramBOT has not been tested as I do not have a compatible board. If you can help please let me know!
 
 ## Getting started
 
