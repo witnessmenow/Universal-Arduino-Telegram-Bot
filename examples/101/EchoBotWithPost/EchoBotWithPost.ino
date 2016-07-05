@@ -1,13 +1,14 @@
 /*******************************************************************
  *  An example of bot that echos back any messages received        *
- *  using 101TelegramBOT.                                          *
+ *  using A101TelegramBot.                                          *
  *                                                                 *
  *  written by Brian Lough                                         *
  *******************************************************************/
 
 
+ #include <WiFiSSLClient.h>
  #include <WiFi101.h>
- #include <101TelegramBOT.h>
+ #include <UniversalTelegramBot.h>
 
 
 // Initialize Wifi connection to the router
@@ -17,7 +18,9 @@ char password[] = "yyyyyyyyy";                              // your network key
 
 // Initialize Telegram BOT
 #define BOTtoken "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  // your Bot Token (Get off Botfather)
-101TelegramBOT bot(BOTtoken);
+
+WiFiSSLClient client;
+UniversalTelegramBot bot(BOTtoken, client);
 
 int Bot_mtbs = 1000; //mean time between scan messages
 long Bot_lasttime;   //last time messages' scan has been done

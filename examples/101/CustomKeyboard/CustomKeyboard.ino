@@ -1,12 +1,13 @@
 /*******************************************************************
- *  An example of how to use a custom reply keyboard using         *
- *  101TelegramBOT.                                                *
+ *  An example of how to use a custom reply keyboard.              *
+ *                                                                 *
  *                                                                 *
  *  written by Brian Lough                                         *
  *******************************************************************/
 
+#include <WiFiSSLClient.h>
 #include <WiFi101.h>
-#include <101TelegramBOT.h>
+#include <UniversalTelegramBot.h>
 
 
 // Initialize Wifi connection to the router
@@ -20,7 +21,8 @@ const int ledPin = 13;
 // Initialize Telegram BOT
 #define BOTtoken "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  // your Bot Token (Get off Botfather)
 
-101TelegramBOT bot(BOTtoken);
+WiFiSSLClient client;
+UniversalTelegramBot bot(BOTtoken, client);
 
 int Bot_mtbs = 1000; //mean time between scan messages
 long Bot_lasttime;   //last time messages' scan has been done

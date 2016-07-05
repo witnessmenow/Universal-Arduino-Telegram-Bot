@@ -1,13 +1,12 @@
 #101 - Custom Keyboard bot
 
-This is an example of how to use custom reply keyboards using the 101TelegramBOT
+This is an example of how to use custom reply keyboards on a 101 based board.
 
-The application will turn on and off an led based on commands received via telegram
+The application will turn on and off an LED based on commands received via telegram.
 
 NOTE: You will need to enter your SSID, password and bot Token for the example to work.
 
 Application written by [Brian Lough](https://github.com/witnessmenow)
-
 
 
 ## License

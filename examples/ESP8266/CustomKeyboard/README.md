@@ -1,8 +1,8 @@
 #ESP8266 - Custom Keyboard bot
 
-This is an example of how to use custom reply keyboards using the ESP8266TelegramBOT
+This is an example of how to use custom reply keyboards on a ESP8266 based board.
 
-The application will turn on and off an led based on commands received via telegram
+The application will turn on and off an LED based on commands received via telegram.
 
 NOTE: You will need to enter your SSID, password and bot Token for the example to work.
 

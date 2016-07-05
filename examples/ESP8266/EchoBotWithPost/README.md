@@ -1,6 +1,6 @@
 #ESP8266 - Echo Bot with post
 
-This is a basic example of how to use sendPostMessage functionality of ESP8266TelegramBOT.
+This is a basic example of how to use sendPostMessage functionality of UniversalTelegramBot for ESP8266 based boards.
 
 sendPostMessage allows the more advanced options of the Telegram Api to be used (see CustomKeyboard example for how to use keyboards).
 

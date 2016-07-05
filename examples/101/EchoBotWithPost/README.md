@@ -1,6 +1,6 @@
 #101 - Echo Bot with post
 
-This is a basic example of how to use sendPostMessage functionality of 101TelegramBOT.
+This is a basic example of how to use sendPostMessage functionality of UniversalTelegramBot for 101 based boards.
 
 sendPostMessage allows the more advanced options of the Telegram Api to be used (see CustomKeyboard example for how to use keyboards).
 

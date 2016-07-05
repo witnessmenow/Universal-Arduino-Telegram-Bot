@@ -27,15 +27,17 @@ The downloaded code can be included as a new library into the IDE selecting the 
 You also have to install the ArduinoJson library written by [Benoît Blanchon](https://github.com/bblanchon).
 Available [here](https://github.com/bblanchon/ArduinoJson).
 
-If your board is ESP8266 (e.g. WeMos v2 Mini) based include the following:
+Include UniversalTelegramBot in your project:
 
-    #include <ESP8266TelegramBOT.h>
+    #include <UniversalTelegramBot.h>
 
-or if its 101 based include:
+and pass it a Bot token and a SSL Client (See the examples for more details)
 
-     #include <101TelegramBOT.h>
+    #define BOTtoken "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    WiFiClientSecure client;
+    UniversalTelegramBot bot(BOTtoken, client);
 
-*NOTE:* 101TelegramBOT has not been tested as I do not have a compatible board. If you can help please let me know!
+*NOTE:* This library has not been tested with the 101 boards as I do not have a compatible board. If you can help please let me know!
 
 ## Getting started
 

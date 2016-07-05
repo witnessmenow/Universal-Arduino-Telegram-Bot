@@ -1,13 +1,14 @@
 /*******************************************************************
  *  An example of bot that receives commands and turns on and off  *
- *  an led using using 101TelegramBOT.                             *
+ *  an led using using A101TelegramBot.                             *
  *                                                                 *
  *  written by Giacarlo Bacchio (Gianbacchio on Github)            *
  *  adapted by Brian Lough                                         *
  *******************************************************************/
 
+ #include <WiFiSSLClient.h>
  #include <WiFi101.h>
- #include <101TelegramBOT.h>
+ #include <UniversalTelegramBot.h>
 
 
 // Initialize Wifi connection to the router
@@ -21,7 +22,8 @@ const int ledPin = 13;
 // Initialize Telegram BOT
 #define BOTtoken "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  // your Bot Token (Get off Botfather)
 
-101TelegramBOT bot(BOTtoken);
+WiFiSSLClient client;
+UniversalTelegramBot bot(BOTtoken, client);s
 
 int Bot_mtbs = 1000; //mean time between scan messages
 long Bot_lasttime;   //last time messages' scan has been done

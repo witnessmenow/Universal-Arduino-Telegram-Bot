@@ -22,17 +22,99 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
 
-#include "TelegramBotCore.h"
+#include "UniversalTelegramBot.h"
 
-TelegramBotCore::TelegramBotCore(String token)	{
-  _token=token;
+UniversalTelegramBot::UniversalTelegramBot(String token, Client &client)	{
+  _token = token;
+  this->client = &client;
 }
 
-void TelegramBotCore::begin(void)	{
-
+String UniversalTelegramBot::sendGetToTelegram(String command) {
+	String mess="";
+	long now;
+	bool avail;
+	// Connect with api.telegram.org
+	if (client->connect(HOST, SSL_PORT)) {
+		// Serial.println(".... connected to server");
+		String a="";
+		char c;
+		int ch_count=0;
+		client->println("GET /"+command);
+		now=millis();
+		avail=false;
+		while (millis()-now<1500) {
+			while (client->available()) {
+				char c = client->read();
+				//Serial.write(c);
+				if (ch_count < maxMessageLength)  {
+					mess=mess+c;
+					ch_count++;
+				}
+				avail=true;
+			}
+			if (avail) {
+				// Serial.println();
+				// Serial.println(mess);
+				// Serial.println();
+				break;
+			}
+		}
+	}
+	return mess;
 }
 
-bool TelegramBotCore::getMe() {
+String UniversalTelegramBot::sendPostToTelegram(String command, JsonObject& payload){
+
+  String response = "";
+	long now;
+	bool responseRecieved;
+	// Connect with api.telegram.org
+	if (client->connect(HOST, SSL_PORT)) {
+    // POST URI
+    client->print("POST /" + command); client->println(" HTTP/1.1");
+    // Host header
+    client->print("Host:"); client->println(HOST);
+    // JSON content type
+    client->println("Content-Type: application/json");
+    // Content length
+    int length = payload.measureLength();
+    client->print("Content-Length:"); client->println(length);
+    // End of headers
+    client->println();
+    // POST message body
+    //json.printTo(client); // very slow ??
+    String out;
+    payload.printTo(out);
+    client->println(out);
+
+    int ch_count=0;
+    char c;
+    now=millis();
+		responseRecieved=false;
+		while (millis()-now<1500) {
+			while (client->available()) {
+				char c = client->read();
+				//Serial.write(c);
+				if (ch_count < maxMessageLength)  {
+					response=response+c;
+					ch_count++;
+				}
+				responseRecieved=true;
+			}
+			if (responseRecieved) {
+				// Serial.println();
+				// Serial.println(response);
+				// Serial.println();
+				break;
+			}
+		}
+  }
+
+  return response;
+}
+
+
+bool UniversalTelegramBot::getMe() {
   String command="bot"+_token+"/getMe";
   String response = sendGetToTelegram(command);       //recieve reply from telegram.org
   StaticJsonBuffer<500> jsonBuffer;
@@ -55,7 +137,13 @@ bool TelegramBotCore::getMe() {
 * (Argument to pass: the last+1 message to read)             *
 * Returns the number of new messages           *
 ***************************************************************/
-int TelegramBotCore::getUpdates(int offset)  {
+
+// JsonObject * UniversalTelegramBot::parseUpdates(String response) {
+//   StaticJsonBuffer<MAX_BUFFER_SIZE> jsonBufferStatic;
+//   return *jsonBufferStatic.parseObject(response);
+// }
+
+int UniversalTelegramBot::getUpdates(long offset)  {
 
   //Serial.println("GET Update Messages ");
   String command="bot"+_token+"/getUpdates?offset="+String(offset)+"&limit="+String(HANDLE_MESSAGES);
@@ -65,10 +153,12 @@ int TelegramBotCore::getUpdates(int offset)  {
     // Serial.println(response.length());
     // Serial.print("Creating StaticJsonBuffer of size: ");
     // Serial.println(MAX_BUFFER_SIZE);
-    StaticJsonBuffer<MAX_BUFFER_SIZE> jsonBuffer;
 
     // Parse response into Json object
+    //StaticJsonBuffer<MAX_BUFFER_SIZE> jsonBuffer;
+    DynamicJsonBuffer jsonBuffer;
     JsonObject& root = jsonBuffer.parseObject(response);
+
     if(root.success()) {
       // root.printTo(Serial);
       // Serial.println();
@@ -83,11 +173,13 @@ int TelegramBotCore::getUpdates(int offset)  {
               String text = root["result"][i]["message"]["text"];
               String date = root["result"][i]["message"]["date"];
               String chat_id = root["result"][i]["message"]["chat"]["id"];
+              String from_id = root["result"][i]["message"]["from"]["id"];
 
               messages[newMessageIndex].update_id = update_id;
               messages[newMessageIndex].text = text;
               messages[newMessageIndex].date = date;
               messages[newMessageIndex].chat_id = chat_id;
+              messages[newMessageIndex].from_id = from_id;
 
               newMessageIndex++;
             }
@@ -101,7 +193,7 @@ int TelegramBotCore::getUpdates(int offset)  {
       }
     } else {
       // Buffer may not be big enough, increase buffer or reduce max number of messages
-      Serial.println("Failed to parse update");
+      Serial.println("Failed to parse update, the message could be too big for the buffer");
     }
 
     return 0;
@@ -112,7 +204,7 @@ int TelegramBotCore::getUpdates(int offset)  {
 * SendMessage - function to send message to telegram                  *
 * (Arguments to pass: chat_id, text to transmit and markup(optional)) *
 ***********************************************************************/
-bool TelegramBotCore::sendMessage(String chat_id, String text, String reply_markup)  {
+bool UniversalTelegramBot::sendMessage(String chat_id, String text, String reply_markup)  {
 
   bool sent=false;
   // Serial.println("SEND Message ");
@@ -150,7 +242,7 @@ bool TelegramBotCore::sendMessage(String chat_id, String text, String reply_mark
 * SendPostMessage - function to send message to telegram                  *
 * (Arguments to pass: chat_id, text to transmit and markup(optional)) *
 ***********************************************************************/
-bool TelegramBotCore::sendPostMessage(JsonObject& payload)  {
+bool UniversalTelegramBot::sendPostMessage(JsonObject& payload)  {
 
   bool sent=false;
   // Serial.println("SEND Message ");

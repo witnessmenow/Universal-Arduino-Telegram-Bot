@@ -21,44 +21,48 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
 
-#ifndef TelegramBotCore_h
-#define TelegramBotCore_h
+#ifndef UniversalTelegramBot_h
+#define UniversalTelegramBot_h
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
+#include <Client.h>
 
 #define HOST "api.telegram.org"
 #define SSL_PORT 443
 #define HANDLE_MESSAGES 1
-#define MAX_BUFFER_SIZE 1000
+#define MAX_BUFFER_SIZE 1250
 
 struct telegramMessage{
   String text;
   String chat_id;
+  String from_id;
   String sender;
   String date;
   int update_id;
 };
 
-class TelegramBotCore
+class UniversalTelegramBot
 {
   public:
-    TelegramBotCore (String);
-    virtual String sendGetToTelegram(String command) = 0;
-    virtual String sendPostToTelegram(String command, JsonObject& payload) = 0;
-    void begin(void);
+    UniversalTelegramBot (String token, Client &client);
+    String sendGetToTelegram(String command);
+    String sendPostToTelegram(String command, JsonObject& payload);
     bool getMe();
     bool sendMessage(String chat_id, String text, String reply_markup);
     bool sendPostMessage(JsonObject& payload);
-    int getUpdates(int offset);
+    int getUpdates(long offset);
     telegramMessage messages[HANDLE_MESSAGES];
-    int last_message_recived;
+    long last_message_recived;
     String name;
     String userName;
     const char* fingerprint = "37:21:36:77:50:57:F3:C9:28:D0:F7:FA:4C:05:35:7F:60:C1:20:44";  //Telegram.org Certificate
 
   private:
+    //JsonObject * parseUpdates(String response);
     String _token;
+    Client *client;
+    const int maxMessageLength = 1000;
 };
 
 #endif

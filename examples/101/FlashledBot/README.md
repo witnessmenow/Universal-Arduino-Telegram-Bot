@@ -1,8 +1,8 @@
 #101 - Flashled Bot
 
-This is a basic example of how to receive commands using 101TelegramBOT.
+This is a basic example of how to receive commands using UniversalTelegramBot for 101 based boards.
 
-The application will turn on and off an led based on commands received via telegram
+The application will turn on and off an LED based on commands received via telegram.
 
 Application originally written by [Giancarlo Bacchio](giancarlo.bacchio@gmail.com) for [ESP8266-TelegramBot library](https://github.com/Gianbacchio/ESP8266-TelegramBot)
 

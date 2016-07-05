@@ -1,6 +1,6 @@
 #ESP8266 - Echo Bot
 
-This is a basic example of how to use ESP8266TelegramBOT.
+This is a basic example of how to use UniversalTelegramBot on ESP8266 based boards.
 
 The application will echo an message it received back to the user.
 

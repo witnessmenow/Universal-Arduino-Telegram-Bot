@@ -1,6 +1,6 @@
 #101 - Echo Bot
 
-This is a basic example of how to use 101TelegramBOT.
+This is a basic example of how to use UniversalTelegramBot on 101 based boards.
 
 The application will echo an message it received back to the user.
 

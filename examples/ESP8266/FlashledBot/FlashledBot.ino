@@ -1,6 +1,6 @@
 /*******************************************************************
  *  An example of bot that receives commands and turns on and off  *
- *  an led using using ESP8266TelegramBot.                         *
+ *  an LED.                                                        *
  *                                                                 *
  *  written by Giacarlo Bacchio (Gianbacchio on Github)            *
  *  adapted by Brian Lough                                         *
@@ -8,7 +8,7 @@
 
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
-#include <ESP8266TelegramBOT.h>
+#include <UniversalTelegramBot.h>
 
 
 // Initialize Wifi connection to the router
@@ -22,7 +22,8 @@ const int ledPin = 13;
 // Initialize Telegram BOT
 #define BOTtoken "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  // your Bot Token (Get off Botfather)
 
-ESP8266TelegramBOT bot(BOTtoken);
+WiFiClientSecure client;
+UniversalTelegramBot bot(BOTtoken, client);
 
 int Bot_mtbs = 1000; //mean time between scan messages
 long Bot_lasttime;   //last time messages' scan has been done
