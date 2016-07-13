@@ -58,7 +58,7 @@ void setup() {
   IPAddress ip = WiFi.localIP();
   Serial.println(ip);
 
-  bot.begin();      // launch Bot functionalities
+
 }
 
 

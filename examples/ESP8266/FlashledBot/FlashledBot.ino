@@ -36,24 +36,24 @@ void handleNewMessages(int numNewMessages) {
   for(int i=0; i<numNewMessages; i++) {
     String chat_id = String(bot.messages[i].chat_id);
     String text = bot.messages[i].text;
-    if (text == "\/ledon") {
+    if (text == "/ledon") {
       digitalWrite(ledPin, HIGH);   // turn the LED on (HIGH is the voltage level)
       ledStatus = 1;
       bot.sendMessage(chat_id, "Led is ON", "");
     }
-    if (text == "\/ledoff") {
+    if (text == "/ledoff") {
       ledStatus = 0;
       digitalWrite(ledPin, LOW);    // turn the LED off (LOW is the voltage level)
       bot.sendMessage(chat_id, "Led is OFF", "");
     }
-    if (text == "\/status") {
+    if (text == "/status") {
       if(ledStatus){
         bot.sendMessage(chat_id, "Led is ON", "");
       } else {
         bot.sendMessage(chat_id, "Led is OFF", "");
       }
     }
-    if (text == "\/start") {
+    if (text == "/start") {
       String wellcome = "Wellcome from FlashLedBot, your personal Bot on ESP8266 board";
       String wellcome1 = "/ledon : to switch the Led ON";
       String wellcome2 = "/ledoff : to switch the Led OFF";
@@ -84,7 +84,7 @@ void setup() {
   Serial.println("IP address: ");
   IPAddress ip = WiFi.localIP();
   Serial.println(ip);
-  bot.begin();      // launch Bot functionalities
+
   pinMode(ledPin, OUTPUT); // initialize digital ledPin as an output.
   delay(10);
   digitalWrite(ledPin, HIGH); //initilase pin as off
