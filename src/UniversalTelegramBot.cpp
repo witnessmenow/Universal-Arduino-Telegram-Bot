@@ -238,6 +238,39 @@ bool UniversalTelegramBot::sendMessage(String chat_id, String text, String reply
   // if (sent==false) Serial.println("Message not delivered");
 }
 
+bool UniversalTelegramBot::sendMessageWithReplyKeyboard(String chat_id, String text, String reply_markup, String keyboard, bool resize, bool oneTime, bool selective)  {
+
+
+  DynamicJsonBuffer jsonBuffer;
+  JsonObject& payload = jsonBuffer.createObject();
+  payload["chat_id"] = chat_id;
+  payload["text"] = text;
+  JsonObject& replyMarkup = payload.createNestedObject("reply_markup");
+
+  // Reply keyboard is an array of arrays.
+  // Outer array represents rows
+  // Inner arrays represents columns
+  // This example "ledon" and "ledoff" are two buttons on the top row
+  // and "status is a single button on the next row"
+  DynamicJsonBuffer keyboardBuffer;
+  replyMarkup["keyboard"] = keyboardBuffer.parseArray(keyboard);
+
+  //Telegram defaults these values to false, so to decrease the size of the payload we will only send them if needed
+  if(resize){
+    replyMarkup["resize_keyboard"] = resize;
+  }
+
+  if(oneTime){
+    replyMarkup["one_time_keyboard"] = oneTime;
+  }
+
+  if(selective){
+    replyMarkup["selective"] = selective;
+  }
+
+  return sendPostMessage(payload);
+}
+
 /***********************************************************************
 * SendPostMessage - function to send message to telegram                  *
 * (Arguments to pass: chat_id, text to transmit and markup(optional)) *

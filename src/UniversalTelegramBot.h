@@ -50,6 +50,7 @@ class UniversalTelegramBot
     String sendPostToTelegram(String command, JsonObject& payload);
     bool getMe();
     bool sendMessage(String chat_id, String text, String reply_markup);
+    bool sendMessageWithReplyKeyboard(String chat_id, String text, String reply_markup, String keyboard, bool resize = false, bool oneTime = false, bool selective = false);
     bool sendPostMessage(JsonObject& payload);
     int getUpdates(long offset);
     telegramMessage messages[HANDLE_MESSAGES];
