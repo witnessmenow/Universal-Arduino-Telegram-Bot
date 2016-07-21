@@ -54,15 +54,11 @@ void handleNewMessages(int numNewMessages) {
       }
     }
     if (text == "/start") {
-      String wellcome = "Wellcome from FlashLedBot, your personal Bot on ESP8266 board";
-      String wellcome1 = "/ledon : to switch the Led ON";
-      String wellcome2 = "/ledoff : to switch the Led OFF";
-      String wellcome3 = "/status : Returns current status of LED";
-      bot.sendMessage(chat_id, wellcome, "");
-      bot.sendMessage(chat_id, wellcome1, "");
-      bot.sendMessage(chat_id, wellcome2, "");
-      bot.sendMessage(chat_id, wellcome3, "");
-      Start = true;
+      String welcome = "Wellcome from FlashLedBot, your personal Bot on ESP8266 board \n";
+      welcome = welcome + "/ledon : to switch the Led ON \n";
+      welcome = welcome + "/ledoff : to switch the Led OFF \n";
+      welcome = welcome + "/status : Returns current status of LED \n";
+      bot.sendMessage(chat_id, welcome, "Markdown");
     }
   }
 }
@@ -70,7 +66,12 @@ void handleNewMessages(int numNewMessages) {
 
 void setup() {
   Serial.begin(115200);
-  delay(3000);
+
+  // Set WiFi to station mode and disconnect from an AP if it was Previously
+  // connected
+  WiFi.mode(WIFI_STA);
+  WiFi.disconnect();
+  delay(100);
 
   // attempt to connect to Wifi network:
   Serial.print("Connecting Wifi: ");
@@ -87,19 +88,18 @@ void setup() {
 
   pinMode(ledPin, OUTPUT); // initialize digital ledPin as an output.
   delay(10);
-  digitalWrite(ledPin, HIGH); //initilase pin as off
+  digitalWrite(ledPin, LOW); //initilase pin as off
 
 }
 
-
-
 void loop() {
-  if (millis() > Bot_lasttime + Bot_mtbs)  {
 
-    int numNewMessages = bot.getUpdates(bot.last_message_recived + 1);   // launch API GetUpdates up to xxx message
-    if(numNewMessages) {
+  if (millis() > Bot_lasttime + Bot_mtbs)  {
+    int numNewMessages = bot.getUpdates(bot.last_message_recived + 1);
+    while(numNewMessages) {
       Serial.println("got response");
-      handleNewMessages(numNewMessages);   // reply to message with Echo
+      handleNewMessages(numNewMessages);
+      numNewMessages = bot.getUpdates(bot.last_message_recived + 1);
     }
     Bot_lasttime = millis();
   }

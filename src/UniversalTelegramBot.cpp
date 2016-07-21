@@ -117,7 +117,7 @@ String UniversalTelegramBot::sendPostToTelegram(String command, JsonObject& payl
 bool UniversalTelegramBot::getMe() {
   String command="bot"+_token+"/getMe";
   String response = sendGetToTelegram(command);       //recieve reply from telegram.org
-  StaticJsonBuffer<500> jsonBuffer;
+  DynamicJsonBuffer jsonBuffer;
   JsonObject& root = jsonBuffer.parseObject(response);
   if(root.success()) {
     if (root.containsKey("result")) {
@@ -204,47 +204,50 @@ int UniversalTelegramBot::getUpdates(long offset)  {
 * SendMessage - function to send message to telegram                  *
 * (Arguments to pass: chat_id, text to transmit and markup(optional)) *
 ***********************************************************************/
-bool UniversalTelegramBot::sendMessage(String chat_id, String text, String reply_markup)  {
+bool UniversalTelegramBot::sendSimpleMessage(String chat_id, String text, String parse_mode)  {
 
   bool sent=false;
-  // Serial.println("SEND Message ");
+  Serial.println("SEND Simple Message ");
   long sttime=millis();
   if (text!="") {
     while (millis()<sttime+8000) {    // loop for a while to send the message
-      String command="bot"+_token+"/sendMessage?chat_id="+chat_id+"&text="+text+"&reply_markup="+reply_markup;
-      String mess=sendGetToTelegram(command);
-      //Serial.println(mess);
-      int messageLenght=mess.length();
-      for (int m=5; m<messageLenght+1; m++)  {
-        if (mess.substring(m-10,m)=="{\"ok\":true")     {  //Chek if message has been properly sent
-          sent=true;
-          break;
-        }
-      }
-      if (sent==true)   {
-        //  Serial.print("Message delivred: \"");
-        //  Serial.print(text);
-        //  Serial.println("\"");
-        //  Serial.println();
+      String command="bot"+_token+"/sendMessage?chat_id="+chat_id+"&text="+text+"&parse_mode="+parse_mode;
+      String response = sendGetToTelegram(command);
+      Serial.println(response);
+      sent = checkForOkResponse(response);
+      if(sent){
         break;
       }
-      delay(1000);
-      //	Serial.println("Retry");
-
     }
   }
 
   return sent;
-  // if (sent==false) Serial.println("Message not delivered");
 }
 
-bool UniversalTelegramBot::sendMessageWithReplyKeyboard(String chat_id, String text, String reply_markup, String keyboard, bool resize, bool oneTime, bool selective)  {
+bool UniversalTelegramBot::sendMessage(String chat_id, String text, String parse_mode)  {
 
 
   DynamicJsonBuffer jsonBuffer;
   JsonObject& payload = jsonBuffer.createObject();
   payload["chat_id"] = chat_id;
   payload["text"] = text;
+  if(parse_mode != ""){
+    payload["parse_mode"] = parse_mode;
+  }
+
+  return sendPostMessage(payload);
+}
+
+bool UniversalTelegramBot::sendMessageWithReplyKeyboard(String chat_id, String text, String parse_mode, String keyboard, bool resize, bool oneTime, bool selective)  {
+
+
+  DynamicJsonBuffer jsonBuffer;
+  JsonObject& payload = jsonBuffer.createObject();
+  payload["chat_id"] = chat_id;
+  payload["text"] = text;
+  if(parse_mode != ""){
+    payload["parse_mode"] = parse_mode;
+  }
   JsonObject& replyMarkup = payload.createNestedObject("reply_markup");
 
   // Reply keyboard is an array of arrays.
@@ -278,33 +281,30 @@ bool UniversalTelegramBot::sendMessageWithReplyKeyboard(String chat_id, String t
 bool UniversalTelegramBot::sendPostMessage(JsonObject& payload)  {
 
   bool sent=false;
-  // Serial.println("SEND Message ");
+  Serial.println("SEND Post Message ");
   long sttime=millis();
   if (payload.containsKey("text")) {
     while (millis()<sttime+8000) {    // loop for a while to send the message
-      String command="bot"+_token+"/sendMessage";
-      String mess=sendPostToTelegram(command, payload);
-      //Serial.println(mess);
-      int messageLenght=mess.length();
-      for (int m=5; m<messageLenght+1; m++)  {
-        if (mess.substring(m-10,m)=="{\"ok\":true")     {  //Chek if message has been properly sent
-          sent=true;
-          break;
-        }
-      }
-      if (sent==true)   {
-        //  Serial.print("Message delivred: \"");
-        //  Serial.print(text);
-        //  Serial.println("\"");
-        //  Serial.println();
+      String command = "bot"+_token+"/sendMessage";
+      String response = sendPostToTelegram(command, payload);
+      Serial.println(response);
+      sent = checkForOkResponse(response);
+      if(sent){
         break;
       }
-      delay(1000);
-      //	Serial.println("Retry");
-
     }
   }
 
   return sent;
-  // if (sent==false) Serial.println("Message not delivered");
+}
+
+bool UniversalTelegramBot::checkForOkResponse(String response) {
+  int responseLength = response.length();
+  for (int m=5; m<responseLength+1; m++)  {
+    if (response.substring(m-10,m)=="{\"ok\":true")     {  //Chek if message has been properly sent
+      return true;
+    }
+  }
+
+  return false;
 }

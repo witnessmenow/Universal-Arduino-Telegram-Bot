@@ -52,36 +52,17 @@ void handleNewMessages(int numNewMessages) {
       }
     }
     if (text == "/options") {
-      StaticJsonBuffer<500> jsonBuffer;
-      JsonObject& payload = jsonBuffer.createObject();
-      payload["chat_id"] = chat_id;
-      payload["text"] = "Choose from one of the following options";
-      JsonObject& replyMarkup = payload.createNestedObject("reply_markup");
-
-      // Reply keyboard is an array of arrays.
-      // Outer array represents rows
-      // Inner arrays represents columns
-      // This example "ledon" and "ledoff" are two buttons on the top row
-      // and "status is a single button on the next row"
-      StaticJsonBuffer<200> keyboardBuffer;
-      char keyboardJson[] = "[[\"/ledon\", \"/ledoff\"],[\"/status\"]]";
-      replyMarkup["keyboard"] = keyboardBuffer.parseArray(keyboardJson);
-      replyMarkup["resize_keyboard"] = true;
-
-      bot.sendPostMessage(payload);
+      String keyboardJson = "[[\"/ledon\", \"/ledoff\"],[\"/status\"]]";
+      bot.sendMessageWithReplyKeyboard(chat_id, "Choose from one of the following options", "", keyboardJson, true);
     }
 
     if (text == "/start") {
-      String wellcome = "The custom keyboard example for ESP8266TelegramBot";
-      String wellcome1 = "/ledon : to switch the Led ON";
-      String wellcome2 = "/ledoff : to switch the Led OFF";
-      String wellcome3 = "/status : Returns current status of LED";
-      String wellcome4 = "/options : returns the custom keyboard";
-      bot.sendMessage(chat_id, wellcome, "");
-      bot.sendMessage(chat_id, wellcome1, "");
-      bot.sendMessage(chat_id, wellcome2, "");
-      bot.sendMessage(chat_id, wellcome3, "");
-      bot.sendMessage(chat_id, wellcome4, "");
+      String welcome = "Wellcome from FlashLedBot, your personal Bot on ESP8266 board \n";
+      welcome = welcome + "/ledon : to switch the Led ON \n";
+      welcome = welcome + "/ledoff : to switch the Led OFF \n";
+      welcome = welcome + "/status : Returns current status of LED \n";
+      welcome = welcome + "/options : returns the custom keyboard \n";
+      bot.sendMessage(chat_id, welcome, "Markdown");
     }
   }
 }
@@ -89,8 +70,8 @@ void handleNewMessages(int numNewMessages) {
 
 void setup() {
   Serial.begin(115200);
-  delay(3000);
 
+  delay(100);
   // attempt to connect to Wifi network:
   Serial.print("Connecting Wifi: ");
   Serial.println(ssid);
@@ -113,12 +94,13 @@ void setup() {
 
 
 void loop() {
-  if (millis() > Bot_lasttime + Bot_mtbs)  {
 
+  if (millis() > Bot_lasttime + Bot_mtbs)  {
     int numNewMessages = bot.getUpdates(bot.last_message_recived + 1);
-    if(numNewMessages) {
+    while(numNewMessages) {
       Serial.println("got response");
       handleNewMessages(numNewMessages);
+      numNewMessages = bot.getUpdates(bot.last_message_recived + 1);
     }
     Bot_lasttime = millis();
   }

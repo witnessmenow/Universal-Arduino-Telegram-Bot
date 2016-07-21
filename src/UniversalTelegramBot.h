@@ -49,8 +49,9 @@ class UniversalTelegramBot
     String sendGetToTelegram(String command);
     String sendPostToTelegram(String command, JsonObject& payload);
     bool getMe();
-    bool sendMessage(String chat_id, String text, String reply_markup);
-    bool sendMessageWithReplyKeyboard(String chat_id, String text, String reply_markup, String keyboard, bool resize = false, bool oneTime = false, bool selective = false);
+    bool sendSimpleMessage(String chat_id, String text, String parse_mode);
+    bool sendMessage(String chat_id, String text, String parse_mode);
+    bool sendMessageWithReplyKeyboard(String chat_id, String text, String parse_mode, String keyboard, bool resize = false, bool oneTime = false, bool selective = false);
     bool sendPostMessage(JsonObject& payload);
     int getUpdates(long offset);
     telegramMessage messages[HANDLE_MESSAGES];
@@ -64,6 +65,7 @@ class UniversalTelegramBot
     String _token;
     Client *client;
     const int maxMessageLength = 1000;
+    bool checkForOkResponse(String response);
 };
 
 #endif
