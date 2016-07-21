@@ -24,8 +24,7 @@ The downloaded code can be included as a new library into the IDE selecting the 
 
      Sketch / include Library / Add .Zip library
 
-You also have to install the ArduinoJson library written by [Benoît Blanchon](https://github.com/bblanchon).
-Available [here](https://github.com/bblanchon/ArduinoJson).
+You also have to install the ArduinoJson library written by [Benoît Blanchon](https://github.com/bblanchon). Search for it on the Arduino Library manager or get it from [here](https://github.com/bblanchon/ArduinoJson).
 
 Include UniversalTelegramBot in your project:
 
@@ -34,7 +33,8 @@ Include UniversalTelegramBot in your project:
 and pass it a Bot token and a SSL Client (See the examples for more details)
 
     #define BOTtoken "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-    WiFiClientSecure client;
+    // WiFiSSLClient client; //For 101 boards
+    WiFiClientSecure client; //For ESP8266 boards
     UniversalTelegramBot bot(BOTtoken, client);
 
 *NOTE:* This library has not been tested with the 101 boards as I do not have a compatible board. If you can help please let me know!
@@ -47,6 +47,30 @@ To generate your new Bot, you need an Access Token. Talk to [BotFather](https://
 
 For full details, see "[Bots: An introduction for developers](https://core.telegram.org/bots)".
 
+## --- API ---
+
+These are the main functions of the library
+
+#### sendMessage
+
+    bool sendMessage(String chat_id, String text, String parse_mode);
+
+Send a message to the specified chat_id. parse_mode can be left blank. Will return true if the message sends successfully.
+
+#### sendMessageWithReplyKeyboard
+
+    bool sendMessageWithReplyKeyboard(String chat_id, String text,
+      String parse_mode, String keyboard, bool resize = false,
+      bool oneTime = false, bool selective = false);
+
+Send a keyboard to the specified chat_id. parse_mode can be left blank. Will return true if the message sends successfully. See the CustomKeyboard example for more details.
+
+#### getUpdates
+
+    int getUpdates(long offset);
+
+Gets any pending messages from Telegram and stores them in bot.messages . Offset should be set to bot.last_message_recived + 1. Returns the numbers new messages received. See any of the examples for recommended usage.
+
 
 ## Examples
 
@@ -55,8 +79,6 @@ Here are listed some examples to help you to build your own Bot:
 - EchoBot : replies echoing your messages.
 
 - FlashLedBot : Reacts to your command switching ON/OFF a GPIO.
-
-- EchoBotWithPost : same as EchoBot but using post to commincate with Telegram.
 
 - CustomKeyboard : Same as FlashLedBot but also uses a replyKeyboard
 
