@@ -12,7 +12,7 @@
 
 // Initialize Wifi connection to the router
 char ssid[] = "xxxxxxxxxxxxxxxxxxxxxx";              // your network SSID (name)
-char pass[] = "yyyyyyyy";                              // your network key
+char password[] = "yyyyyyyy";                              // your network key
 
 
 
@@ -75,7 +75,7 @@ void setup() {
   // attempt to connect to Wifi network:
   Serial.print("Connecting Wifi: ");
   Serial.println(ssid);
-  while (WiFi.begin(ssid, pass) != WL_CONNECTED) {
+  while (WiFi.begin(ssid, password) != WL_CONNECTED) {
     Serial.print(".");
     delay(500);
   }
