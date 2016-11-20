@@ -213,7 +213,7 @@ bool UniversalTelegramBot::sendSimpleMessage(String chat_id, String text, String
     while (millis()<sttime+8000) {    // loop for a while to send the message
       String command="bot"+_token+"/sendMessage?chat_id="+chat_id+"&text="+text+"&parse_mode="+parse_mode;
       String response = sendGetToTelegram(command);
-      Serial.println(response);
+      //Serial.println(response);
       sent = checkForOkResponse(response);
       if(sent){
         break;
@@ -287,7 +287,7 @@ bool UniversalTelegramBot::sendPostMessage(JsonObject& payload)  {
     while (millis()<sttime+8000) {    // loop for a while to send the message
       String command = "bot"+_token+"/sendMessage";
       String response = sendPostToTelegram(command, payload);
-      Serial.println(response);
+      //Serial.println(response);
       sent = checkForOkResponse(response);
       if(sent){
         break;
