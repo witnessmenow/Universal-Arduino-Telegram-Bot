@@ -26,9 +26,6 @@ long Bot_lasttime;   //last time messages' scan has been done
 int bulk_messages_mtbs = 1500; //mean time between send messages, 1.5 seconds
 int messages_limit_per_second = 25; // Telegram API have limit for bulk messages ~30 messages in 1 second
 
-StaticJsonBuffer<200> jsonBuffer;
-JsonObject& subscribed_users = jsonBuffer.createObject();
-
 void handleNewMessages(int numNewMessages) {
     Serial.println("handleNewMessages");
     Serial.println(String(numNewMessages));
@@ -38,72 +35,100 @@ void handleNewMessages(int numNewMessages) {
         String text = bot.messages[i].text;
 
         if (text == "/start") {
-            addSubscribedUser(chat_id);
-            bot.sendMessage(chat_id, "Welcome", "");
-            loadSubscribedUsersFile();
+            if (addSubscribedUser(chat_id)) {
+              bot.sendMessage(chat_id, "Welcome!", "");
+            } else {
+              bot.sendMessage(chat_id, "Something wrong, please try again", "");
+            }
         }
 
         if (text == "/stop") {
             bot.sendMessage(chat_id, "Thank you, we always waiting you back", "");
             removeSubscribedUser(chat_id);
-            loadSubscribedUsersFile();
         }
 
         if (text == "/testbulkmessage") {
             sendMessageToAllSubscribedUsers("Current temperature is 0.0C");
         }
+
+        if (text == "\/showallusers") {
+          File subscribedUsersFile = SPIFFS.open("/subscribed_users.json", "r");
+
+          if (!subscribedUsersFile) {
+            bot.sendMessage(chat_id, "No subscription file", "");
+          }
+
+          size_t size = subscribedUsersFile.size();
+
+          if (size > 1024) {
+              bot.sendMessage(chat_id, "Subscribed users file is too large", "");
+          } else {
+              String file_content = subscribedUsersFile.readString();
+              bot.sendMessage(chat_id, file_content, "");
+          }
+        }
+
+       if (text == "\/removeallusers") {
+          SPIFFS.remove("/subscribed_users.json");
+        }
     }
 }
 
-bool loadSubscribedUsersFile() {
+JsonObject& getSubscribedUsers(JsonBuffer& jsonBuffer) {
     File subscribedUsersFile = SPIFFS.open("/subscribed_users.json", "r");
 
     if (!subscribedUsersFile) {
+
         Serial.println("Failed to open subscribed users file");
-        return false;
+
+        // Create empyt file (w+ not working as expect)
+        File f = SPIFFS.open("/subscribed_users.json", "w");
+        f.close();
+
+        JsonObject& users = jsonBuffer.createObject();
+
+        return users;
+    } else {
+
+      size_t size = subscribedUsersFile.size();
+
+      if (size > 1024) {
+          Serial.println("Subscribed users file is too large");
+          //return users;
+      }
+
+      String file_content = subscribedUsersFile.readString();
+
+      JsonObject& users = jsonBuffer.parseObject(file_content);
+
+      if (!users.success()) {
+          Serial.println("Failed to parse subscribed users file");
+          return users;
+      }
+
+      subscribedUsersFile.close();
+
+  //    Serial.println("Test");
+  //    users.printTo(Serial);
+
+      return users;
     }
 
-    size_t size = subscribedUsersFile.size();
-
-    if (size > 1024) {
-        Serial.println("Subscribed users file is too large");
-        return false;
-    }
-
-    // Allocate a buffer to store contents of the file.
-    std::unique_ptr<char[]> buf(new char[size]);
-
-    // We don't use String here because ArduinoJson library requires the input
-    // buffer to be mutable. If you don't use ArduinoJson, you may as well
-    // use configFile.readString instead.
-    subscribedUsersFile.readBytes(buf.get(), size);
-
-    StaticJsonBuffer<200> jsonBuffer;
-    JsonObject& subscribed_users = jsonBuffer.parseObject(buf.get());
-
-    if (!subscribed_users.success()) {
-        Serial.println("Failed to parse subscribed users file");
-        return false;
-    }
-
-    subscribedUsersFile.close();
-
-    subscribed_users.printTo(Serial);
-
-    return true;
 }
 
 bool addSubscribedUser(String chat_id) {
-    File subscribedUsersFile = SPIFFS.open("/subscribed_users.json", "w");
+    StaticJsonBuffer<200> jsonBuffer;
+    JsonObject& users = getSubscribedUsers(jsonBuffer);
+
+    File subscribedUsersFile = SPIFFS.open("/subscribed_users.json", "w+");
 
     if (!subscribedUsersFile) {
         Serial.println("Failed to open subscribed users file for writing");
-        return false;
+       //return false;
     }
 
-    subscribed_users[chat_id] = 1;
-
-    subscribed_users.printTo(subscribedUsersFile);
+    users.set(chat_id, 1);
+    users.printTo(subscribedUsersFile);
 
     subscribedUsersFile.close();
 
@@ -111,6 +136,9 @@ bool addSubscribedUser(String chat_id) {
 }
 
 bool removeSubscribedUser(String chat_id) {
+    StaticJsonBuffer<200> jsonBuffer;
+    JsonObject& users = getSubscribedUsers(jsonBuffer);
+
     File subscribedUsersFile = SPIFFS.open("/subscribed_users.json", "w");
 
     if (!subscribedUsersFile) {
@@ -118,9 +146,8 @@ bool removeSubscribedUser(String chat_id) {
         return false;
     }
 
-    subscribed_users.remove(chat_id);
-
-    subscribed_users.printTo(subscribedUsersFile);
+    users.remove(chat_id);
+    users.printTo(subscribedUsersFile);
 
     subscribedUsersFile.close();
 
@@ -128,9 +155,12 @@ bool removeSubscribedUser(String chat_id) {
 }
 
 void sendMessageToAllSubscribedUsers(String message) {
-    int users_processed = 0;
+  int users_processed = 0;
 
-  for(JsonObject::iterator it=subscribed_users.begin(); it!=subscribed_users.end(); ++it)
+  StaticJsonBuffer<200> jsonBuffer;
+  JsonObject& users = getSubscribedUsers(jsonBuffer);
+
+  for(JsonObject::iterator it=users.begin(); it!=users.end(); ++it)
   {
     users_processed++;
 
@@ -151,8 +181,6 @@ void setup() {
         Serial.println("Failed to mount file system");
         return;
     }
-
-    loadSubscribedUsersFile();
 
     // Set WiFi to station mode and disconnect from an AP if it was Previously
     // connected
