@@ -1,8 +1,8 @@
 /*******************************************************************
- *  An example of how to use a custom reply keyboard.              *
+ *  An example of how to use a bulk messages to subscribed users.  *
  *                                                                 *
  *                                                                 *
- *  written by Brian Lough                                         *
+ *  written by Vadim Sinitski                                      *
  *******************************************************************/
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
@@ -11,11 +11,11 @@
 #include <ArduinoJson.h>
 
 // Initialize Wifi connection to the router
-char ssid[] = "1a3496";        // your network SSID (name)
-char password[] = "278833924"; // your network key
+char ssid[] = "xxxxxxx";        // your network SSID (name)
+char password[] = "yyyyyyyy"; // your network key
 
 // Initialize Telegram BOT
-#define BOTtoken "326858637:AAGDZGkaKP_Vrhzs8mkd--0BnGQQ6AioF4M"  // your Bot Token (Get off Botfather)
+#define BOTtoken "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  // your Bot Token (Get off Botfather)
 
 WiFiClientSecure client;
 UniversalTelegramBot bot(BOTtoken, client);
