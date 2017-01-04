@@ -58,7 +58,6 @@ class UniversalTelegramBot
     long last_message_recived;
     String name;
     String userName;
-    const char* fingerprint = "37:21:36:77:50:57:F3:C9:28:D0:F7:FA:4C:05:35:7F:60:C1:20:44";  //Telegram.org Certificate
 
   private:
     //JsonObject * parseUpdates(String response);
@@ -66,6 +65,7 @@ class UniversalTelegramBot
     Client *client;
     const int maxMessageLength = 1000;
     bool checkForOkResponse(String response);
+    bool _debug = false;
 };
 
 #endif
