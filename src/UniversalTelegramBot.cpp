@@ -143,8 +143,8 @@ bool UniversalTelegramBot::getMe() {
 ***************************************************************/
 
 // JsonObject * UniversalTelegramBot::parseUpdates(String response) {
-//   StaticJsonBuffer<MAX_BUFFER_SIZE> jsonBufferStatic;
-//   return *jsonBufferStatic.parseObject(response);
+//   DynamicJsonBuffer jsonBuffer;
+//   return *jsonBuffer.parseObject(response);
 // }
 
 int UniversalTelegramBot::getUpdates(long offset)  {
@@ -156,12 +156,10 @@ int UniversalTelegramBot::getUpdates(long offset)  {
     if (_debug)  {
          Serial.print("incoming message length");
          Serial.println(response.length());
-         Serial.print("Creating StaticJsonBuffer of size: ");
-         Serial.println(MAX_BUFFER_SIZE);
+         Serial.println("Creating DynamicJsonBuffer");
     }
 
     // Parse response into Json object
-    //StaticJsonBuffer<MAX_BUFFER_SIZE> jsonBuffer;
     DynamicJsonBuffer jsonBuffer;
     JsonObject& root = jsonBuffer.parseObject(response);
 
