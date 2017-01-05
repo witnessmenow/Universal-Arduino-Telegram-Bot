@@ -95,7 +95,7 @@ void setup() {
   pinMode(resetConfigPin, INPUT);
   pinMode(ledPin, OUTPUT); // initialize digital ledPin as an output.
   delay(10);
-  digitalWrite(ledPin, LOW); //initilase pin as off
+  digitalWrite(ledPin, LOW); // initialize pin as off
 
   Serial.println("read bot token");
   readBotTokenFromEeprom(0);

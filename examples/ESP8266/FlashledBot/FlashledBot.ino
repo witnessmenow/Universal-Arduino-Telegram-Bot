@@ -20,7 +20,7 @@ char password[] = "yyyyyyyy";                              // your network key
 const int ledPin = 13;
 
 // Initialize Telegram BOT
-#define BOTtoken "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  // your Bot Token (Get off Botfather)
+#define BOTtoken "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  // your Bot Token (Get from Botfather)
 
 WiFiClientSecure client;
 UniversalTelegramBot bot(BOTtoken, client);
@@ -89,7 +89,7 @@ void setup() {
 
   pinMode(ledPin, OUTPUT); // initialize digital ledPin as an output.
   delay(10);
-  digitalWrite(ledPin, LOW); //initilase pin as off
+  digitalWrite(ledPin, LOW); // initialize pin as off
 
 }
 
