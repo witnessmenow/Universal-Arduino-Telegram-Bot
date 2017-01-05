@@ -57,11 +57,11 @@ void handleNewMessages(int numNewMessages) {
     }
 
     if (text == "/start") {
-      String welcome = "Wellcome from FlashLedBot, your personal Bot on ESP8266 board \n";
-      welcome = welcome + "/ledon : to switch the Led ON \n";
-      welcome = welcome + "/ledoff : to switch the Led OFF \n";
-      welcome = welcome + "/status : Returns current status of LED \n";
-      welcome = welcome + "/options : returns the custom keyboard \n";
+      String welcome = "Welcome from FlashLedBot, your personal Bot on ESP8266\n";
+      welcome = welcome + "/ledon : to switch the Led ON\n";
+      welcome = welcome + "/ledoff : to switch the Led OFF\n";
+      welcome = welcome + "/status : Returns current status of LED\n";
+      welcome = welcome + "/options : returns the custom keyboard\n";
       bot.sendMessage(chat_id, welcome, "Markdown");
     }
   }
@@ -101,11 +101,11 @@ void setup() {
 void loop() {
 
   if (millis() > Bot_lasttime + Bot_mtbs)  {
-    int numNewMessages = bot.getUpdates(bot.last_message_recived + 1);
+    int numNewMessages = bot.getUpdates(bot.last_message_received + 1);
     while(numNewMessages) {
       Serial.println("got response");
       handleNewMessages(numNewMessages);
-      numNewMessages = bot.getUpdates(bot.last_message_recived + 1);
+      numNewMessages = bot.getUpdates(bot.last_message_received + 1);
     }
     Bot_lasttime = millis();
   }

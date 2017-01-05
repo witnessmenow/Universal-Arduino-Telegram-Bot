@@ -54,7 +54,7 @@ void handleNewMessages(int numNewMessages) {
       }
     }
     if (text == "/start") {
-      String welcome = "Wellcome from FlashLedBot, your personal Bot on ESP8266 board \n";
+      String welcome = "Welcome from FlashLedBot, your personal Bot on Arduino 101\n";
       welcome = welcome + "/ledon : to switch the Led ON \n";
       welcome = welcome + "/ledoff : to switch the Led OFF \n";
       welcome = welcome + "/status : Returns current status of LED \n";
@@ -91,11 +91,11 @@ void setup() {
 void loop() {
 
   if (millis() > Bot_lasttime + Bot_mtbs)  {
-    int numNewMessages = bot.getUpdates(bot.last_message_recived + 1);
+    int numNewMessages = bot.getUpdates(bot.last_message_received + 1);
     while(numNewMessages) {
       Serial.println("got response");
       handleNewMessages(numNewMessages);
-      numNewMessages = bot.getUpdates(bot.last_message_recived + 1);
+      numNewMessages = bot.getUpdates(bot.last_message_received + 1);
     }
     Bot_lasttime = millis();
   }
