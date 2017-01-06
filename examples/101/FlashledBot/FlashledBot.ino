@@ -54,7 +54,10 @@ void handleNewMessages(int numNewMessages) {
       }
     }
     if (text == "/start") {
-      String welcome = "Welcome from FlashLedBot, your personal Bot on Arduino 101\n";
+      String from_name = message.from_name;
+      if (from_name == "") from_name = "Anonymous";
+
+      String welcome = "Welcome, " + from_name + ", from FlashLedBot, your personal Bot on Arduino 101\n";
       welcome = welcome + "/ledon : to switch the Led ON \n";
       welcome = welcome + "/ledoff : to switch the Led OFF \n";
       welcome = welcome + "/status : Returns current status of LED \n";
