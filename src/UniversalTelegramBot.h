@@ -31,13 +31,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #define HOST "api.telegram.org"
 #define SSL_PORT 443
 #define HANDLE_MESSAGES 1
-#define MAX_BUFFER_SIZE 1250
 
 struct telegramMessage{
   String text;
   String chat_id;
   String from_id;
-  String sender;
   String date;
   int update_id;
 };
