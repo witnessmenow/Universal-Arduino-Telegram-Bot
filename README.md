@@ -76,11 +76,15 @@ Gets any pending messages from Telegram and stores them in bot.messages . Offset
 
 Here are listed some examples to help you to build your own Bot:
 
+- BulkMessages : sends messages to multiple subscribers (ESP8266 only).
+
 - EchoBot : replies echoing your messages.
 
 - FlashLedBot : Reacts to your command switching ON/OFF a GPIO.
 
 - CustomKeyboard : Same as FlashLedBot but also uses a replyKeyboard
+
+- UsingWifiManager : Same as FlashLedBot but also uses WiFiManager library to configure WiFi (ESP8266 only).
 
 
 

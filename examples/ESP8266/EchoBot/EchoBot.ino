@@ -18,7 +18,7 @@ char password[] = "yyyyyyyyy";                              // your network key
 
 
 // Initialize Telegram BOT
-#define BOTtoken "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  // your Bot Token (Get off Botfather)
+#define BOTtoken "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  // your Bot Token (Get from Botfather)
 
 WiFiClientSecure client;
 UniversalTelegramBot bot(BOTtoken, client);
@@ -57,13 +57,13 @@ void setup() {
 void loop() {
 
   if (millis() > Bot_lasttime + Bot_mtbs)  {
-    int numNewMessages = bot.getUpdates(bot.last_message_recived + 1);
+    int numNewMessages = bot.getUpdates(bot.last_message_received + 1);
     while(numNewMessages) {
       Serial.println("got response");
       for(int i=0; i<numNewMessages; i++) {
         bot.sendMessage(bot.messages[i].chat_id, bot.messages[i].text, "");
       }
-      numNewMessages = bot.getUpdates(bot.last_message_recived + 1);
+      numNewMessages = bot.getUpdates(bot.last_message_received + 1);
     }
     Bot_lasttime = millis();
   }

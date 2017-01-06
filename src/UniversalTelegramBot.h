@@ -51,11 +51,13 @@ class UniversalTelegramBot
     bool getMe();
     bool sendSimpleMessage(String chat_id, String text, String parse_mode);
     bool sendMessage(String chat_id, String text, String parse_mode);
-    bool sendMessageWithReplyKeyboard(String chat_id, String text, String parse_mode, String keyboard, bool resize = false, bool oneTime = false, bool selective = false);
+    bool sendMessageWithReplyKeyboard(String chat_id, String text,
+        String parse_mode, String keyboard, bool resize = false,
+        bool oneTime = false, bool selective = false);
     bool sendPostMessage(JsonObject& payload);
     int getUpdates(long offset);
     telegramMessage messages[HANDLE_MESSAGES];
-    long last_message_recived;
+    long last_message_received;
     String name;
     String userName;
 
