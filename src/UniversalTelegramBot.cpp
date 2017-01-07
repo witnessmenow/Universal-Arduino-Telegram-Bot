@@ -117,6 +117,107 @@ String UniversalTelegramBot::sendPostToTelegram(String command, JsonObject& payl
   return response;
 }
 
+String UniversalTelegramBot::sendImageFromFileToTelegram(File* file, String chat_id){
+
+  String response = "";
+	long now;
+	bool responseRecieved;
+	// Connect with api.telegram.org
+	if (client->connect(HOST, SSL_PORT)) {
+    // POST URI
+    client->print("POST /sendPhoto?chat_id="+chat_id); client->println(" HTTP/1.1");
+    // Host header
+    client->print("Host:"); client->println(HOST);
+    // JSON content type
+    client->println("Content-Type: multipart/form-data, boundary=UH3xBZZtzewr09oPP");
+    client->print("Content-Length:"); client->println(file->size() + 175);
+    client->println(); //2
+    client->println("--UH3xBZZtzewr09oPP"); //19 + 2
+    client->println("content-disposition: form-data; name=\"photo\"; filename=\"img.jpg\""); //64 + 2
+    client->println("Content-Type: image/jpeg"); //24 + 2
+    client->println("Content-Transfer-Encoding: binary"); //33 + 2
+    client->println(); //2
+
+
+    Serial.println("data");
+    int count = 0;
+    char ch;
+    while (file->available()) {
+      ch = file->read();
+      client->println(ch);
+      //Serial.println(ch);
+      count++;
+      if(count > 50){
+        ESP.wdtFeed();
+        Serial.println("feed");
+        count = 0;
+      }
+    }
+
+
+    client->println(); //2
+    client->println("--UH3xBZZtzewr09oPP--"); // 21 + 2
+    // // Content length
+    // //int length = payload.measureLength();
+    // client->print("Content-Length:"); client->println(file->size());
+    // Serial.println(file->size());
+    // // End of headers
+    // client->println();
+    //
+    // Serial.println("data");
+    // int count = 0;
+    // char ch;
+    // while (file->available()) {
+    //   ch = file->read();
+    //   client->println(ch);
+    //   //Serial.println(ch);
+    //   count++;
+    //   if(count > 50){
+    //     ESP.wdtFeed();
+    //     Serial.println("feed");
+    //     count = 0;
+    //   }
+    // }
+
+    Serial.println("Done");
+    Serial.println("Done");
+    Serial.println("Done");
+    Serial.println("Done");
+
+
+    count = 0;
+    int ch_count=0;
+    char c;
+    now=millis();
+		responseRecieved=false;
+		while (millis()-now<1500) {
+      // if(count > 100){
+      //   ESP.wdtFeed();
+      //   Serial.println("feed1");
+      //   count = 0;
+      // }
+      // count++;
+			while (client->available()) {
+				char c = client->read();
+				//Serial.write(c);
+				if (ch_count < maxMessageLength)  {
+					response=response+c;
+					ch_count++;
+				}
+				responseRecieved=true;
+			}
+			if (responseRecieved) {
+				Serial.println();
+				Serial.println(response);
+				Serial.println();
+				break;
+			}
+		}
+  }
+
+  return response;
+}
+
 
 bool UniversalTelegramBot::getMe() {
   String command="bot"+_token+"/getMe";
