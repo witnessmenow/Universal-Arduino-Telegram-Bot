@@ -1,9 +1,21 @@
+language: python
+python:
+    - "2.7"
+
+# Cache PlatformIO packages using Travis CI container-based infrastructure
 sudo: false
-language: cpp
-matrix:
-  include:
-    - env: SCRIPT=platformioEsp8266 BOARD=d1_mini
 cache:
-  directories:
-    - "~/.platformio"
+    directories:
+        - "~/.platformio"
+
+env:
+    - SCRIPT=platformioEsp8266 BOARD=d1_mini
+
+install:
+    - pip install -U platformio
+    #
+    # Libraries from PlatformIO Library Registry:
+    #
+    # http://platformio.org/lib/show/64/ArduinoJson
+    - platformio lib -g install 64
 script: scripts/travis/$SCRIPT.sh
