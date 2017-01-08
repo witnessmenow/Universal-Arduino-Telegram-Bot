@@ -15,13 +15,12 @@
 
 
 // Initialize Wifi connection to the router
-char ssid[] = "Mikrotik";              // your network SSID (name)
-char password[] = "carolinebrian";                              // your network key
-
+char ssid[] = "xxxxxxxxxxxxxxxxxxxxxx";              // your network SSID (name)
+char password[] = "yyyyyyyy";                              // your network key
 
 
 // Initialize Telegram BOT
-#define BOTtoken "245123272:AAF0si333T4uO9b8soU7sC1nNy2ksmEdqFU" //token of test2
+#define BOTtoken "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  // your Bot Token (Get from Botfather)
 
 WiFiClientSecure client;
 UniversalTelegramBot bot(BOTtoken, client);
@@ -63,7 +62,6 @@ void setup() {
   IPAddress ip = WiFi.localIP();
   Serial.println(ip);
 
-  //ESP.wdtEnable(15000000); // make the watch dog timeout longer
 
 }
 
@@ -77,7 +75,7 @@ void loop() {
       DynamicJsonBuffer jsonBuffer;
       JsonObject& payload = jsonBuffer.createObject();
       payload["chat_id"] = bot.messages[0].chat_id;
-      
+
       File myFile = SD.open("box.jpg");
       if (myFile) {
         Serial.println("box.jpg:");
