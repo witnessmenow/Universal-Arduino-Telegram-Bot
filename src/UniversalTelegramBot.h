@@ -31,6 +31,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #include <SD.h>
 
 #define HOST "api.telegram.org"
+#define HOST2 "posttestserver.com"
 #define SSL_PORT 443
 #define HANDLE_MESSAGES 1
 
