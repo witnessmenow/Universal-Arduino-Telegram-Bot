@@ -130,13 +130,13 @@ String UniversalTelegramBot::sendImageFromFileToTelegram(File* file, String chat
     client->print("Host:"); client->println(HOST);
     client->println("User-Agent: arduino/1.0");
     client->println("Accept: */*");
-    client->println("Expect: 100-continue");
     // JSON content type
     //client->print("Content-Length:"); client->println(file->size() + 225);
     //175753396
     Serial.println("Content-Length: " + String(file->size() + 317 + chat_id.length()));
     Serial.println("File-Length: " + String(file->size()));
     client->print("Content-Length: "); client->println(file->size() + 317 + chat_id.length());
+    client->println("Expect: 100-continue");
     client->println("Content-Type: multipart/form-data, boundary=boundary=------------------------fa174948e0da42aa");
     client->println(); //
     delay(500);
