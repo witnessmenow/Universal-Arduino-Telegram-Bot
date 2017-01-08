@@ -69,7 +69,7 @@ String UniversalTelegramBot::sendPostToTelegram(String command, JsonObject& payl
 
   String response = "";
 	long now;
-	bool responseRecieved;
+	bool responseReceived;
 	// Connect with api.telegram.org
 	if (client->connect(HOST, SSL_PORT)) {
     // POST URI
@@ -92,7 +92,7 @@ String UniversalTelegramBot::sendPostToTelegram(String command, JsonObject& payl
     int ch_count=0;
     char c;
     now=millis();
-		responseRecieved=false;
+		responseReceived=false;
 		while (millis()-now<1500) {
 			while (client->available()) {
 				char c = client->read();
@@ -101,9 +101,9 @@ String UniversalTelegramBot::sendPostToTelegram(String command, JsonObject& payl
 					response=response+c;
 					ch_count++;
 				}
-				responseRecieved=true;
+				responseReceived=true;
 			}
-			if (responseRecieved) {
+			if (responseReceived) {
 			    if (_debug) {
 				    Serial.println();
 				    Serial.println(response);
@@ -120,7 +120,7 @@ String UniversalTelegramBot::sendPostToTelegram(String command, JsonObject& payl
 
 bool UniversalTelegramBot::getMe() {
   String command="bot"+_token+"/getMe";
-  String response = sendGetToTelegram(command);       //recieve reply from telegram.org
+  String response = sendGetToTelegram(command);       //receive reply from telegram.org
   DynamicJsonBuffer jsonBuffer;
   JsonObject& root = jsonBuffer.parseObject(response);
   if(root.success()) {
@@ -143,25 +143,23 @@ bool UniversalTelegramBot::getMe() {
 ***************************************************************/
 
 // JsonObject * UniversalTelegramBot::parseUpdates(String response) {
-//   StaticJsonBuffer<MAX_BUFFER_SIZE> jsonBufferStatic;
-//   return *jsonBufferStatic.parseObject(response);
+//   DynamicJsonBuffer jsonBuffer;
+//   return *jsonBuffer.parseObject(response);
 // }
 
 int UniversalTelegramBot::getUpdates(long offset)  {
 
-  if (_debug) Serial.println("GET Update Messages ");
+  if (_debug) Serial.println("GET Update Messages");
   String command="bot"+_token+"/getUpdates?offset="+String(offset)+"&limit="+String(HANDLE_MESSAGES);
-  String response = sendGetToTelegram(command);       //recieve reply from telegram.org
+  String response = sendGetToTelegram(command);       //receive reply from telegram.org
   if (response != "") {
     if (_debug)  {
          Serial.print("incoming message length");
          Serial.println(response.length());
-         Serial.print("Creating StaticJsonBuffer of size: ");
-         Serial.println(MAX_BUFFER_SIZE);
+         Serial.println("Creating DynamicJsonBuffer");
     }
 
     // Parse response into Json object
-    //StaticJsonBuffer<MAX_BUFFER_SIZE> jsonBuffer;
     DynamicJsonBuffer jsonBuffer;
     JsonObject& root = jsonBuffer.parseObject(response);
 
@@ -173,19 +171,22 @@ int UniversalTelegramBot::getUpdates(long offset)  {
         if(resultArrayLength > 0) {
           int newMessageIndex = 0;
           for(int i=0; i < resultArrayLength; i++){
+            JsonObject& message = root["result"][i]["message"];
             int update_id = root["result"][i]["update_id"];
-            if(last_message_recived != update_id) {
-              last_message_recived = update_id;
-              String text = root["result"][i]["message"]["text"];
-              String date = root["result"][i]["message"]["date"];
-              String chat_id = root["result"][i]["message"]["chat"]["id"];
-              String from_id = root["result"][i]["message"]["from"]["id"];
+            if(last_message_received != update_id) {
+              last_message_received = update_id;
+              String text = message["text"];
+              String date = message["date"];
+              String chat_id = message["chat"]["id"];
+              String from_id = message["from"]["id"];
+              String from_name = message["from"]["first_name"];
 
               messages[newMessageIndex].update_id = update_id;
               messages[newMessageIndex].text = text;
               messages[newMessageIndex].date = date;
               messages[newMessageIndex].chat_id = chat_id;
               messages[newMessageIndex].from_id = from_id;
+              messages[newMessageIndex].from_name = from_name;
 
               newMessageIndex++;
             }
@@ -213,7 +214,7 @@ int UniversalTelegramBot::getUpdates(long offset)  {
 bool UniversalTelegramBot::sendSimpleMessage(String chat_id, String text, String parse_mode)  {
 
   bool sent=false;
-  if (_debug) Serial.println("SEND Simple Message ");
+  if (_debug) Serial.println("SEND Simple Message");
   long sttime=millis();
   if (text!="") {
     while (millis()<sttime+8000) {    // loop for a while to send the message
@@ -287,7 +288,7 @@ bool UniversalTelegramBot::sendMessageWithReplyKeyboard(String chat_id, String t
 bool UniversalTelegramBot::sendPostMessage(JsonObject& payload)  {
 
   bool sent=false;
-  if (_debug) Serial.println("SEND Post Message ");
+  if (_debug) Serial.println("SEND Post Message");
   long sttime=millis();
   if (payload.containsKey("text")) {
     while (millis()<sttime+8000) {    // loop for a while to send the message

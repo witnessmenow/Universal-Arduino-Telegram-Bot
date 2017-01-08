@@ -31,13 +31,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #define HOST "api.telegram.org"
 #define SSL_PORT 443
 #define HANDLE_MESSAGES 1
-#define MAX_BUFFER_SIZE 1250
 
 struct telegramMessage{
   String text;
   String chat_id;
   String from_id;
-  String sender;
+  String from_name;
   String date;
   int update_id;
 };
@@ -51,11 +50,13 @@ class UniversalTelegramBot
     bool getMe();
     bool sendSimpleMessage(String chat_id, String text, String parse_mode);
     bool sendMessage(String chat_id, String text, String parse_mode);
-    bool sendMessageWithReplyKeyboard(String chat_id, String text, String parse_mode, String keyboard, bool resize = false, bool oneTime = false, bool selective = false);
+    bool sendMessageWithReplyKeyboard(String chat_id, String text,
+        String parse_mode, String keyboard, bool resize = false,
+        bool oneTime = false, bool selective = false);
     bool sendPostMessage(JsonObject& payload);
     int getUpdates(long offset);
     telegramMessage messages[HANDLE_MESSAGES];
-    long last_message_recived;
+    long last_message_received;
     String name;
     String userName;
 
