@@ -125,18 +125,41 @@ String UniversalTelegramBot::sendImageFromFileToTelegram(File* file, String chat
 	// Connect with api.telegram.org
 	if (client->connect(HOST, SSL_PORT)) {
     // POST URI
-    client->print("POST /sendPhoto?chat_id="+chat_id); client->println(" HTTP/1.1");
+    client->print("POST /bot"+_token+"/sendPhoto"); client->println(" HTTP/1.1");
     // Host header
     client->print("Host:"); client->println(HOST);
+    client->println("User-Agent: arduino/1.0");
+    client->println("Accept: */*");
+    client->println("Expect: 100-continue");
     // JSON content type
-    client->println("Content-Type: multipart/form-data, boundary=UH3xBZZtzewr09oPP");
-    client->print("Content-Length:"); client->println(file->size() + 175);
+    //client->print("Content-Length:"); client->println(file->size() + 225);
+    //175753396
+    Serial.println("Content-Length: " + String(file->size() + 317 + chat_id.length()));
+    Serial.println("File-Length: " + String(file->size()));
+    client->print("Content-Length: "); client->println(file->size() + 317 + chat_id.length());
+    client->println("Content-Type: multipart/form-data, boundary=boundary=------------------------fa174948e0da42aa");
+    client->println(); //
+    delay(500);
+    while (client->available()) {
+      char c = client->read();
+      response=response+c;
+    }
+
+    Serial.println("Resp:" + response);
+    response = "";
+
+    client->println("--------------------------fa174948e0da42aa"); //42 + 2
+    client->println("content-disposition: form-data; name=\"chat_id\""); //48 + 2
     client->println(); //2
-    client->println("--UH3xBZZtzewr09oPP"); //19 + 2
+    client->println(chat_id); //2 + chat_id length
+    client->println("--------------------------fa174948e0da42aa"); //42 + 2
     client->println("content-disposition: form-data; name=\"photo\"; filename=\"img.jpg\""); //64 + 2
+
+    //client->println("Content-Type: application/octet-stream"); //38 + 2
+
     client->println("Content-Type: image/jpeg"); //24 + 2
     client->println("Content-Transfer-Encoding: binary"); //33 + 2
-    client->println(); //2
+    client->println(); //
 
 
     Serial.println("data");
@@ -144,19 +167,18 @@ String UniversalTelegramBot::sendImageFromFileToTelegram(File* file, String chat
     char ch;
     while (file->available()) {
       ch = file->read();
-      client->println(ch);
-      //Serial.println(ch);
+      client->print(ch);
+      Serial.print(ch);
       count++;
-      if(count > 50){
+      if(count > 100){
         ESP.wdtFeed();
-        Serial.println("feed");
+        //Serial.println("feed");
         count = 0;
       }
     }
 
-
     client->println(); //2
-    client->println("--UH3xBZZtzewr09oPP--"); // 21 + 2
+    client->println("--------------------------fa174948e0da42aa--"); // 44 + 2
     // // Content length
     // //int length = payload.measureLength();
     // client->print("Content-Length:"); client->println(file->size());
