@@ -9,7 +9,8 @@ cache:
         - "~/.platformio"
 
 env:
-    - SCRIPT=platformioEsp8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE=EchoBot BOARDTYPE=ESP8266 BOARD=d1_mini
+    #- SCRIPT=platformioEsp8266 BOARD=d1_mini
 
 install:
     - pip install -U platformio
