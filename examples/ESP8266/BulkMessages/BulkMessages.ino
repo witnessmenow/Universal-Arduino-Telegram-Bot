@@ -28,6 +28,8 @@ int messages_limit_per_second = 25; // Telegram API have limit for bulk messages
 
 String subscribed_users_filename = "subscribed_users.json";
 
+DynamicJsonBuffer jsonBuffer;
+
 void handleNewMessages(int numNewMessages) {
   Serial.println("handleNewMessages");
   Serial.println(String(numNewMessages));
@@ -86,7 +88,7 @@ void handleNewMessages(int numNewMessages) {
   }
 }
 
-JsonObject& getSubscribedUsers(JsonBuffer& jsonBuffer) {
+JsonObject& getSubscribedUsers() {
   File subscribedUsersFile = SPIFFS.open("/"+subscribed_users_filename, "r");
 
   if (!subscribedUsersFile) {
@@ -124,8 +126,7 @@ JsonObject& getSubscribedUsers(JsonBuffer& jsonBuffer) {
 }
 
 bool addSubscribedUser(String chat_id, String from_name) {
-  DynamicJsonBuffer jsonBuffer;
-  JsonObject& users = getSubscribedUsers(jsonBuffer);
+  JsonObject& users = getSubscribedUsers();
 
   File subscribedUsersFile = SPIFFS.open("/"+subscribed_users_filename, "w+");
 
@@ -143,8 +144,7 @@ bool addSubscribedUser(String chat_id, String from_name) {
 }
 
 bool removeSubscribedUser(String chat_id) {
-  DynamicJsonBuffer jsonBuffer;
-  JsonObject& users = getSubscribedUsers(jsonBuffer);
+  JsonObject& users = getSubscribedUsers();
 
   File subscribedUsersFile = SPIFFS.open("/"+subscribed_users_filename, "w");
 
@@ -164,8 +164,7 @@ bool removeSubscribedUser(String chat_id) {
 void sendMessageToAllSubscribedUsers(String message) {
   int users_processed = 0;
 
-  DynamicJsonBuffer jsonBuffer;
-  JsonObject& users = getSubscribedUsers(jsonBuffer);
+  JsonObject& users = getSubscribedUsers();
 
   for (JsonObject::iterator it=users.begin(); it!=users.end(); ++it) {
     users_processed++;
