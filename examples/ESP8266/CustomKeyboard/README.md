@@ -1,6 +1,16 @@
-#ESP8266 - Custom Keyboard bot
+#Reply Keyboard Markup
 
-This is an example of how to use custom reply keyboards on a ESP8266 based board.
+This is an example of how to use reply keyboard markup on a ESP8266 based board.
+
+![alt text](https://core.telegram.org/file/811140184/1/5YJxx-rostA/ad3f74094485fb97bd "Reply Keyboard example")
+
+The application will turn on and off an LED based on commands received via telegram.
+
+#Inline Keyboard Markup
+
+This is an example of how to use reply keyboard markup on a ESP8266 based board.
+
+![alt text](https://core.telegram.org/file/811140659/1/RRJyulbtLBY/ea6163411c7eb4f4dc "Inline Keyboard example")
 
 The application will turn on and off an LED based on commands received via telegram.
 
