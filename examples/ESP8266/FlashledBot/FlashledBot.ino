@@ -54,7 +54,7 @@ void handleNewMessages(int numNewMessages) {
       }
     }
     if (text == "/start") {
-      String from_name = message.from_name;
+      String from_name = bot.messages[i].from_name;
       if (from_name == "") from_name = "Anonymous";
 
       String welcome = "Welcome, " + from_name + ", from FlashLedBot, your personal Bot on ESP8266\n";
