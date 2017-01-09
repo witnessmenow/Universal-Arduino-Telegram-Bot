@@ -1,0 +1,29 @@
+language: python
+python:
+    - "2.7"
+
+# Cache PlatformIO packages using Travis CI container-based infrastructure
+sudo: false
+cache:
+    directories:
+        - "~/.platformio"
+
+env:
+    - SCRIPT=platformioSingle EXAMPLE=EchoBot BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE=CustomKeyboard BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE=FlashledBot BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE=UsingWiFiManager BOARDTYPE=ESP8266 BOARD=d1_mini
+
+    # This will run all the ESP8266 examples
+    #- SCRIPT=platformioEsp8266 BOARD=d1_mini
+
+install:
+    - pip install -U platformio
+    #
+    # Libraries from PlatformIO Library Registry:
+    #
+    # http://platformio.org/lib/show/64/ArduinoJson
+    - platformio lib -g install 64
+    # http://platformio.org/lib/show/567/WifiManager
+    - platformio lib -g install 567
+script: scripts/travis/$SCRIPT.sh
