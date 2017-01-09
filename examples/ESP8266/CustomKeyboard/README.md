@@ -2,7 +2,11 @@
 
 This is an example of how to use reply keyboard markup on a ESP8266 based board.
 
-![alt text](https://core.telegram.org/file/811140184/1/5YJxx-rostA/ad3f74094485fb97bd "Reply Keyboard example")
+![Original icon][img-icon_original]
+[img-icon_original]: https://core.telegram.org/file/811140184/1/5YJxx-rostA/ad3f74094485fb97bd "B"
+[img-icon_styled]: https://core.telegram.org/file/811140184/1/5YJxx-rostA/ad3f74094485fb97bd "Reply Keyboard example" width="96px" height="96px"
+
+[fakemacro]: http://www.macdrifter.com/uploads/2011/12/Screen%20Shot%2020111223_232543.jpg style="display: block; margin-left: auto; margin-right: auto; width: 600;"
 
 The application will turn on and off an LED based on commands received via telegram.
 
