@@ -65,7 +65,7 @@ void handleNewMessages(int numNewMessages) {
       welcome += "/ledon : to switch the Led ON\n";
       welcome += "/ledoff : to switch the Led OFF\n";
       welcome += "/status : Returns current status of LED\n";
-      welcome += "/options : returns the custom keyboard\n";
+      welcome += "/options : returns the reply keyboard markup\n";
       bot.sendMessage(chat_id, welcome, "Markdown");
     }
   }
