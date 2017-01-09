@@ -10,9 +10,12 @@ The application will turn on and off an LED based on commands received via teleg
 
 This is an example of how to use reply keyboard markup on a ESP8266 based board.
 
-![alt text](https://core.telegram.org/file/811140659/1/RRJyulbtLBY/ea6163411c7eb4f4dc "Inline Keyboard example")
 
-The application will turn on and off an LED based on commands received via telegram.
+![alt text](https://core.telegram.org/file/811140999/1/2JSoUVlWKa0/4fad2e2743dc8eda04 "Inline Keyboard example")
+
+Right now working only URL redirection button. Other features will be added later.
+
+-----------------
 
 NOTE: You will need to enter your SSID, password and bot Token for the example to work.
 
