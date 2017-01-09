@@ -4,18 +4,13 @@
  *  written by Giacarlo Bacchio (Gianbacchio on Github)            *
  *  adapted by Brian Lough                                         *
  *******************************************************************/
-
-
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
 
-
 // Initialize Wifi connection to the router
-char ssid[] = "xxxxxxxxxxxxxxxxxxxxxxxx";              // your network SSID (name)
-char password[] = "yyyyyyyyy";                              // your network key
-
-
+char ssid[] = "XXXXXX";     // your network SSID (name)
+char password[] = "YYYYYY"; // your network key
 
 // Initialize Telegram BOT
 #define BOTtoken "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  // your Bot Token (Get from Botfather)
@@ -25,7 +20,6 @@ UniversalTelegramBot bot(BOTtoken, client);
 
 int Bot_mtbs = 1000; //mean time between scan messages
 long Bot_lasttime;   //last time messages' scan has been done
-
 
 void setup() {
 

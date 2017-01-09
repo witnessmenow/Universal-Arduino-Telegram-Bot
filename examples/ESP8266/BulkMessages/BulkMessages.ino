@@ -11,8 +11,8 @@
 #include <ArduinoJson.h>
 
 // Initialize Wifi connection to the router
-char ssid[] = "xxxxxxx";      // your network SSID (name)
-char password[] = "yyyyyyyy"; // your network key
+char ssid[] = "XXXXXX";     // your network SSID (name)
+char password[] = "YYYYYY"; // your network key
 
 // Initialize Telegram BOT
 #define BOTtoken "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  // your Bot Token (Get from Botfather)
