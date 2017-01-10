@@ -123,131 +123,76 @@ String UniversalTelegramBot::sendImageFromFileToTelegram(File* file, String chat
   String response = "";
 	long now;
 	bool responseRecieved;
-  String boundry = "AaB03x";
+  String boundry = "------------------------b8f610217e83e29b";
 	// Connect with api.telegram.org
-	//if (client->connect(HOST, SSL_PORT)) {
   if (client->connect(HOST, SSL_PORT)) {
     Serial.println("connected");
     // POST URI
     String start_request = "";
     String end_request = "";
 
-    start_request = start_request + "\n";
-    start_request = start_request + "--------------------------fa174948e0da42aa" + "\n";
-    start_request = start_request + "content-disposition: form-data; name=\"chat_id\"" + "\n";
-    start_request = start_request + "\n";
-    start_request = start_request + chat_id + "\n";
+    start_request = start_request + "--" + boundry + "\r\n";
+    start_request = start_request + "content-disposition: form-data; name=\"chat_id\"" + "\r\n";
+    start_request = start_request + "\r\n";
+    start_request = start_request + chat_id + "\r\n";
 
-    start_request = start_request + boundry + "\n";
-    start_request = start_request + "content-disposition: form-data; name=\"photo\"; filename=\"img.jpg\"" + "\n";
-    start_request = start_request + "Content-Type: image/jpeg" + "\n";
-    start_request = start_request + "\n";
+    start_request = start_request + "--" + boundry + "\r\n";
+    start_request = start_request + "content-disposition: form-data; name=\"photo\"; filename=\"img.jpg\"" + "\r\n";
+    start_request = start_request + "Content-Type: image/jpeg" + "\r\n";
+    start_request = start_request + "\r\n";
 
 
-    end_request = end_request + "\n";
-    end_request = end_request + boundry + "--" + "\n";
+    end_request = end_request + "\r\n";
+    end_request = end_request + "--" + boundry + "--" + "\r\n";
 
-    //client->print("POST /bot"+_token+"/sendPhoto"); client->println(" HTTP/1.1");
-    client->print("POST /post.php"); client->println(" HTTP/1.1");
+    client->print("POST /bot"+_token+"/sendPhoto"); client->println(" HTTP/1.1");
     // Host header
     client->print("Host: "); client->println(HOST);
     client->println("User-Agent: arduino/1.0");
     client->println("Accept: */*");
-    // JSON content type
-    //client->print("Content-Length:"); client->println(file->size() + 225);
-    //175753396
-    Serial.println("Content-Length: " + String(file->size() + start_request.length() + end_request.length()));
-    Serial.println("File-Length: " + String(file->size()));
-    client->print("Content-Length: "); client->println(file->size() + start_request.length() + end_request.length());
 
+    int contentLength = file->size() + start_request.length() + end_request.length();
+    Serial.println("Content-Length: " + String(contentLength));
+    client->print("Content-Length: "); client->println(String(contentLength));
     client->println("Content-Type: multipart/form-data; boundary=" + boundry);
-    //
-    // client->println("--------------------------fa174948e0da42aa"); //42 + 2
-    // client->println("content-disposition: form-data; name=\"chat_id\""); //48 + 2
-    // client->println(); //2
-    // client->println(chat_id); //2 + chat_id length
-    // client->println("--------------------------fa174948e0da42aa"); //42 + 2
-    // client->println("content-disposition: form-data; name=\"photo\"; filename=\"box.jpg\""); //64 + 2
-    //
-    // //client->println("Content-Type: application/octet-stream"); //38 + 2
-    //
-    // client->println("Content-Type: image/jpeg"); //24 + 2
-    // //client->println("Content-Transfer-Encoding: binary"); //33 + 2
-    // client->println(); //
+    client->println("");
 
     client->print(start_request);
-    Serial.println(start_request);
+    Serial.print(start_request);
 
-    byte buff[1055];
-    int clientCount = 0;
-
-
-    Serial.println("data");
+    Serial.println("Sending....");
+    char buffer[512];
     int count = 0;
     char ch;
     while (file->available()) {
-      // buff[clientCount] = file->read();
-      // clientCount++;
-      ch = file->read();
-      client->write(ch);
-      Serial.write(ch);
+      buffer[count] = file->read();
+      //client->write(ch);
+      //Serial.write(ch);
       count++;
-      if(count > 100){
+      if(count == 512){
         //yield();
-        //Serial.println("feed");
+        Serial.println("Sending full buffer");
+        client->write((const uint8_t *)buffer, 512);
         count = 0;
       }
     }
 
-    // if(clientCount > 0) {
-    //   client->write(buff,clientCount);
-    // }
+    if(count > 0) {
+      Serial.println("Sending remaining buffer");
+      client->write((const uint8_t *)buffer, count);
+    }
 
     client->print(end_request);
-    Serial.println(end_request);
-
-    // client->println(); //2
-    // client->println("--------------------------fa174948e0da42aa--"); // 44 + 2
-    // // Content length
-    // //int length = payload.measureLength();
-    // client->print("Content-Length:"); client->println(file->size());
-    // Serial.println(file->size());
-    // // End of headers
-    // client->println();
-    //
-    // Serial.println("data");
-    // int count = 0;
-    // char ch;
-    // while (file->available()) {
-    //   ch = file->read();
-    //   client->println(ch);
-    //   //Serial.println(ch);
-    //   count++;
-    //   if(count > 50){
-    //     ESP.wdtFeed();
-    //     Serial.println("feed");
-    //     count = 0;
-    //   }
-    // }
-
-    Serial.println("Done");
-    Serial.println("Done");
-    Serial.println("Done");
-    Serial.println("Done");
+    Serial.print(end_request);
 
 
+    Serial.println("Done");
     count = 0;
     int ch_count=0;
     char c;
     now=millis();
 		responseRecieved=false;
 		while (millis()-now<1500) {
-      // if(count > 100){
-      //   ESP.wdtFeed();
-      //   Serial.println("feed1");
-      //   count = 0;
-      // }
-      // count++;
 			while (client->available()) {
 				char c = client->read();
 				//Serial.write(c);
