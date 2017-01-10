@@ -61,7 +61,7 @@ void handleNewMessages(int numNewMessages) {
     }
 
     if (text == "/start") {
-      String welcome = "Welcome to Universal Telegram Bot library, " + from_name + ".\n";
+      String welcome = "Welcome to Universal Arduino Telegram Bot library, " + from_name + ".\n";
       welcome += "This is Reply Keyboard Markup example.\n\n";
       welcome += "/ledon : to switch the Led ON\n";
       welcome += "/ledon : to switch the Led ON\n";
