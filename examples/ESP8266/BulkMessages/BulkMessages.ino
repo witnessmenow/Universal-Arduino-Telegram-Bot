@@ -43,7 +43,13 @@ void handleNewMessages(int numNewMessages) {
 
     if (text == "/start") {
       if (addSubscribedUser(chat_id, from_name)) {
-        bot.sendMessage(chat_id, "Welcome to BulkMessages example, " + from_name, "");
+        String welcome = "Welcome to Universal Arduino Telegram Bot library, " + from_name + ".\n";
+        welcome += "This is Bulk Messages example.\n\n";
+        welcome += "/showallusers : show all subscribed users\n";
+        welcome += "/testbulkmessage : send test message to subscribed users\n";
+        welcome += "/removeallusers : remove all subscribed users\n";
+        welcome += "/stop : unsubscribe from bot\n";
+        bot.sendMessage(chat_id, welcome, "Markdown");
       } else {
         bot.sendMessage(chat_id, "Something wrong, please try again (later?)", "");
       }
@@ -61,7 +67,7 @@ void handleNewMessages(int numNewMessages) {
       sendMessageToAllSubscribedUsers("ATTENTION, this is bulk message for all subscribed users!");
     }
 
-    if (text == "\/showallusers") {
+    if (text == "/showallusers") {
       File subscribedUsersFile = SPIFFS.open("/"+subscribed_users_filename, "r");
 
       if (!subscribedUsersFile) {
@@ -78,7 +84,7 @@ void handleNewMessages(int numNewMessages) {
       }
     }
 
-    if (text == "\/removeallusers") {
+    if (text == "/removeallusers") {
       if (SPIFFS.remove("/"+subscribed_users_filename)) {
         bot.sendMessage(chat_id, "All users removed", "");
       } else {
@@ -180,7 +186,7 @@ void sendMessageToAllSubscribedUsers(String message) {
 }
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   if (!SPIFFS.begin()) {
     Serial.println("Failed to mount file system");
