@@ -29,7 +29,8 @@ int ledStatus = 0;
 void handleNewMessages(int numNewMessages) {
   Serial.println("handleNewMessages");
   Serial.println(String(numNewMessages));
-  for(int i=0; i<numNewMessages; i++) {
+
+  for (int i=0; i<numNewMessages; i++) {
     String chat_id = String(bot.messages[i].chat_id);
     String text = bot.messages[i].text;
 
@@ -41,11 +42,13 @@ void handleNewMessages(int numNewMessages) {
       ledStatus = 1;
       bot.sendMessage(chat_id, "Led is ON", "");
     }
+
     if (text == "/ledoff") {
       ledStatus = 0;
       digitalWrite(ledPin, LOW);    // turn the LED off (LOW is the voltage level)
       bot.sendMessage(chat_id, "Led is OFF", "");
     }
+
     if (text == "/status") {
       if(ledStatus){
         bot.sendMessage(chat_id, "Led is ON", "");
@@ -53,11 +56,13 @@ void handleNewMessages(int numNewMessages) {
         bot.sendMessage(chat_id, "Led is OFF", "");
       }
     }
+
     if (text == "/start") {
-      String welcome = "Welcome, " + from_name + ", from FlashLedBot, your personal Bot on ESP8266\n";
-      welcome = welcome + "/ledon : to switch the Led ON\n";
-      welcome = welcome + "/ledoff : to switch the Led OFF\n";
-      welcome = welcome + "/status : Returns current status of LED\n";
+      String welcome = "Welcome to Universal Arduino Telegram Bot library, " + from_name + ".\n";
+      welcome += "This is Flash Led Bot example.\n\n";
+      welcome += "/ledon : to switch the Led ON\n";
+      welcome += "/ledoff : to switch the Led OFF\n";
+      welcome += "/status : Returns current status of LED\n";
       bot.sendMessage(chat_id, welcome, "Markdown");
     }
   }
@@ -77,31 +82,32 @@ void setup() {
   Serial.print("Connecting Wifi: ");
   Serial.println(ssid);
   WiFi.begin(ssid, password);
+
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print(".");
     delay(500);
   }
+
   Serial.println("");
   Serial.println("WiFi connected");
-  Serial.println("IP address: ");
-  IPAddress ip = WiFi.localIP();
-  Serial.println(ip);
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
 
   pinMode(ledPin, OUTPUT); // initialize digital ledPin as an output.
   delay(10);
   digitalWrite(ledPin, LOW); // initialize pin as off
-
 }
 
 void loop() {
-
   if (millis() > Bot_lasttime + Bot_mtbs)  {
     int numNewMessages = bot.getUpdates(bot.last_message_received + 1);
+
     while(numNewMessages) {
       Serial.println("got response");
       handleNewMessages(numNewMessages);
       numNewMessages = bot.getUpdates(bot.last_message_received + 1);
     }
+
     Bot_lasttime = millis();
   }
 }
