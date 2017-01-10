@@ -31,7 +31,9 @@ void handleNewMessages(int numNewMessages) {
   for (int i=0; i<numNewMessages; i++) {
     String chat_id = String(bot.messages[i].chat_id);
     String text = bot.messages[i].text;
+
     String from_name = bot.messages[i].from_name;
+    if (from_name == "") from_name = "Guest";
 
     if (text == "/ledon") {
       digitalWrite(ledPin, HIGH);   // turn the LED on (HIGH is the voltage level)

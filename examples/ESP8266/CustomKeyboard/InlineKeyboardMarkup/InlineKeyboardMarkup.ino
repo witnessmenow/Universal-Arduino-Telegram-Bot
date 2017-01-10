@@ -28,7 +28,9 @@ void handleNewMessages(int numNewMessages) {
   for (int i=0; i<numNewMessages; i++) {
     String chat_id = String(bot.messages[i].chat_id);
     String text = bot.messages[i].text;
+
     String from_name = bot.messages[i].from_name;
+    if (from_name == "") from_name = "Guest";
 
     if (text == "/options") {
       String keyboardJson = "[[\{ \"text\" : \"Go to Google\", \"url\" : \"https://www.google.com\" \} ]]";

@@ -32,6 +32,10 @@ void handleNewMessages(int numNewMessages) {
   for(int i=0; i<numNewMessages; i++) {
     String chat_id = String(bot.messages[i].chat_id);
     String text = bot.messages[i].text;
+
+    String from_name = bot.messages[i].from_name;
+    if (from_name == "") from_name = "Guest";
+
     if (text == "/ledon") {
       digitalWrite(ledPin, HIGH);   // turn the LED on (HIGH is the voltage level)
       ledStatus = 1;
@@ -50,9 +54,6 @@ void handleNewMessages(int numNewMessages) {
       }
     }
     if (text == "/start") {
-      String from_name = bot.messages[i].from_name;
-      if (from_name == "") from_name = "Anonymous";
-
       String welcome = "Welcome, " + from_name + ", from FlashLedBot, your personal Bot on ESP8266\n";
       welcome = welcome + "/ledon : to switch the Led ON\n";
       welcome = welcome + "/ledoff : to switch the Led OFF\n";
