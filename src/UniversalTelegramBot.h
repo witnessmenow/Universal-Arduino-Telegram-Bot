@@ -34,6 +34,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #define SSL_PORT 443
 #define HANDLE_MESSAGES 1
 
+typedef bool (*MoreDataAvailable)();
+typedef byte (*GetNextByte)();
+
 struct telegramMessage{
   String text;
   String chat_id;
@@ -49,7 +52,7 @@ class UniversalTelegramBot
     UniversalTelegramBot (String token, Client &client);
     String sendGetToTelegram(String command);
     String sendPostToTelegram(String command, JsonObject& payload);
-    String sendImageFromFileToTelegram(File* file, String chat_id);
+    String sendImageFromFileToTelegram(String chat_id, int fileSize, MoreDataAvailable moreDataAvailableCallback, GetNextByte getNextByteCallback);
     bool getMe();
     bool sendSimpleMessage(String chat_id, String text, String parse_mode);
     bool sendMessage(String chat_id, String text, String parse_mode);

@@ -119,7 +119,7 @@ String UniversalTelegramBot::sendPostToTelegram(String command, JsonObject& payl
   return response;
 }
 
-String UniversalTelegramBot::sendImageFromFileToTelegram(File* file, String chat_id){
+String UniversalTelegramBot::sendImageFromFileToTelegram(String chat_id, int fileSize, MoreDataAvailable moreDataAvailableCallback, GetNextByte getNextByteCallback){
 
   Serial.println("sendImageFromFileToTelegram");
   String response = "";
@@ -153,7 +153,7 @@ String UniversalTelegramBot::sendImageFromFileToTelegram(File* file, String chat
     client->println("User-Agent: arduino/1.0");
     client->println("Accept: */*");
 
-    int contentLength = file->size() + start_request.length() + end_request.length();
+    int contentLength = fileSize + start_request.length() + end_request.length();
     Serial.println("Content-Length: " + String(contentLength));
     client->print("Content-Length: "); client->println(String(contentLength));
     client->println("Content-Type: multipart/form-data; boundary=" + boundry);
@@ -163,11 +163,11 @@ String UniversalTelegramBot::sendImageFromFileToTelegram(File* file, String chat
     Serial.print(start_request);
 
     Serial.println("Sending....");
-    char buffer[512];
+    byte buffer[512];
     int count = 0;
     char ch;
-    while (file->available()) {
-      buffer[count] = file->read();
+    while (moreDataAvailableCallback()) {
+      buffer[count] = getNextByteCallback();
       //client->write(ch);
       //Serial.write(ch);
       count++;

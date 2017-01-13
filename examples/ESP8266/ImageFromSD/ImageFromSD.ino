@@ -13,11 +13,14 @@
 #include <SPI.h>
 #include <SD.h>
 
+bool isMoreDataAvailable();
+byte getNextByte();
 
 // Initialize Wifi connection to the router
 char ssid[] = "xxxxxxxxxxxxxxxxxxxxxx";              // your network SSID (name)
 char password[] = "yyyyyyyy";                              // your network key
 
+File myFile;
 
 // Initialize Telegram BOT
 #define BOTtoken "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  // your Bot Token (Get from Botfather)
@@ -65,6 +68,14 @@ void setup() {
 
 }
 
+bool isMoreDataAvailable(){
+  return myFile.available();
+}
+
+byte getNextByte(){
+  return myFile.read();
+}
+
 void loop() {
 
   if (millis() > Bot_lasttime + Bot_mtbs)  {
@@ -76,11 +87,11 @@ void loop() {
       JsonObject& payload = jsonBuffer.createObject();
       payload["chat_id"] = bot.messages[0].chat_id;
 
-      File myFile = SD.open("box.jpg");
+      myFile = SD.open("box.jpg");
       if (myFile) {
         Serial.println("box.jpg:");
 
-        bot.sendImageFromFileToTelegram(&myFile, bot.messages[0].chat_id);
+        bot.sendImageFromFileToTelegram(bot.messages[0].chat_id, myFile.size(), isMoreDataAvailable, getNextByte);
         // close the file:
         myFile.close();
         } else {
