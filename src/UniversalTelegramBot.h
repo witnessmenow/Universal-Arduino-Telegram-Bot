@@ -20,7 +20,6 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
-
 #ifndef UniversalTelegramBot_h
 #define UniversalTelegramBot_h
 
@@ -57,6 +56,8 @@ class UniversalTelegramBot
     bool sendMessageWithReplyKeyboard(String chat_id, String text,
         String parse_mode, String keyboard, bool resize = false,
         bool oneTime = false, bool selective = false);
+    bool sendMessageWithInlineKeyboard(String chat_id, String text,
+        String parse_mode, String keyboard);
     bool sendPostMessage(JsonObject& payload);
     int getUpdates(long offset);
     telegramMessage messages[HANDLE_MESSAGES];

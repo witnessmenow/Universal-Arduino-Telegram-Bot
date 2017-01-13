@@ -1,9 +1,8 @@
 /*******************************************************************
- *  An example of bot that receives commands and turns on and off  *
- *  an LED.                                                        *
+ *  An example of how to use a custom reply keyboard markup.       *
  *                                                                 *
- *  written by Giacarlo Bacchio (Gianbacchio on Github)            *
- *  adapted by Brian Lough                                         *
+ *                                                                 *
+ *  written by Brian Lough                                         *
  *******************************************************************/
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
@@ -21,7 +20,6 @@ UniversalTelegramBot bot(BOTtoken, client);
 
 int Bot_mtbs = 1000; //mean time between scan messages
 long Bot_lasttime;   //last time messages' scan has been done
-bool Start = false;
 
 const int ledPin = 13;
 int ledStatus = 0;
@@ -57,23 +55,28 @@ void handleNewMessages(int numNewMessages) {
       }
     }
 
+    if (text == "/options") {
+      String keyboardJson = "[[\"/ledon\", \"/ledoff\"],[\"/status\"]]";
+      bot.sendMessageWithReplyKeyboard(chat_id, "Choose from one of the following options", "", keyboardJson, true);
+    }
+
     if (text == "/start") {
       String welcome = "Welcome to Universal Arduino Telegram Bot library, " + from_name + ".\n";
-      welcome += "This is Flash Led Bot example.\n\n";
+      welcome += "This is Reply Keyboard Markup example.\n\n";
+      welcome += "/ledon : to switch the Led ON\n";
       welcome += "/ledon : to switch the Led ON\n";
       welcome += "/ledoff : to switch the Led OFF\n";
       welcome += "/status : Returns current status of LED\n";
+      welcome += "/options : returns the reply keyboard\n";
       bot.sendMessage(chat_id, welcome, "Markdown");
     }
   }
 }
 
-
 void setup() {
   Serial.begin(115200);
 
-  // Set WiFi to station mode and disconnect from an AP if it was Previously
-  // connected
+  // Set WiFi to station mode and disconnect from an AP if it was Previously connected
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
   delay(100);
@@ -95,7 +98,7 @@ void setup() {
 
   pinMode(ledPin, OUTPUT); // initialize digital ledPin as an output.
   delay(10);
-  digitalWrite(ledPin, LOW); // initialize pin as off
+  digitalWrite(ledPin, HIGH); // initialize pin as off
 }
 
 void loop() {
