@@ -20,7 +20,6 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
-
 #ifndef UniversalTelegramBot_h
 #define UniversalTelegramBot_h
 
@@ -31,9 +30,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #include <SD.h>
 
 #define HOST "api.telegram.org"
-#define HOST2 "posttestserver.com"
 #define SSL_PORT 443
 #define HANDLE_MESSAGES 1
+
+typedef bool (*MoreDataAvailable)();
+typedef byte (*GetNextByte)();
 
 struct telegramMessage{
   String text;
@@ -50,14 +51,24 @@ class UniversalTelegramBot
     UniversalTelegramBot (String token, Client &client);
     String sendGetToTelegram(String command);
     String sendPostToTelegram(String command, JsonObject& payload);
-    String sendImageFromFileToTelegram(File* file, String chat_id);
+    String sendMultipartFormDataToTelegram(String command, String binaryProperyName,
+        String fileName, String contentType,
+        String chat_id, int fileSize,
+        MoreDataAvailable moreDataAvailableCallback,
+        GetNextByte getNextByteCallback);
+
     bool getMe();
     bool sendSimpleMessage(String chat_id, String text, String parse_mode);
     bool sendMessage(String chat_id, String text, String parse_mode);
     bool sendMessageWithReplyKeyboard(String chat_id, String text,
         String parse_mode, String keyboard, bool resize = false,
         bool oneTime = false, bool selective = false);
+    bool sendMessageWithInlineKeyboard(String chat_id, String text,
+        String parse_mode, String keyboard);
     bool sendPostMessage(JsonObject& payload);
+    bool sendImage(String chat_id, String contentType, int fileSize,
+        MoreDataAvailable moreDataAvailableCallback,
+        GetNextByte getNextByteCallback);
     int getUpdates(long offset);
     telegramMessage messages[HANDLE_MESSAGES];
     long last_message_received;
