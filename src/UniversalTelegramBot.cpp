@@ -431,6 +431,27 @@ bool UniversalTelegramBot::sendPostMessage(JsonObject& payload)  {
   return sent;
 }
 
+bool UniversalTelegramBot::sendPostPhoto(JsonObject& payload)  {
+
+  bool sent=false;
+  if (_debug) Serial.println("SEND Post Photo");
+  long sttime=millis();
+
+  if (payload.containsKey("photo")) {
+    while (millis() < sttime+8000) { // loop for a while to send the message
+      String command = "bot"+_token+"/sendPhoto";
+      String response = sendPostToTelegram(command, payload);
+      if (_debug) Serial.println(response);
+      sent = checkForOkResponse(response);
+      if (sent) {
+        break;
+      }
+    }
+  }
+
+  return sent;
+}
+
 bool UniversalTelegramBot::sendImage(String chat_id, String contentType, int fileSize,
     MoreDataAvailable moreDataAvailableCallback,
     GetNextByte getNextByteCallback) {
@@ -444,6 +465,36 @@ bool UniversalTelegramBot::sendImage(String chat_id, String contentType, int fil
   if (_debug) Serial.println(response);
 
   return checkForOkResponse(response);
+}
+
+bool UniversalTelegramBot::sendImageAsURL(String chat_id, String URL, String caption, bool disable_notification, int reply_to_message_id, String keyboard) {
+
+  DynamicJsonBuffer jsonBuffer;
+  JsonObject& payload = jsonBuffer.createObject();
+
+  payload["chat_id"] = chat_id;
+  payload["photo"] = URL;
+
+  if (caption) {
+    payload["caption"] = caption;
+  }
+
+  if (disable_notification) {
+    payload["disable_notification"] = disable_notification;
+  }
+
+  if (reply_to_message_id && reply_to_message_id != 0) {
+    payload["reply_to_message_id"] = reply_to_message_id;
+  }
+
+  if (keyboard) {
+    JsonObject& replyMarkup = payload.createNestedObject("reply_markup");
+
+    DynamicJsonBuffer keyboardBuffer;
+    replyMarkup["keyboard"] = keyboardBuffer.parseArray(keyboard);
+  }
+
+  return sendPostPhoto(payload);
 }
 
 bool UniversalTelegramBot::checkForOkResponse(String response) {
