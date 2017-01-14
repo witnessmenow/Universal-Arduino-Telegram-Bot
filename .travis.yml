@@ -15,6 +15,7 @@ env:
     - SCRIPT=platformioSingle EXAMPLE_FOLDER=FlashledBot EXAMPLE_FILE=FlashledBot BOARDTYPE=ESP8266 BOARD=d1_mini
     - SCRIPT=platformioSingle EXAMPLE_FOLDER=UsingWiFiManager EXAMPLE_FILE=UsingWiFiManager BOARDTYPE=ESP8266 BOARD=d1_mini
     - SCRIPT=platformioSingle EXAMPLE_FOLDER=BulkMessages EXAMPLE_FILE=BulkMessages BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE_FOLDER=SendPhoto/ImageFromSD EXAMPLE_FILE=ImageFromSD BOARDTYPE=ESP8266 BOARD=d1_mini
 
     # This will run all the ESP8266 examples
     #- SCRIPT=platformioEsp8266 BOARD=d1_mini

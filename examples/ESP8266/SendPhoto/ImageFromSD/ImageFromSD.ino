@@ -83,16 +83,24 @@ void loop() {
     while(numNewMessages) {
       Serial.println("got response");
 
-      DynamicJsonBuffer jsonBuffer;
-      JsonObject& payload = jsonBuffer.createObject();
-      payload["chat_id"] = bot.messages[0].chat_id;
+
+      String chat_id = bot.messages[0].chat_id;
 
       myFile = SD.open("box.jpg");
       if (myFile) {
         Serial.println("box.jpg:");
 
-        bot.sendImageFromFileToTelegram(bot.messages[0].chat_id, myFile.size(), isMoreDataAvailable, getNextByte);
-        // close the file:
+        //Content type for PNG image/png
+        bool sent = bot.sendImage(chat_id, "image/jpeg", myFile.size(),
+            isMoreDataAvailable,
+            getNextByte);
+
+        if(sent){
+          Serial.println("Succesfully sent image");
+        } else {
+          Serial.println("Error sending image");
+        }
+
         myFile.close();
         } else {
           // if the file didn't open, print an error:

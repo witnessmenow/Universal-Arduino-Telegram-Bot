@@ -119,17 +119,19 @@ String UniversalTelegramBot::sendPostToTelegram(String command, JsonObject& payl
   return response;
 }
 
-String UniversalTelegramBot::sendImageFromFileToTelegram(String chat_id, int fileSize, MoreDataAvailable moreDataAvailableCallback, GetNextByte getNextByteCallback){
+String UniversalTelegramBot::sendMultipartFormDataToTelegram(String command, String binaryProperyName,
+    String fileName, String contentType,
+    String chat_id, int fileSize,
+    MoreDataAvailable moreDataAvailableCallback,
+    GetNextByte getNextByteCallback) {
 
-  Serial.println("sendImageFromFileToTelegram");
   String response = "";
 	long now;
 	bool responseRecieved;
   String boundry = "------------------------b8f610217e83e29b";
 	// Connect with api.telegram.org
   if (client->connect(HOST, SSL_PORT)) {
-    Serial.println("connected");
-    // POST URI
+
     String start_request = "";
     String end_request = "";
 
@@ -139,30 +141,30 @@ String UniversalTelegramBot::sendImageFromFileToTelegram(String chat_id, int fil
     start_request = start_request + chat_id + "\r\n";
 
     start_request = start_request + "--" + boundry + "\r\n";
-    start_request = start_request + "content-disposition: form-data; name=\"photo\"; filename=\"img.jpg\"" + "\r\n";
-    start_request = start_request + "Content-Type: image/jpeg" + "\r\n";
+    start_request = start_request + "content-disposition: form-data; name=\"" + binaryProperyName + "\"; filename=\"" + fileName + "\"" + "\r\n";
+    start_request = start_request + "Content-Type: " + contentType + "\r\n";
     start_request = start_request + "\r\n";
 
 
     end_request = end_request + "\r\n";
     end_request = end_request + "--" + boundry + "--" + "\r\n";
 
-    client->print("POST /bot"+_token+"/sendPhoto"); client->println(" HTTP/1.1");
+    client->print("POST /bot"+_token+"/" + command); client->println(" HTTP/1.1");
     // Host header
     client->print("Host: "); client->println(HOST);
     client->println("User-Agent: arduino/1.0");
     client->println("Accept: */*");
 
     int contentLength = fileSize + start_request.length() + end_request.length();
-    Serial.println("Content-Length: " + String(contentLength));
+    if (_debug) Serial.println("Content-Length: " + String(contentLength));
     client->print("Content-Length: "); client->println(String(contentLength));
     client->println("Content-Type: multipart/form-data; boundary=" + boundry);
     client->println("");
 
     client->print(start_request);
-    Serial.print(start_request);
 
-    Serial.println("Sending....");
+    if (_debug) Serial.print(start_request);
+
     byte buffer[512];
     int count = 0;
     char ch;
@@ -173,22 +175,24 @@ String UniversalTelegramBot::sendImageFromFileToTelegram(String chat_id, int fil
       count++;
       if(count == 512){
         //yield();
-        Serial.println("Sending full buffer");
+        if (_debug) {
+          Serial.println("Sending full buffer");
+        }
         client->write((const uint8_t *)buffer, 512);
         count = 0;
       }
     }
 
     if(count > 0) {
-      Serial.println("Sending remaining buffer");
+      if (_debug) {
+        Serial.println("Sending remaining buffer");
+      }
       client->write((const uint8_t *)buffer, count);
     }
 
     client->print(end_request);
-    Serial.print(end_request);
+    if (_debug) Serial.print(end_request);
 
-
-    Serial.println("Done");
     count = 0;
     int ch_count=0;
     char c;
@@ -205,9 +209,11 @@ String UniversalTelegramBot::sendImageFromFileToTelegram(String chat_id, int fil
 				responseRecieved=true;
 			}
 			if (responseRecieved) {
-				Serial.println();
-				Serial.println(response);
-				Serial.println();
+        if (_debug) {
+  				Serial.println();
+  				Serial.println(response);
+  				Serial.println();
+        }
 				break;
 			}
 		}
@@ -423,6 +429,21 @@ bool UniversalTelegramBot::sendPostMessage(JsonObject& payload)  {
   }
 
   return sent;
+}
+
+bool UniversalTelegramBot::sendImage(String chat_id, String contentType, int fileSize,
+    MoreDataAvailable moreDataAvailableCallback,
+    GetNextByte getNextByteCallback) {
+
+  if (_debug) Serial.println("SEND Photo");
+
+  String response = sendMultipartFormDataToTelegram("sendPhoto", "photo", "img.jpg",
+    contentType, chat_id, fileSize,
+    moreDataAvailableCallback, getNextByteCallback);
+
+  if (_debug) Serial.println(response);
+
+  return checkForOkResponse(response);
 }
 
 bool UniversalTelegramBot::checkForOkResponse(String response) {
