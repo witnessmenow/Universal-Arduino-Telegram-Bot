@@ -67,7 +67,8 @@ String UniversalTelegramBot::sendGetToTelegram(String command) {
 
 String UniversalTelegramBot::sendPostToTelegram(String command, JsonObject& payload){
 
-  String response = "";
+  String body = "";
+  String headers = "";
 	long now;
 	bool responseReceived;
 
@@ -95,28 +96,171 @@ String UniversalTelegramBot::sendPostToTelegram(String command, JsonObject& payl
     char c;
     now=millis();
 		responseReceived=false;
+    bool finishedHeaders = false;
+    bool currentLineIsBlank = true;
 		while (millis()-now<1500) {
 			while (client->available()) {
 				char c = client->read();
-				//Serial.write(c);
-				if (ch_count < maxMessageLength)  {
-					response=response+c;
-					ch_count++;
-				}
 				responseReceived=true;
+
+
+        if(!finishedHeaders){
+          if (currentLineIsBlank && c == '\n') {
+            finishedHeaders = true;
+          }
+          else {
+            headers = headers + c;
+          }
+        } else {
+          if (ch_count < maxMessageLength) {
+            body=body+c;
+            ch_count++;
+  				}
+        }
+
+        if (c == '\n') {
+          currentLineIsBlank = true;
+        }else if (c != '\r') {
+          currentLineIsBlank = false;
+        }
+
 			}
-			if (responseReceived) {
+
+      if (responseReceived) {
         if (_debug) {
           Serial.println();
-          Serial.println(response);
+          Serial.println(body);
           Serial.println();
         }
-				break;
-			}
+  			break;
+  		}
 		}
   }
 
-  return response;
+  return body;
+}
+
+String UniversalTelegramBot::sendMultipartFormDataToTelegram(String command, String binaryProperyName,
+    String fileName, String contentType,
+    String chat_id, int fileSize,
+    MoreDataAvailable moreDataAvailableCallback,
+    GetNextByte getNextByteCallback) {
+
+  String body = "";
+  String headers = "";
+	long now;
+	bool responseReceived;
+  String boundry = "------------------------b8f610217e83e29b";
+	// Connect with api.telegram.org
+  if (client->connect(HOST, SSL_PORT)) {
+
+    String start_request = "";
+    String end_request = "";
+
+    start_request = start_request + "--" + boundry + "\r\n";
+    start_request = start_request + "content-disposition: form-data; name=\"chat_id\"" + "\r\n";
+    start_request = start_request + "\r\n";
+    start_request = start_request + chat_id + "\r\n";
+
+    start_request = start_request + "--" + boundry + "\r\n";
+    start_request = start_request + "content-disposition: form-data; name=\"" + binaryProperyName + "\"; filename=\"" + fileName + "\"" + "\r\n";
+    start_request = start_request + "Content-Type: " + contentType + "\r\n";
+    start_request = start_request + "\r\n";
+
+
+    end_request = end_request + "\r\n";
+    end_request = end_request + "--" + boundry + "--" + "\r\n";
+
+    client->print("POST /bot"+_token+"/" + command); client->println(" HTTP/1.1");
+    // Host header
+    client->print("Host: "); client->println(HOST);
+    client->println("User-Agent: arduino/1.0");
+    client->println("Accept: */*");
+
+    int contentLength = fileSize + start_request.length() + end_request.length();
+    if (_debug) Serial.println("Content-Length: " + String(contentLength));
+    client->print("Content-Length: "); client->println(String(contentLength));
+    client->println("Content-Type: multipart/form-data; boundary=" + boundry);
+    client->println("");
+
+    client->print(start_request);
+
+    if (_debug) Serial.print(start_request);
+
+    byte buffer[512];
+    int count = 0;
+    char ch;
+    while (moreDataAvailableCallback()) {
+      buffer[count] = getNextByteCallback();
+      //client->write(ch);
+      //Serial.write(ch);
+      count++;
+      if(count == 512){
+        //yield();
+        if (_debug) {
+          Serial.println("Sending full buffer");
+        }
+        client->write((const uint8_t *)buffer, 512);
+        count = 0;
+      }
+    }
+
+    if(count > 0) {
+      if (_debug) {
+        Serial.println("Sending remaining buffer");
+      }
+      client->write((const uint8_t *)buffer, count);
+    }
+
+    client->print(end_request);
+    if (_debug) Serial.print(end_request);
+
+    count = 0;
+    int ch_count=0;
+    char c;
+    now=millis();
+    bool finishedHeaders = false;
+    bool currentLineIsBlank = true;
+    while (millis()-now<1500) {
+      while (client->available()) {
+        char c = client->read();
+        responseReceived=true;
+
+
+        if(!finishedHeaders){
+          if (currentLineIsBlank && c == '\n') {
+            finishedHeaders = true;
+          }
+          else {
+            headers = headers + c;
+          }
+        } else {
+          if (ch_count < maxMessageLength) {
+            body=body+c;
+            ch_count++;
+          }
+        }
+
+        if (c == '\n') {
+          currentLineIsBlank = true;
+        }else if (c != '\r') {
+          currentLineIsBlank = false;
+        }
+
+      }
+
+      if (responseReceived) {
+        if (_debug) {
+          Serial.println();
+          Serial.println(body);
+          Serial.println();
+        }
+        break;
+      }
+    }
+  }
+
+  return body;
 }
 
 bool UniversalTelegramBot::getMe() {
@@ -326,6 +470,93 @@ bool UniversalTelegramBot::sendPostMessage(JsonObject& payload)  {
   }
 
   return sent;
+}
+
+String UniversalTelegramBot::sendPostPhoto(JsonObject& payload)  {
+
+  bool sent=false;
+  String response = "";
+  if (_debug) Serial.println("SEND Post Photo");
+  long sttime=millis();
+
+  if (payload.containsKey("photo")) {
+    while (millis() < sttime+8000) { // loop for a while to send the message
+      String command = "bot"+_token+"/sendPhoto";
+      response = sendPostToTelegram(command, payload);
+      if (_debug) Serial.println(response);
+      sent = checkForOkResponse(response);
+      if (sent) {
+        break;
+      }
+    }
+  }
+
+  if(sent)
+  {
+    return extractFileIdFromResponse(response);
+  }
+
+  return "";
+}
+
+String UniversalTelegramBot::sendPhotoByBinary(String chat_id, String contentType, int fileSize,
+    MoreDataAvailable moreDataAvailableCallback,
+    GetNextByte getNextByteCallback) {
+
+  if (_debug) Serial.println("SEND Photo");
+
+  String response = sendMultipartFormDataToTelegram("sendPhoto", "photo", "img.jpg",
+    contentType, chat_id, fileSize,
+    moreDataAvailableCallback, getNextByteCallback);
+
+  if (_debug) Serial.println(response);
+
+  if(checkForOkResponse(response))
+  {
+    return extractFileIdFromResponse(response);
+  }
+
+  return "";
+}
+
+String UniversalTelegramBot::sendPhoto(String chat_id, String photo, String caption, bool disable_notification, int reply_to_message_id, String keyboard) {
+
+  DynamicJsonBuffer jsonBuffer;
+  JsonObject& payload = jsonBuffer.createObject();
+
+  payload["chat_id"] = chat_id;
+  payload["photo"] = photo;
+
+  if (caption) {
+    payload["caption"] = caption;
+  }
+
+  if (disable_notification) {
+    payload["disable_notification"] = disable_notification;
+  }
+
+  if (reply_to_message_id && reply_to_message_id != 0) {
+    payload["reply_to_message_id"] = reply_to_message_id;
+  }
+
+  if (keyboard) {
+    JsonObject& replyMarkup = payload.createNestedObject("reply_markup");
+
+    DynamicJsonBuffer keyboardBuffer;
+    replyMarkup["keyboard"] = keyboardBuffer.parseArray(keyboard);
+  }
+
+  return sendPostPhoto(payload);
+}
+
+String UniversalTelegramBot::extractFileIdFromResponse(String response) {
+  int indexOfFileId = response.lastIndexOf("\"file_id\":\"");
+  if(indexOfFileId > -1){
+    // 11 is the length of "file_id":""
+    // 55 is the length of the file_id
+    return response.substring(indexOfFileId + 11, indexOfFileId + 11 + 55);
+  }
+  return "";
 }
 
 bool UniversalTelegramBot::checkForOkResponse(String response) {
