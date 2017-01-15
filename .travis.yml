@@ -9,12 +9,12 @@ cache:
         - "~/.platformio"
 
 env:
-    - SCRIPT=platformioSingle EXAMPLE_NAME=EchoBot BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE_NAME=EchoBot EXAMPLE_FOLDER= BOARDTYPE=ESP8266 BOARD=d1_mini
     - SCRIPT=platformioSingle EXAMPLE_NAME=ReplyKeyboardMarkup EXAMPLE_FOLDER=CustomKeyboard/ BOARDTYPE=ESP8266 BOARD=d1_mini
     - SCRIPT=platformioSingle EXAMPLE_NAME=InlineKeyboardMarkup EXAMPLE_FOLDER=CustomKeyboard/ BOARDTYPE=ESP8266 BOARD=d1_mini
-    - SCRIPT=platformioSingle EXAMPLE_NAME=FlashledBot BOARDTYPE=ESP8266 BOARD=d1_mini
-    - SCRIPT=platformioSingle EXAMPLE_NAME=UsingWiFiManager BOARDTYPE=ESP8266 BOARD=d1_mini
-    - SCRIPT=platformioSingle EXAMPLE_NAME=BulkMessages BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE_NAME=FlashledBot EXAMPLE_FOLDER= BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE_NAME=UsingWiFiManager EXAMPLE_FOLDER= BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE_NAME=BulkMessages EXAMPLE_FOLDER= BOARDTYPE=ESP8266 BOARD=d1_mini
     - SCRIPT=platformioSingle EXAMPLE_NAME=ImageFromSD EXAMPLE_FOLDER=SendPhoto/ EXAMPLE_NAME=ImageFromSD BOARDTYPE=ESP8266 BOARD=d1_mini
     - SCRIPT=platformioSingle EXAMPLE_NAME=ImageFromURL EXAMPLE_FOLDER=SendPhoto/ BOARDTYPE=ESP8266 BOARD=d1_mini
     - SCRIPT=platformioSingle EXAMPLE_NAME=ImageFromURL EXAMPLE_FOLDER=SendPhoto/ BOARDTYPE=ESP8266 BOARD=d1_mini
