@@ -70,7 +70,7 @@ class UniversalTelegramBot
     String sendPhotoByBinary(String chat_id, String contentType, int fileSize,
         MoreDataAvailable moreDataAvailableCallback,
         GetNextByte getNextByteCallback);
-    String sendPhoto(String chat_id, String photo, String caption,
+    String sendPhoto(String chat_id, String photo, String caption = "",
         bool disable_notification = false, int reply_to_message_id = 0, String keyboard = "");
 
     int getUpdates(long offset);
