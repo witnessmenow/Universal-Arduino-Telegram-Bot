@@ -491,12 +491,7 @@ String UniversalTelegramBot::sendPostPhoto(JsonObject& payload)  {
     }
   }
 
-  if(sent)
-  {
-    return extractFileIdFromResponse(response);
-  }
-
-  return "";
+  return response;
 }
 
 String UniversalTelegramBot::sendPhotoByBinary(String chat_id, String contentType, int fileSize,
@@ -547,16 +542,6 @@ String UniversalTelegramBot::sendPhoto(String chat_id, String photo, String capt
   }
 
   return sendPostPhoto(payload);
-}
-
-String UniversalTelegramBot::extractFileIdFromResponse(String response) {
-  int indexOfFileId = response.lastIndexOf("\"file_id\":\"");
-  if(indexOfFileId > -1){
-    // 11 is the length of "file_id":""
-    // 55 is the length of the file_id
-    return response.substring(indexOfFileId + 11, indexOfFileId + 11 + 55);
-  }
-  return "";
 }
 
 bool UniversalTelegramBot::checkForOkResponse(String response) {

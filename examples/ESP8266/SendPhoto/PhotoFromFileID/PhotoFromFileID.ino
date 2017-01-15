@@ -7,6 +7,7 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
+#include <ArduinoJson.h>
 
 // Initialize Wifi connection to the router
 char ssid[] = "XXXXXX";     // your network SSID (name)
@@ -35,8 +36,18 @@ void handleNewMessages(int numNewMessages) {
     if (from_name == "") from_name = "Guest";
 
     if (text == "/get_test_photo") {
-      String file_id = bot.sendPhoto(chat_id, test_photo_url, "This photo was sent using URL");
-      bot.sendPhoto(chat_id, file_id, "This photo was sent using File ID");
+      String response = bot.sendPhoto(chat_id, test_photo_url, "This photo was sent using URL");
+
+      DynamicJsonBuffer jsonBuffer;
+      JsonObject& images = jsonBuffer.parseObject(response);
+
+      // There are 3 image sizes after Telegram has process photo
+      // You may choose what you want, in example was choosed bigger size
+      String file_id = images["result"]["photo"][2]["file_id"];
+
+      if (file_id) {
+        bot.sendPhoto(chat_id, file_id, "This photo was sent using File ID");
+      }
     }
 
     if (text == "/start") {
