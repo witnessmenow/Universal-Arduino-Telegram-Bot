@@ -66,11 +66,11 @@ class UniversalTelegramBot
         String parse_mode, String keyboard);
 
     bool sendPostMessage(JsonObject& payload);
-    bool sendPostPhoto(JsonObject& payload);
-    bool sendImage(String chat_id, String contentType, int fileSize,
+    String sendPostPhoto(JsonObject& payload);
+    String sendPhotoByBinary(String chat_id, String contentType, int fileSize,
         MoreDataAvailable moreDataAvailableCallback,
         GetNextByte getNextByteCallback);
-    bool sendImageAsURL(String chat_id, String URL, String caption,
+    String sendPhoto(String chat_id, String photo, String caption,
         bool disable_notification = false, int reply_to_message_id = 0, String keyboard = "");
 
     int getUpdates(long offset);
@@ -83,8 +83,9 @@ class UniversalTelegramBot
     //JsonObject * parseUpdates(String response);
     String _token;
     Client *client;
-    const int maxMessageLength = 1000;
+    const int maxMessageLength = 1300;
     bool checkForOkResponse(String response);
+    String extractFileIdFromResponse(String response);
     bool _debug = false;
 };
 

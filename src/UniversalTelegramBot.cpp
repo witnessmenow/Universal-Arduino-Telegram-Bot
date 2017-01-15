@@ -67,7 +67,8 @@ String UniversalTelegramBot::sendGetToTelegram(String command) {
 
 String UniversalTelegramBot::sendPostToTelegram(String command, JsonObject& payload){
 
-  String response = "";
+  String body = "";
+  String headers = "";
 	long now;
 	bool responseReceived;
 
@@ -95,28 +96,48 @@ String UniversalTelegramBot::sendPostToTelegram(String command, JsonObject& payl
     char c;
     now=millis();
 		responseReceived=false;
+    bool finishedHeaders = false;
+    bool currentLineIsBlank = true;
 		while (millis()-now<1500) {
 			while (client->available()) {
 				char c = client->read();
-				//Serial.write(c);
-				if (ch_count < maxMessageLength)  {
-					response=response+c;
-					ch_count++;
-				}
 				responseReceived=true;
+
+
+        if(!finishedHeaders){
+          if (currentLineIsBlank && c == '\n') {
+            finishedHeaders = true;
+          }
+          else {
+            headers = headers + c;
+          }
+        } else {
+          if (ch_count < maxMessageLength) {
+            body=body+c;
+            ch_count++;
+  				}
+        }
+
+        if (c == '\n') {
+          currentLineIsBlank = true;
+        }else if (c != '\r') {
+          currentLineIsBlank = false;
+        }
+
 			}
-			if (responseReceived) {
+
+      if (responseReceived) {
         if (_debug) {
           Serial.println();
-          Serial.println(response);
+          Serial.println(body);
           Serial.println();
         }
-				break;
-			}
+  			break;
+  		}
 		}
   }
 
-  return response;
+  return body;
 }
 
 String UniversalTelegramBot::sendMultipartFormDataToTelegram(String command, String binaryProperyName,
@@ -125,9 +146,10 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(String command, Str
     MoreDataAvailable moreDataAvailableCallback,
     GetNextByte getNextByteCallback) {
 
-  String response = "";
+  String body = "";
+  String headers = "";
 	long now;
-	bool responseRecieved;
+	bool responseReceived;
   String boundry = "------------------------b8f610217e83e29b";
 	// Connect with api.telegram.org
   if (client->connect(HOST, SSL_PORT)) {
@@ -197,29 +219,48 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(String command, Str
     int ch_count=0;
     char c;
     now=millis();
-		responseRecieved=false;
-		while (millis()-now<1500) {
-			while (client->available()) {
-				char c = client->read();
-				//Serial.write(c);
-				if (ch_count < maxMessageLength)  {
-					response=response+c;
-					ch_count++;
-				}
-				responseRecieved=true;
-			}
-			if (responseRecieved) {
-        if (_debug) {
-  				Serial.println();
-  				Serial.println(response);
-  				Serial.println();
+    bool finishedHeaders = false;
+    bool currentLineIsBlank = true;
+    while (millis()-now<1500) {
+      while (client->available()) {
+        char c = client->read();
+        responseReceived=true;
+
+
+        if(!finishedHeaders){
+          if (currentLineIsBlank && c == '\n') {
+            finishedHeaders = true;
+          }
+          else {
+            headers = headers + c;
+          }
+        } else {
+          if (ch_count < maxMessageLength) {
+            body=body+c;
+            ch_count++;
+          }
         }
-				break;
-			}
-		}
+
+        if (c == '\n') {
+          currentLineIsBlank = true;
+        }else if (c != '\r') {
+          currentLineIsBlank = false;
+        }
+
+      }
+
+      if (responseReceived) {
+        if (_debug) {
+          Serial.println();
+          Serial.println(body);
+          Serial.println();
+        }
+        break;
+      }
+    }
   }
 
-  return response;
+  return body;
 }
 
 bool UniversalTelegramBot::getMe() {
@@ -431,16 +472,17 @@ bool UniversalTelegramBot::sendPostMessage(JsonObject& payload)  {
   return sent;
 }
 
-bool UniversalTelegramBot::sendPostPhoto(JsonObject& payload)  {
+String UniversalTelegramBot::sendPostPhoto(JsonObject& payload)  {
 
   bool sent=false;
+  String response = "";
   if (_debug) Serial.println("SEND Post Photo");
   long sttime=millis();
 
   if (payload.containsKey("photo")) {
     while (millis() < sttime+8000) { // loop for a while to send the message
       String command = "bot"+_token+"/sendPhoto";
-      String response = sendPostToTelegram(command, payload);
+      response = sendPostToTelegram(command, payload);
       if (_debug) Serial.println(response);
       sent = checkForOkResponse(response);
       if (sent) {
@@ -449,10 +491,15 @@ bool UniversalTelegramBot::sendPostPhoto(JsonObject& payload)  {
     }
   }
 
-  return sent;
+  if(sent)
+  {
+    return extractFileIdFromResponse(response);
+  }
+
+  return "";
 }
 
-bool UniversalTelegramBot::sendImage(String chat_id, String contentType, int fileSize,
+String UniversalTelegramBot::sendPhotoByBinary(String chat_id, String contentType, int fileSize,
     MoreDataAvailable moreDataAvailableCallback,
     GetNextByte getNextByteCallback) {
 
@@ -464,16 +511,21 @@ bool UniversalTelegramBot::sendImage(String chat_id, String contentType, int fil
 
   if (_debug) Serial.println(response);
 
-  return checkForOkResponse(response);
+  if(checkForOkResponse(response))
+  {
+    return extractFileIdFromResponse(response);
+  }
+
+  return "";
 }
 
-bool UniversalTelegramBot::sendImageAsURL(String chat_id, String URL, String caption, bool disable_notification, int reply_to_message_id, String keyboard) {
+String UniversalTelegramBot::sendPhoto(String chat_id, String photo, String caption, bool disable_notification, int reply_to_message_id, String keyboard) {
 
   DynamicJsonBuffer jsonBuffer;
   JsonObject& payload = jsonBuffer.createObject();
 
   payload["chat_id"] = chat_id;
-  payload["photo"] = URL;
+  payload["photo"] = photo;
 
   if (caption) {
     payload["caption"] = caption;
@@ -495,6 +547,16 @@ bool UniversalTelegramBot::sendImageAsURL(String chat_id, String URL, String cap
   }
 
   return sendPostPhoto(payload);
+}
+
+String UniversalTelegramBot::extractFileIdFromResponse(String response) {
+  int indexOfFileId = response.lastIndexOf("\"file_id\":\"");
+  if(indexOfFileId > -1){
+    // 11 is the length of "file_id":""
+    // 55 is the length of the file_id
+    return response.substring(indexOfFileId + 11, indexOfFileId + 11 + 55);
+  }
+  return "";
 }
 
 bool UniversalTelegramBot::checkForOkResponse(String response) {

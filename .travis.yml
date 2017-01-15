@@ -9,17 +9,16 @@ cache:
         - "~/.platformio"
 
 env:
-    - SCRIPT=platformioSingle EXAMPLE_FOLDER=EchoBot EXAMPLE_FILE=EchoBot BOARDTYPE=ESP8266 BOARD=d1_mini
-    - SCRIPT=platformioSingle EXAMPLE_FOLDER=CustomKeyboard/ReplyKeyboardMarkup EXAMPLE_FILE=ReplyKeyboardMarkup BOARDTYPE=ESP8266 BOARD=d1_mini
-    - SCRIPT=platformioSingle EXAMPLE_FOLDER=CustomKeyboard/InlineKeyboardMarkup EXAMPLE_FILE=InlineKeyboardMarkup BOARDTYPE=ESP8266 BOARD=d1_mini
-    - SCRIPT=platformioSingle EXAMPLE_FOLDER=FlashledBot EXAMPLE_FILE=FlashledBot BOARDTYPE=ESP8266 BOARD=d1_mini
-    - SCRIPT=platformioSingle EXAMPLE_FOLDER=UsingWiFiManager EXAMPLE_FILE=UsingWiFiManager BOARDTYPE=ESP8266 BOARD=d1_mini
-    - SCRIPT=platformioSingle EXAMPLE_FOLDER=BulkMessages EXAMPLE_FILE=BulkMessages BOARDTYPE=ESP8266 BOARD=d1_mini
-    - SCRIPT=platformioSingle EXAMPLE_FOLDER=SendPhoto/ImageFromSD EXAMPLE_FILE=ImageFromSD BOARDTYPE=ESP8266 BOARD=d1_mini
-    - SCRIPT=platformioSingle EXAMPLE_FOLDER=SendPhoto/ImageFromURL EXAMPLE_FILE=ImageFromURL BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE_NAME=EchoBot BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE_NAME=ReplyKeyboardMarkup EXAMPLE_FOLDER=CustomKeyboard/ BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE_NAME=InlineKeyboardMarkup EXAMPLE_FOLDER=CustomKeyboard/ BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE_NAME=FlashledBot BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE_NAME=UsingWiFiManager BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE_NAME=BulkMessages BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE_NAME=ImageFromSD EXAMPLE_FOLDER=SendPhoto/ EXAMPLE_NAME=ImageFromSD BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE_NAME=ImageFromURL EXAMPLE_FOLDER=SendPhoto/ BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE_NAME=ImageFromURL EXAMPLE_FOLDER=SendPhoto/ BOARDTYPE=ESP8266 BOARD=d1_mini
 
-    # This will run all the ESP8266 examples
-    #- SCRIPT=platformioEsp8266 BOARD=d1_mini
 
 install:
     - pip install -U platformio

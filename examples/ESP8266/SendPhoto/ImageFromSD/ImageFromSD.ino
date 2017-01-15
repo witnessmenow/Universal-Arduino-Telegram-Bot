@@ -91,20 +91,20 @@ void loop() {
         Serial.println("box.jpg:");
 
         //Content type for PNG image/png
-        bool sent = bot.sendImage(chat_id, "image/jpeg", myFile.size(),
+        bool sent = bot.sendPhotoByBinary(chat_id, "image/jpeg", myFile.size(),
             isMoreDataAvailable,
             getNextByte);
 
         if(sent){
-          Serial.println("Succesfully sent image");
+          Serial.println("Succesfully sent photo");
         } else {
-          Serial.println("Error sending image");
+          Serial.println("Error sending photo");
         }
 
         myFile.close();
         } else {
           // if the file didn't open, print an error:
-          Serial.println("error opening image.jpg");
+          Serial.println("error opening photo.jpg");
       }
       numNewMessages = bot.getUpdates(bot.last_message_received + 1);
     }
