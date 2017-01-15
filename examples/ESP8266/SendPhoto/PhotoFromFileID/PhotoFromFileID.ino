@@ -35,14 +35,14 @@ void handleNewMessages(int numNewMessages) {
     if (from_name == "") from_name = "Guest";
 
     if (text == "/get_test_photo") {
-      bot.sendPhoto(chat_id, test_photo_url, "Caption is optional, you may not use photo caption");
+      String file_id = bot.sendPhoto(chat_id, test_photo_url, "This photo was sent using URL");
+      bot.sendPhoto(chat_id, file_id, "This photo was sent using File ID");
     }
 
     if (text == "/start") {
       String welcome = "Welcome to Universal Arduino Telegram Bot library, " + from_name + ".\n";
-      welcome += "This is Send Image From URL example.\n\n";
+      welcome += "This is Send Photo From File ID example.\n\n";
       welcome += "/get_test_photo : getting test photo\n";
-      //welcome += "You will receive photo from " + test_photo_url + "\n";
 
       bot.sendMessage(chat_id, welcome, "");
     }
