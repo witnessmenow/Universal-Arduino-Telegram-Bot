@@ -27,8 +27,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #include <ArduinoJson.h>
 #include <Client.h>
 
-#include <SD.h>
-
 #define HOST "api.telegram.org"
 #define SSL_PORT 443
 #define HANDLE_MESSAGES 1
@@ -58,6 +56,7 @@ class UniversalTelegramBot
         GetNextByte getNextByteCallback);
 
     bool getMe();
+
     bool sendSimpleMessage(String chat_id, String text, String parse_mode);
     bool sendMessage(String chat_id, String text, String parse_mode);
     bool sendMessageWithReplyKeyboard(String chat_id, String text,
@@ -65,10 +64,15 @@ class UniversalTelegramBot
         bool oneTime = false, bool selective = false);
     bool sendMessageWithInlineKeyboard(String chat_id, String text,
         String parse_mode, String keyboard);
+
     bool sendPostMessage(JsonObject& payload);
+    bool sendPostPhoto(JsonObject& payload);
     bool sendImage(String chat_id, String contentType, int fileSize,
         MoreDataAvailable moreDataAvailableCallback,
         GetNextByte getNextByteCallback);
+    bool sendImageAsURL(String chat_id, String URL, String caption,
+        bool disable_notification = false, int reply_to_message_id = 0, String keyboard = "");
+
     int getUpdates(long offset);
     telegramMessage messages[HANDLE_MESSAGES];
     long last_message_received;
