@@ -31,6 +31,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #define SSL_PORT 443
 #define HANDLE_MESSAGES 1
 
+typedef bool (*MoreDataAvailable)();
+typedef byte (*GetNextByte)();
+
 struct telegramMessage{
   String text;
   String chat_id;
@@ -46,7 +49,14 @@ class UniversalTelegramBot
     UniversalTelegramBot (String token, Client &client);
     String sendGetToTelegram(String command);
     String sendPostToTelegram(String command, JsonObject& payload);
+    String sendMultipartFormDataToTelegram(String command, String binaryProperyName,
+        String fileName, String contentType,
+        String chat_id, int fileSize,
+        MoreDataAvailable moreDataAvailableCallback,
+        GetNextByte getNextByteCallback);
+
     bool getMe();
+
     bool sendSimpleMessage(String chat_id, String text, String parse_mode);
     bool sendMessage(String chat_id, String text, String parse_mode);
     bool sendMessageWithReplyKeyboard(String chat_id, String text,
@@ -54,7 +64,15 @@ class UniversalTelegramBot
         bool oneTime = false, bool selective = false);
     bool sendMessageWithInlineKeyboard(String chat_id, String text,
         String parse_mode, String keyboard);
+
     bool sendPostMessage(JsonObject& payload);
+    String sendPostPhoto(JsonObject& payload);
+    String sendPhotoByBinary(String chat_id, String contentType, int fileSize,
+        MoreDataAvailable moreDataAvailableCallback,
+        GetNextByte getNextByteCallback);
+    String sendPhoto(String chat_id, String photo, String caption,
+        bool disable_notification = false, int reply_to_message_id = 0, String keyboard = "");
+
     int getUpdates(long offset);
     telegramMessage messages[HANDLE_MESSAGES];
     long last_message_received;
@@ -65,8 +83,9 @@ class UniversalTelegramBot
     //JsonObject * parseUpdates(String response);
     String _token;
     Client *client;
-    const int maxMessageLength = 1000;
+    const int maxMessageLength = 1300;
     bool checkForOkResponse(String response);
+    String extractFileIdFromResponse(String response);
     bool _debug = false;
 };
 
