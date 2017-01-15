@@ -506,12 +506,7 @@ String UniversalTelegramBot::sendPhotoByBinary(String chat_id, String contentTyp
 
   if (_debug) Serial.println(response);
 
-  if(checkForOkResponse(response))
-  {
-    return extractFileIdFromResponse(response);
-  }
-
-  return "";
+  return response;
 }
 
 String UniversalTelegramBot::sendPhoto(String chat_id, String photo, String caption, bool disable_notification, int reply_to_message_id, String keyboard) {
