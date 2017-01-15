@@ -85,7 +85,7 @@ class UniversalTelegramBot
     Client *client;
     const int maxMessageLength = 1000;
     bool checkForOkResponse(String response);
-    bool _debug = true;
+    bool _debug = false;
 };
 
 #endif
