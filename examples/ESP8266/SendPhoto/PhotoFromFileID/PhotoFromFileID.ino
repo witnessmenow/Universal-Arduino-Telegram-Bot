@@ -43,10 +43,14 @@ void handleNewMessages(int numNewMessages) {
 
       // There are 3 image sizes after Telegram has process photo
       // You may choose what you want, in example was choosed bigger size
-      String file_id = images["result"]["photo"][2]["file_id"];
+      int photosArrayLength = images["result"]["photo"].size();
 
-      if (file_id) {
-        bot.sendPhoto(chat_id, file_id, "This photo was sent using File ID");
+      if (photosArrayLength > 0) {
+        String file_id = images["result"]["photo"][photosArrayLength-1]["file_id"];
+
+        if (file_id) {
+          bot.sendPhoto(chat_id, file_id, "This photo was sent using File ID");
+        }
       }
     }
 
