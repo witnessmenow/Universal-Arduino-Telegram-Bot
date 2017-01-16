@@ -38,18 +38,26 @@ void handleNewMessages(int numNewMessages) {
     if (text == "/get_test_photo") {
       String response = bot.sendPhoto(chat_id, test_photo_url, "This photo was sent using URL");
 
-      DynamicJsonBuffer jsonBuffer;
-      JsonObject& images = jsonBuffer.parseObject(response);
+      if (bot.checkForOkResponse(response)) {
+        DynamicJsonBuffer jsonBuffer;
+        JsonObject& images = jsonBuffer.parseObject(response);
 
-      // There are 3 image sizes after Telegram has process photo
-      // You may choose what you want, in example was choosed bigger size
-      int photosArrayLength = images["result"]["photo"].size();
+        // There are 3 image sizes after Telegram has process photo
+        // You may choose what you want, in example was choosed bigger size
+        int photosArrayLength = images["result"]["photo"].size();
 
-      if (photosArrayLength > 0) {
-        String file_id = images["result"]["photo"][photosArrayLength-1]["file_id"];
+        if (photosArrayLength > 0) {
+          String file_id = images["result"]["photo"][photosArrayLength-1]["file_id"];
 
-        if (file_id) {
-          bot.sendPhoto(chat_id, file_id, "This photo was sent using File ID");
+          if (file_id) {
+            String send_photo_by_file_id_response = bot.sendPhoto(chat_id, file_id, "This photo was sent using File ID");
+
+            if (bot.checkForOkResponse(send_photo_by_file_id_response)) {
+              // do something
+            } else {
+              // or not to do
+            }
+          }
         }
       }
     }

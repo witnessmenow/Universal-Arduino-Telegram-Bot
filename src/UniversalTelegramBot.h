@@ -74,6 +74,7 @@ class UniversalTelegramBot
         bool disable_notification = false, int reply_to_message_id = 0, String keyboard = "");
 
     int getUpdates(long offset);
+    bool checkForOkResponse(String response);
     telegramMessage messages[HANDLE_MESSAGES];
     long last_message_received;
     String name;
@@ -84,7 +85,6 @@ class UniversalTelegramBot
     String _token;
     Client *client;
     const int maxMessageLength = 1300;
-    bool checkForOkResponse(String response);
     bool _debug = false;
 };
 
