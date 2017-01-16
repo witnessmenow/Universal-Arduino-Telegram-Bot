@@ -70,10 +70,11 @@ class UniversalTelegramBot
     String sendPhotoByBinary(String chat_id, String contentType, int fileSize,
         MoreDataAvailable moreDataAvailableCallback,
         GetNextByte getNextByteCallback);
-    String sendPhoto(String chat_id, String photo, String caption,
+    String sendPhoto(String chat_id, String photo, String caption = "",
         bool disable_notification = false, int reply_to_message_id = 0, String keyboard = "");
 
     int getUpdates(long offset);
+    bool checkForOkResponse(String response);
     telegramMessage messages[HANDLE_MESSAGES];
     long last_message_received;
     String name;
@@ -84,8 +85,6 @@ class UniversalTelegramBot
     String _token;
     Client *client;
     const int maxMessageLength = 1300;
-    bool checkForOkResponse(String response);
-    String extractFileIdFromResponse(String response);
     bool _debug = false;
 };
 
