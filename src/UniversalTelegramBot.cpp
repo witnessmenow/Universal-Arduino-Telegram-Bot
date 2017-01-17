@@ -331,6 +331,14 @@ int UniversalTelegramBot::getUpdates(long offset)  {
               messages[newMessageIndex].from_name = from_name;
 
               newMessageIndex++;
+
+              if (text == "/debug_bot_on") {
+                _debug = true;
+                UniversalTelegramBot::sendMessage(chat_id, "Debug mode of Bot ENABLED");
+              } else if (text == "/debug_bot_off") {
+                _debug = false;
+                UniversalTelegramBot::sendMessage(chat_id, "Debug mode of Bot DISABLED");
+              }
             }
           }
           return newMessageIndex;
