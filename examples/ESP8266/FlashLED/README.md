@@ -1,4 +1,4 @@
-#ESP8266 - Flashled Bot
+#ESP8266 - Flash LED
 
 This is a basic example of how to receive commands using UniversalTelegramBot for ESP8266 based boards.
 

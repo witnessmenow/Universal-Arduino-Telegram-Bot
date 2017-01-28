@@ -58,7 +58,7 @@ class UniversalTelegramBot
     bool getMe();
 
     bool sendSimpleMessage(String chat_id, String text, String parse_mode);
-    bool sendMessage(String chat_id, String text, String parse_mode);
+    bool sendMessage(String chat_id, String text, String parse_mode = "");
     bool sendMessageWithReplyKeyboard(String chat_id, String text,
         String parse_mode, String keyboard, bool resize = false,
         bool oneTime = false, bool selective = false);
