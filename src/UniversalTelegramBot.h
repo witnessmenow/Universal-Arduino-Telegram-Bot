@@ -65,6 +65,8 @@ class UniversalTelegramBot
     bool sendMessageWithInlineKeyboard(String chat_id, String text,
         String parse_mode, String keyboard);
 
+    bool sendChatAction(String chat_id, String text);
+
     bool sendPostMessage(JsonObject& payload);
     String sendPostPhoto(JsonObject& payload);
     String sendPhotoByBinary(String chat_id, String contentType, int fileSize,

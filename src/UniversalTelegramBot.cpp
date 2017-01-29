@@ -550,3 +550,26 @@ bool UniversalTelegramBot::checkForOkResponse(String response) {
 
   return false;
 }
+
+bool UniversalTelegramBot::sendChatAction(String chat_id, String text)  {
+
+  bool sent = false;
+  if (_debug) Serial.println("SEND Chat Action Message");
+  long sttime = millis();
+
+  if (text != "") {
+    while (millis() < sttime+8000) {    // loop for a while to send the message
+      String command="bot"+_token+"/sendChatAction?chat_id="+chat_id+"&action="+text;
+      String response = sendGetToTelegram(command);
+
+      if (_debug) Serial.println(response);
+      sent = checkForOkResponse(response);
+
+      if (sent) {
+        break;
+      }
+    }
+  }
+
+  return sent;
+}
