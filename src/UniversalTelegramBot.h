@@ -64,6 +64,7 @@ class UniversalTelegramBot
         bool oneTime = false, bool selective = false);
     bool sendMessageWithInlineKeyboard(String chat_id, String text,
         String parse_mode, String keyboard);
+    bool sendChatActionMessage(String chat_id, String text);
 
     bool sendPostMessage(JsonObject& payload);
     String sendPostPhoto(JsonObject& payload);
