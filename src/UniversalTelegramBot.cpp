@@ -551,7 +551,7 @@ bool UniversalTelegramBot::checkForOkResponse(String response) {
   return false;
 }
 
-bool UniversalTelegramBot::sendChatActionMessage(String chat_id, String text)  {
+bool UniversalTelegramBot::sendChatAction(String chat_id, String text)  {
 
   bool sent = false;
   if (_debug) Serial.println("SEND Chat Action Message");

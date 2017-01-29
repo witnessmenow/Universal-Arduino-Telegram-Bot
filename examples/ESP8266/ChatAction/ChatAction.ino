@@ -35,7 +35,9 @@ void handleNewMessages(int numNewMessages) {
     if (from_name == "") from_name = "Guest";
 
     if (text == "/send_test_action") {
-        bot.sendChatActionMessage(chat_id, "typing");
+        bot.sendChatAction(chat_id, "typing");
+        delay(4000);
+        bot.sendMessage(chat_id, "Did you saw action message?");
 
         // You can't use own message, just choose from one of bellow
 
