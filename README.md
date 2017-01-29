@@ -2,7 +2,7 @@
 
 An Arduino IDE library for using Telegram Bot API. It's designed to be used with multiple Arduino architectures.
 
-Please join the [Telegram Group Chat](https://t.me/arduino_telegram_library) if you like to discuss the library or need any help.
+Join the [Arduino Telegram Library Group Chat](https://t.me/arduino_telegram_library) if you have any questions/feedback or would just like to be kept up to date with the library's progress.
 
 ## Introduction
 
