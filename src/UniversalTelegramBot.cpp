@@ -312,24 +312,10 @@ int UniversalTelegramBot::getUpdates(long offset)  {
         int resultArrayLength = root["result"].size();
         if (resultArrayLength > 0) {
           int newMessageIndex = 0;
+          //Step through all results
           for (int i=0; i < resultArrayLength; i++) {
-            JsonObject& message = root["result"][i]["message"];
-            int update_id = root["result"][i]["update_id"];
-            if (last_message_received != update_id) {
-              last_message_received = update_id;
-              String text = message["text"];
-              String date = message["date"];
-              String chat_id = message["chat"]["id"];
-              String from_id = message["from"]["id"];
-              String from_name = message["from"]["first_name"];
-
-              messages[newMessageIndex].update_id = update_id;
-              messages[newMessageIndex].text = text;
-              messages[newMessageIndex].date = date;
-              messages[newMessageIndex].chat_id = chat_id;
-              messages[newMessageIndex].from_id = from_id;
-              messages[newMessageIndex].from_name = from_name;
-
+            JsonObject& result = root["result"][i];
+            if (processResult(result, newMessageIndex)) {
               newMessageIndex++;
             }
           }
@@ -347,6 +333,56 @@ int UniversalTelegramBot::getUpdates(long offset)  {
 
     return 0;
   }
+}
+
+bool UniversalTelegramBot::processResult(JsonObject& result, int messageIndex) {
+  int update_id = result["update_id"];
+  // Check have we already dealt with this message (this shouldn't happen!)
+  if (last_message_received != update_id) {
+    last_message_received = update_id;
+
+    String text;
+    String date;
+    String chat_id;
+    String chat_title;
+    String from_id;
+    String from_name;
+    String type;
+
+
+    if (result.containsKey("message")) {
+      JsonObject& message = result["message"];
+      type = "message";
+      from_id = message["from"]["id"].as<String>();
+      from_name = message["from"]["first_name"].as<String>();
+
+      text = message["text"].as<String>();
+      date = message["date"].as<String>();
+      chat_id = message["chat"]["id"].as<String>();
+      chat_title = message["chat"]["title"].as<String>();
+    }
+    else if (result.containsKey("channel_post")) {
+      JsonObject& message = result["channel_post"];
+      type = "channel_post";
+
+      text = message["text"].as<String>();
+      date = message["date"].as<String>();
+      chat_id = message["chat"]["id"].as<String>();
+      chat_title = message["chat"]["title"].as<String>();
+    }
+
+    messages[messageIndex].update_id = update_id;
+    messages[messageIndex].text = text;
+    messages[messageIndex].date = date;
+    messages[messageIndex].chat_id = chat_id;
+    messages[messageIndex].chat_title = chat_title;
+    messages[messageIndex].from_id = from_id;
+    messages[messageIndex].from_name = from_name;
+    messages[messageIndex].type = type;
+
+    return true;
+  }
+  return false;
 }
 
 /***********************************************************************

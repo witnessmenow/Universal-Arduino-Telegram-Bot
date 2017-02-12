@@ -37,9 +37,11 @@ typedef byte (*GetNextByte)();
 struct telegramMessage{
   String text;
   String chat_id;
+  String chat_title;
   String from_id;
   String from_name;
   String date;
+  String type;
   int update_id;
 };
 
@@ -86,6 +88,7 @@ class UniversalTelegramBot
     //JsonObject * parseUpdates(String response);
     String _token;
     Client *client;
+    bool processResult(JsonObject& result, int messageIndex);
     const int maxMessageLength = 1300;
     bool _debug = false;
 };
