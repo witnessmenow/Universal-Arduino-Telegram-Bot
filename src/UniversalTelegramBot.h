@@ -67,6 +67,12 @@ class UniversalTelegramBot
 
     bool sendChatAction(String chat_id, String text);
 
+    // Chat Settings
+    bool setChatTitle(String chat_id, String title);
+    bool setChatDescription(String chat_id, String description);
+    bool pinChatMessage(String chat_id, String message_id, bool disable_notification = true);
+    bool unpinChatMessage(String chat_id);
+
     bool sendPostMessage(JsonObject& payload);
     String sendPostPhoto(JsonObject& payload);
     String sendPhotoByBinary(String chat_id, String contentType, int fileSize,

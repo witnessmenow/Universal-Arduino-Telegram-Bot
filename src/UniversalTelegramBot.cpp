@@ -60,6 +60,8 @@ String UniversalTelegramBot::sendGetToTelegram(String command) {
 				break;
 			}
 		}
+	} else {
+	  if (_debug) Serial.println("Can't connect to telegram host (error 1)");
 	}
 
 	return mess;
@@ -135,6 +137,8 @@ String UniversalTelegramBot::sendPostToTelegram(String command, JsonObject& payl
   			break;
   		}
 		}
+  } else {
+    if (_debug) Serial.println("Can't connect to telegram host (error 2)");
   }
 
   return body;
@@ -258,6 +262,8 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(String command, Str
         break;
       }
     }
+  } else {
+    if (_debug) Serial.println("Can't connect to telegram host (error 3)");
   }
 
   return body;
@@ -568,6 +574,94 @@ bool UniversalTelegramBot::sendChatAction(String chat_id, String text)  {
       if (sent) {
         break;
       }
+    }
+  }
+
+  return sent;
+}
+
+bool UniversalTelegramBot::setChatTitle(String chat_id, String title)  {
+
+  bool sent = false;
+  if (_debug) Serial.println("SEND Chat Title");
+  long sttime = millis();
+
+  if (title != "") {
+    while (millis() < sttime+8000) {    // loop for a while to send the message
+      String command="bot"+_token+"/setChatTitle?chat_id="+chat_id+"&title="+title;
+      String response = sendGetToTelegram(command);
+
+      if (_debug) Serial.println(response);
+      sent = checkForOkResponse(response);
+
+      if (sent) {
+        break;
+      }
+    }
+  }
+
+  return sent;
+}
+
+bool UniversalTelegramBot::setChatDescription(String chat_id, String description)  {
+
+  bool sent = false;
+  if (_debug) Serial.println("SEND Chat Description");
+  long sttime = millis();
+
+  if (description != "") {
+    while (millis() < sttime+8000) {    // loop for a while to send the message
+      String command="bot"+_token+"/setChatDescription?chat_id="+chat_id+"&description="+description;
+      String response = sendGetToTelegram(command);
+
+      if (_debug) Serial.println(response);
+      sent = checkForOkResponse(response);
+
+      if (sent) {
+        break;
+      }
+    }
+  }
+
+  return sent;
+}
+
+bool UniversalTelegramBot::pinChatMessage(String chat_id, String message_id, bool disable_notification)  {
+
+  bool sent = false;
+  if (_debug) Serial.println("SEND Pin Chat Message");
+  long sttime = millis();
+
+  while (millis() < sttime+8000) {    // loop for a while to send the message
+    String command="bot"+_token+"/pinChatMessage?chat_id="+chat_id+"&message_id="+message_id+"&disable_notification="+disable_notification;
+    String response = sendGetToTelegram(command);
+
+    if (_debug) Serial.println(response);
+    sent = checkForOkResponse(response);
+
+    if (sent) {
+      break;
+    }
+  }
+
+  return sent;
+}
+
+bool UniversalTelegramBot::unpinChatMessage(String chat_id)  {
+
+  bool sent = false;
+  if (_debug) Serial.println("SEND Unpit Chat Message");
+  long sttime = millis();
+
+  while (millis() < sttime+8000) {    // loop for a while to send the message
+    String command="bot"+_token+"/unpinChatMessage?chat_id="+chat_id;
+    String response = sendGetToTelegram(command);
+
+    if (_debug) Serial.println(response);
+    sent = checkForOkResponse(response);
+
+    if (sent) {
+      break;
     }
   }
 
