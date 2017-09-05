@@ -10,11 +10,11 @@
 #include <UniversalTelegramBot.h>
 
 // Initialize Wifi connection to the router
-char ssid[] = "HUAWEI-B315-7E9D";     // your network SSID (name)
-char password[] = "MGHT409FR4E"; // your network key
+char ssid[] = "XXXXXX";     // your network SSID (name)
+char password[] = "YYYYYY"; // your network key
 
 // Initialize Telegram BOT
-#define BOTtoken "326858637:AAGDZGkaKP_Vrhzs8mkd--0BnGQQ6AioF4M"  // your Bot Token (Get from Botfather)
+#define BOTtoken "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  // your Bot Token (Get from Botfather)
 
 WiFiClientSecure client;
 UniversalTelegramBot bot(BOTtoken, client);
