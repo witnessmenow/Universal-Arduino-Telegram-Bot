@@ -42,6 +42,8 @@ struct telegramMessage{
   String from_name;
   String date;
   String type;
+  float longitude;
+  float latitude;
   int update_id;
 };
 
@@ -83,6 +85,8 @@ class UniversalTelegramBot
     long last_message_received;
     String name;
     String userName;
+    int longPoll = 0;
+    bool _debug = false;
 
   private:
     //JsonObject * parseUpdates(String response);
@@ -90,7 +94,6 @@ class UniversalTelegramBot
     Client *client;
     bool processResult(JsonObject& result, int messageIndex);
     const int maxMessageLength = 1300;
-    bool _debug = false;
 };
 
 #endif

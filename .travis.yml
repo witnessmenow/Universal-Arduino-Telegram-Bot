@@ -18,6 +18,8 @@ env:
     - SCRIPT=platformioSingle EXAMPLE_NAME=PhotoFromSD EXAMPLE_FOLDER=/SendPhoto/ BOARDTYPE=ESP8266 BOARD=d1_mini
     - SCRIPT=platformioSingle EXAMPLE_NAME=PhotoFromURL EXAMPLE_FOLDER=/SendPhoto/ BOARDTYPE=ESP8266 BOARD=d1_mini
     - SCRIPT=platformioSingle EXAMPLE_NAME=PhotoFromFileID EXAMPLE_FOLDER=/SendPhoto/ BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE_NAME=Location EXAMPLE_FOLDER=/ BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE_NAME=ChannelPost EXAMPLE_FOLDER=/ BOARDTYPE=ESP8266 BOARD=d1_mini
 
 
 install:

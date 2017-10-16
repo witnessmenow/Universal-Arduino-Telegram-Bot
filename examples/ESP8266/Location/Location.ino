@@ -1,16 +1,16 @@
 /*******************************************************************
-    An example of how to use a custom reply keyboard markup.
-
-
-     written by Vadim Sinitski (modified by Brian Lough)
+ *  An example of recieving location Data
+ *
+ *
+ *  By Brian Lough
  *******************************************************************/
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
 
 // Initialize Wifi connection to the router
-char ssid[] = "XXXXXX";     // your network SSID (name)
-char password[] = "YYYYYY"; // your network key
+char ssid[] = "SSID";     // your network SSID (name)
+char password[] = "password"; // your network key
 
 // Initialize Telegram BOT
 #define BOTtoken "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  // your Bot Token (Get from Botfather)
@@ -25,32 +25,26 @@ void handleNewMessages(int numNewMessages) {
 
   for (int i = 0; i < numNewMessages; i++) {
 
-    // Inline buttons with callbacks when pressed will raise a callback_query message
-    if (bot.messages[i].type == "callback_query") {
-      Serial.print("Call back button pressed by: ");
-      Serial.println(bot.messages[i].from_id);
-      Serial.print("Data on the button: ");
-      Serial.println(bot.messages[i].text);
-      bot.sendMessage(bot.messages[i].from_id, bot.messages[i].text, "");
-    } else {
-      String chat_id = String(bot.messages[i].chat_id);
-      String text = bot.messages[i].text;
+    String chat_id = String(bot.messages[i].chat_id);
+    String text = bot.messages[i].text;
 
-      String from_name = bot.messages[i].from_name;
-      if (from_name == "") from_name = "Guest";
+    String from_name = bot.messages[i].from_name;
+    if (from_name == "") from_name = "Guest";
 
-      if (text == "/options") {
-        String keyboardJson = "[[{ \"text\" : \"Go to Google\", \"url\" : \"https://www.google.com\" }],[{ \"text\" : \"Send\", \"callback_data\" : \"This was sent by inline\" }]]";
-        bot.sendMessageWithInlineKeyboard(chat_id, "Choose from one of the following options", "", keyboardJson);
-      }
+    if (bot.messages[i].longitude != 0 || bot.messages[i].latitude != 0) {
+      Serial.print("Long: ");
+      Serial.println(String(bot.messages[i].longitude, 6));
+      Serial.print("Lat: ");
+      Serial.println(String(bot.messages[i].latitude, 6));
 
-      if (text == "/start") {
-        String welcome = "Welcome to Universal Arduino Telegram Bot library, " + from_name + ".\n";
-        welcome += "This is Inline Keyboard Markup example.\n\n";
-        welcome += "/options : returns the inline keyboard\n";
+      String message = "Long: " + String(bot.messages[i].longitude, 6) + "\n";
+      message += "Lat: " + String(bot.messages[i].latitude, 6) + "\n";
+      bot.sendMessage(chat_id, message, "Markdown");
+    } else if (text == "/start") {
+      String welcome = "Welcome to Universal Arduino Telegram Bot library, " + from_name + ".\n";
+      welcome += "Share a location or a live location and the bot will respond with the co-ords\n";
 
-        bot.sendMessage(chat_id, welcome, "Markdown");
-      }
+      bot.sendMessage(chat_id, welcome, "Markdown");
     }
   }
 }
