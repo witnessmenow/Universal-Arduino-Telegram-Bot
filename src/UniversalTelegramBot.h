@@ -31,6 +31,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #define SSL_PORT 443
 #define HANDLE_MESSAGES 1
 
+// This will save you some memory (~1.5kb) due to excluding dead debug code
+// ESP8266 compiler can't remove dead code because "_debug" variable can be assigned at runtime
+// #define DEBUG_U_TelegramBot 
+
 typedef bool (*MoreDataAvailable)();
 typedef byte (*GetNextByte)();
 
@@ -49,6 +53,8 @@ struct telegramMessage{
 
 class UniversalTelegramBot
 {
+  friend class UniversalTelegramBotWebhook; // Webhook needs access to privates
+  
   public:
     UniversalTelegramBot (String token, Client &client);
     String sendGetToTelegram(String command);
@@ -60,7 +66,6 @@ class UniversalTelegramBot
         GetNextByte getNextByteCallback);
 
     bool getMe();
-
     bool sendSimpleMessage(String chat_id, String text, String parse_mode);
     bool sendMessage(String chat_id, String text, String parse_mode = "");
     bool sendMessageWithReplyKeyboard(String chat_id, String text,
@@ -86,14 +91,20 @@ class UniversalTelegramBot
     String name;
     String userName;
     int longPoll = 0;
-    bool _debug = false;
+	
+	#ifdef DEBUG_U_TelegramBot
+    bool _debug = true;
+	#endif
 
   private:
     //JsonObject * parseUpdates(String response);
     String _token;
     Client *client;
+	int parseTelegramResponse(String response);
     bool processResult(JsonObject& result, int messageIndex);
+	bool connectTelegramServer();
     const int maxMessageLength = 1300;
+	
 };
 
 #endif

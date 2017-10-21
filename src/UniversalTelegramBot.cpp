@@ -27,15 +27,41 @@ UniversalTelegramBot::UniversalTelegramBot(String token, Client &client)	{
   this->client = &client;
 }
 
+bool UniversalTelegramBot::connectTelegramServer() {
+	
+	#ifdef DEBUG_U_TelegramBot	
+	Serial.println("Entering UniversalTelegramBot::connectTelegramServer()");
+	#endif
+	
+	int isConnected = client -> connected();
+	
+	if (!isConnected) {
+		
+	#ifdef DEBUG_U_TelegramBot	
+	Serial.println("Client is not connected");
+	#endif
+	
+	isConnected = client->connect(HOST, SSL_PORT);	
+	
+	#ifdef DEBUG_U_TelegramBot	
+	Serial.println("isConnected = "+String(isConnected));
+	#endif
+	}
+	
+	return isConnected;
+} 
+
 String UniversalTelegramBot::sendGetToTelegram(String command) {
 	String mess = "";
 	long now;
 	bool avail;
 
 	// Connect with api.telegram.org
-	if (client->connect(HOST, SSL_PORT)) {
-
+	if (connectTelegramServer()) {
+		
+	#ifdef DEBUG_U_TelegramBot
     if (_debug) Serial.println(F(".... connected to server"));
+	#endif
 
 		String a="";
 		char c;
@@ -54,11 +80,14 @@ String UniversalTelegramBot::sendGetToTelegram(String command) {
 				avail=true;
 			}
 			if (avail) {
+				
+		#ifdef DEBUG_U_TelegramBot		
         if (_debug) {
           Serial.println();
           Serial.println(mess);
           Serial.println();
         }
+		#endif
 				break;
 			}
 		}
@@ -75,7 +104,7 @@ String UniversalTelegramBot::sendPostToTelegram(String command, JsonObject& payl
 	bool responseReceived;
 
 	// Connect with api.telegram.org
-	if (client->connect(HOST, SSL_PORT)) {
+	if (connectTelegramServer()) {
     // POST URI
     client->print("POST /" + command); client->println(F(" HTTP/1.1"));
     // Host header
@@ -129,11 +158,14 @@ String UniversalTelegramBot::sendPostToTelegram(String command, JsonObject& payl
 			}
 
       if (responseReceived) {
+	  
+	    #ifdef DEBUG_U_TelegramBot
         if (_debug) {
           Serial.println();
           Serial.println(body);
           Serial.println();
         }
+		#endif
   			break;
   		}
 		}
@@ -154,7 +186,7 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(String command, Str
 	bool responseReceived;
   String boundry = F("------------------------b8f610217e83e29b");
 	// Connect with api.telegram.org
-  if (client->connect(HOST, SSL_PORT)) {
+  if (connectTelegramServer()) {
 
     String start_request = "";
     String end_request = "";
@@ -180,14 +212,20 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(String command, Str
     client->println(F("Accept: */*"));
 
     int contentLength = fileSize + start_request.length() + end_request.length();
+	
+	#ifdef DEBUG_U_TelegramBot
     if (_debug) Serial.println("Content-Length: " + String(contentLength));
+	#endif
+	
     client->print("Content-Length: "); client->println(String(contentLength));
     client->println("Content-Type: multipart/form-data; boundary=" + boundry);
     client->println("");
 
     client->print(start_request);
 
+	#ifdef DEBUG_U_TelegramBot
     if (_debug) Serial.print(start_request);
+	#endif
 
     byte buffer[512];
     int count = 0;
@@ -199,23 +237,32 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(String command, Str
       count++;
       if(count == 512){
         //yield();
+		
+	  #ifdef DEBUG_U_TelegramBot	
         if (_debug) {
           Serial.println(F("Sending full buffer"));
         }
+	  #endif
+	  
         client->write((const uint8_t *)buffer, 512);
         count = 0;
       }
     }
 
     if(count > 0) {
+	  #ifdef DEBUG_U_TelegramBot
       if (_debug) {
         Serial.println(F("Sending remaining buffer"));
       }
+	  #endif
       client->write((const uint8_t *)buffer, count);
     }
 
     client->print(end_request);
+	
+	#ifdef DEBUG_U_TelegramBot
     if (_debug) Serial.print(end_request);
+	#endif
 
     count = 0;
     int ch_count=0;
@@ -252,11 +299,15 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(String command, Str
       }
 
       if (responseReceived) {
+		  
+		#ifdef DEBUG_U_TelegramBot  
         if (_debug) {
           Serial.println();
           Serial.println(body);
           Serial.println();
         }
+		#endif
+		
         break;
       }
     }
@@ -290,9 +341,10 @@ bool UniversalTelegramBot::getMe() {
 * Returns the number of new messages           *
 ***************************************************************/
 int UniversalTelegramBot::getUpdates(long offset)  {
-
+  #ifdef DEBUG_U_TelegramBot
   if (_debug) Serial.println("GET Update Messages");
-
+  #endif
+  
   String command = "bot"+_token+"/getUpdates?offset="+String(offset)+"&limit="+String(HANDLE_MESSAGES);
   if(longPoll > 0) {
     command = command + "&timeout=" + String(longPoll);
@@ -300,19 +352,29 @@ int UniversalTelegramBot::getUpdates(long offset)  {
   String response = sendGetToTelegram(command); //receive reply from telegram.org
 
   if (response != "") {
+	#ifdef DEBUG_U_TelegramBot  
     if (_debug)  {
       Serial.print("incoming message length");
       Serial.println(response.length());
       Serial.println("Creating DynamicJsonBuffer");
     }
+	#endif
+	 return parseTelegramResponse(response);
+	}
+    return 0;
+}
 
-    // Parse response into Json object
+int UniversalTelegramBot::parseTelegramResponse(String response)  {
+   // Parse response into Json object
     DynamicJsonBuffer jsonBuffer;
     JsonObject& root = jsonBuffer.parseObject(response);
 
     if (root.success()) {
       // root.printTo(Serial);
+	  #ifdef DEBUG_U_TelegramBot
       if (_debug) Serial.println();
+	  #endif
+	  
       if (root.containsKey("result")) {
         int resultArrayLength = root["result"].size();
         if (resultArrayLength > 0) {
@@ -325,19 +387,28 @@ int UniversalTelegramBot::getUpdates(long offset)  {
             }
           }
           return newMessageIndex;
-        } else {
+        } 
+		#ifdef DEBUG_U_TelegramBot
+		  else {		  
           if (_debug) Serial.println(F("no new messages"));
+		  
+          }
+		#endif
+      } 
+	  #ifdef DEBUG_U_TelegramBot  
+	    else {
+		if (_debug) Serial.println(F("Response contained no 'result'"));
+		
         }
-      } else {
-        if (_debug) Serial.println(F("Response contained no 'result'"));
-      }
-    } else {
+	  #endif
+    } 
+	#ifdef DEBUG_U_TelegramBot
+	else {
       // Buffer may not be big enough, increase buffer or reduce max number of messages
-      if (_debug) Serial.println(F("Failed to parse update, the message could be too big for the buffer"));
-    }
-
-    return 0;
-  }
+	  if (_debug) Serial.println(F("Failed to parse update, the message could be too big for the buffer"));
+	  }
+	#endif
+	return 0;
 }
 
 bool UniversalTelegramBot::processResult(JsonObject& result, int messageIndex) {
@@ -423,14 +494,21 @@ bool UniversalTelegramBot::processResult(JsonObject& result, int messageIndex) {
 bool UniversalTelegramBot::sendSimpleMessage(String chat_id, String text, String parse_mode)  {
 
   bool sent = false;
+  #ifdef DEBUG_U_TelegramBot
   if (_debug) Serial.println("SEND Simple Message");
+  #endif
+  
   long sttime = millis();
 
   if (text!="") {
     while (millis() < sttime+8000) {    // loop for a while to send the message
       String command="bot"+_token+"/sendMessage?chat_id="+chat_id+"&text="+text+"&parse_mode="+parse_mode;
       String response = sendGetToTelegram(command);
+	  
+	  #ifdef DEBUG_U_TelegramBot
       if (_debug) Serial.println(response);
+	  #endif
+	  
       sent = checkForOkResponse(response);
       if (sent) {
         break;
@@ -521,14 +599,22 @@ bool UniversalTelegramBot::sendMessageWithInlineKeyboard(String chat_id, String 
 bool UniversalTelegramBot::sendPostMessage(JsonObject& payload)  {
 
   bool sent=false;
+  
+  #ifdef DEBUG_U_TelegramBot
   if (_debug) Serial.println(F("SEND Post Message"));
+  #endif
+  
   long sttime=millis();
 
   if (payload.containsKey("text")) {
     while (millis() < sttime+8000) { // loop for a while to send the message
       String command = "bot"+_token+"/sendMessage";
       String response = sendPostToTelegram(command, payload);
+	  
+	  #ifdef DEBUG_U_TelegramBot
       if (_debug) Serial.println(response);
+	  #endif
+	  
       sent = checkForOkResponse(response);
       if (sent) {
         break;
@@ -543,14 +629,21 @@ String UniversalTelegramBot::sendPostPhoto(JsonObject& payload)  {
 
   bool sent=false;
   String response = "";
+  
+  #ifdef DEBUG_U_TelegramBot
   if (_debug) Serial.println(F("SEND Post Photo"));
+  #endif
+  
   long sttime=millis();
 
   if (payload.containsKey("photo")) {
     while (millis() < sttime+8000) { // loop for a while to send the message
       String command = "bot"+_token+"/sendPhoto";
       response = sendPostToTelegram(command, payload);
+	  #ifdef DEBUG_U_TelegramBot
       if (_debug) Serial.println(response);
+	  #endif
+	  
       sent = checkForOkResponse(response);
       if (sent) {
         break;
@@ -564,14 +657,16 @@ String UniversalTelegramBot::sendPostPhoto(JsonObject& payload)  {
 String UniversalTelegramBot::sendPhotoByBinary(String chat_id, String contentType, int fileSize,
     MoreDataAvailable moreDataAvailableCallback,
     GetNextByte getNextByteCallback) {
-
+  #ifdef DEBUG_U_TelegramBot
   if (_debug) Serial.println("SEND Photo");
+  #endif
 
   String response = sendMultipartFormDataToTelegram("sendPhoto", "photo", "img.jpg",
     contentType, chat_id, fileSize,
     moreDataAvailableCallback, getNextByteCallback);
-
+  #ifdef DEBUG_U_TelegramBot
   if (_debug) Serial.println(response);
+  #endif
 
   return response;
 }
@@ -621,15 +716,20 @@ bool UniversalTelegramBot::checkForOkResponse(String response) {
 bool UniversalTelegramBot::sendChatAction(String chat_id, String text)  {
 
   bool sent = false;
+  
+  #ifdef DEBUG_U_TelegramBot
   if (_debug) Serial.println(F("SEND Chat Action Message"));
+  #endif
+  
   long sttime = millis();
 
   if (text != "") {
     while (millis() < sttime+8000) {    // loop for a while to send the message
       String command="bot"+_token+"/sendChatAction?chat_id="+chat_id+"&action="+text;
       String response = sendGetToTelegram(command);
-
+	  #ifdef DEBUG_U_TelegramBot
       if (_debug) Serial.println(response);
+	  #endif
       sent = checkForOkResponse(response);
 
       if (sent) {
