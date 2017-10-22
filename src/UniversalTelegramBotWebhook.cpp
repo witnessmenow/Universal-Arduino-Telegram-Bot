@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 #include "UniversalTelegramBotWebhook.h"
 
-int find_text(String sInput, String sSubStr) {
+inline int find_text(String sInput, String sSubStr) {
   int fpos = -1;
   for (int i = 0; i <=sInput.length() - sSubStr.length(); i++) {
     if (sInput.substring(i,sSubStr.length()+i) == sSubStr) {
