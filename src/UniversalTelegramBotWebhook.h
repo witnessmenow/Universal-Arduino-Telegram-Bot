@@ -25,32 +25,21 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 #include <Arduino.h>
 #include <ArduinoJson.h>
-#include <Client.h>
-#include <Server.h>
 #include "UniversalTelegramBot.h"
 
-int find_text(String sInput, String sSubStr) {
-  int fpos = -1;
-  for (int i = 0; i <=sInput.length() - sSubStr.length(); i++) {
-    if (sInput.substring(i,sSubStr.length()+i) == sSubStr) {
-      fpos = i;
-    }
-  }
-  return fpos;
-}
+int find_text(String sInput, String sSubStr);
 
-class UniversalTelegramBotWebhook : public UniversalTelegramBot
-{
+
+class UniversalTelegramBotWebhook : public UniversalTelegramBot {
   public:
-    UniversalTelegramBotWebhook (String botToken, String secretPOST, Client &client, Server &server);
-	int getUpdates() override;
+    UniversalTelegramBotWebhook (String token, Client &client);
+    //UniversalTelegramBotWebhook (String botToken, String secretPOST);
+	int getUpdates();
    
   private:
-    //String _token;
+    //String _token; // inherited from UniversalTelegramBot
 	String _secretPOST;
-    //Client *client;
-	Server *server;
-	bool isTelegramClientConnected()
+	bool isTelegramClientConnected();
 };
 
 #endif
