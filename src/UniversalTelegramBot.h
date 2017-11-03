@@ -111,7 +111,7 @@ class UniversalTelegramBot
   private:
     //JsonObject * parseUpdates(String response);
     String _token;
-	String _sercretURI;
+	String _secretURI;
     Client *client;
 	int parseTelegramResponse(String response);
 	String parseTelegramHTTPResponse(String response);

@@ -44,9 +44,9 @@ UniversalTelegramBot::UniversalTelegramBot(String token, Client &client)	{
 
 UniversalTelegramBot::UniversalTelegramBot(String token, String botSecretURI) {
   _token = token;
-  _sercretURI = botSecretURI;
+  _secretURI = botSecretURI;
   
-  if (_sercretURI == "") _sercretURI = _token;
+  if (_secretURI == "") _secretURI = _token;
 }
 
 // This function usable in cases when you want to change Telegram bot behavior from Webhook to LongPoll at Runtime.
@@ -397,7 +397,7 @@ int UniversalTelegramBot::getUpdates(Client &client)  {
   this->client -> stop();
   
   if (tgWebhook.length() > 0)
-	if (find_text(tgWebhook,"POST /" + _sercretURI + " HTTP/1.1") != -1) {
+	if (find_text(tgWebhook,"POST /" + _secretURI + " HTTP/1.1") != -1) {
 	    #ifdef DEBUG_U_TelegramBot
 		if (_debug) Serial.println("Exit GET Update Messages >> WebHook mode >> \n"+tgWebhook+"\n");
 		#endif
