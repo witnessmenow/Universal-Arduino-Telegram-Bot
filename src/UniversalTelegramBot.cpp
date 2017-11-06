@@ -100,7 +100,7 @@ String UniversalTelegramBot::sendGetToTelegram(String command) {
 		avail=false;
 		while (millis() - now < longPoll * 1000 + CLIENT_TIMEOUT) {
 			while (client->available()) {
-				mess = client -> readString();
+				mess += client -> readString();
 			}
 			if (mess.length() > 0) {
 				
@@ -128,15 +128,16 @@ String UniversalTelegramBot::sendPostToTelegram(String command, JsonObject& payl
 
   String body = "";
   String header = "";
+  String response = "";
 
 	// Connect with api.telegram.org
 	
 	header  = "POST /" + command + " HTTP/1.1\r\n"; // POST URI
 	header += "Host: " + String(HOST) + "\r\n"; 	 // HOST
-	//header += "User-Agent: ESP8266 Universal Telegram Bot\r\n";
+	header += "User-Agent: ESP8266 Universal Telegram Bot\r\n";
 	header += "Content-Type: application/json\r\n"; // Content type
 	header += "Content-Length: " + String(payload.measureLength()) + "\r\n"; // Content-Length
-	header += "Connection: keep-alive";
+	header += "Connection: close";
 	//header += "\r\nAccept-Encoding: gzip, deflate";
 	header += "\r\n\r\n"; // End of headers
 
@@ -151,21 +152,21 @@ String UniversalTelegramBot::sendPostToTelegram(String command, JsonObject& payl
         }
 	#endif	
 	if (!isConnectedTelegramServer()) return "";
-	
+	client -> setTimeout(500);
 	client -> print(header);
 	client -> print(body);
-	 
-	
-	String response = "";
+		
 	long waitTime = millis() + RESPONSE_TIMEOUT;
+	#ifdef DEBUG_U_TelegramBot
 	Serial.println("Enter wait response");
+	#endif
 	while (millis() < waitTime) {
-	delay(10);
+	
 		while (client -> available()) {
-		String response = this->client -> readString();
-		if (response.length() > 0) return parseTelegramHTTPResponse(response);
-		delay(100);		
+		response += this->client -> readString();
 	    }
+	if (response.length() > 0) return parseTelegramHTTPResponse(response);	
+	delay(100);	
 	}
 			
 	return "";

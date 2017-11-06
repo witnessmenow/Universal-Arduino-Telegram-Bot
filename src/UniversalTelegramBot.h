@@ -43,7 +43,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 // ESP8266 compiler can't remove dead code because "_debug" variable can be assigned at runtime
 // Remove comment below to use debug code
 
-#define DEBUG_U_TelegramBot 
+//#define DEBUG_U_TelegramBot
 
 typedef bool (*MoreDataAvailable)();
 typedef byte (*GetNextByte)();
