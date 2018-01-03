@@ -93,6 +93,7 @@ class UniversalTelegramBot
     String _token;
     Client *client;
     bool processResult(JsonObject& result, int messageIndex);
+    void closeClient();
     const int maxMessageLength = 1300;
 };
 
