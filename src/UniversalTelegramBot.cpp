@@ -299,7 +299,11 @@ int UniversalTelegramBot::getUpdates(long offset)  {
   }
   String response = sendGetToTelegram(command); //receive reply from telegram.org
 
-  if (response != "") {
+  if (response == "") {
+    if(_debug) Serial.println(F("Received empty string in response!"));
+    return 0;
+  }
+  else {
     if (_debug)  {
       Serial.print("incoming message length");
       Serial.println(response.length());
