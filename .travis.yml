@@ -20,7 +20,7 @@ env:
     - SCRIPT=platformioSingle EXAMPLE_NAME=PhotoFromFileID EXAMPLE_FOLDER=/SendPhoto/ BOARDTYPE=ESP8266 BOARD=d1_mini
     - SCRIPT=platformioSingle EXAMPLE_NAME=Location EXAMPLE_FOLDER=/ BOARDTYPE=ESP8266 BOARD=d1_mini
     - SCRIPT=platformioSingle EXAMPLE_NAME=ChannelPost EXAMPLE_FOLDER=/ BOARDTYPE=ESP8266 BOARD=d1_mini
-    - SCRIPT=platformio PLATFORMIO_CI_SRC=examples/ESP32/AdvancedLED_platformio EXAMPLE_NAME=AdvancedLED_platformio EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
+    - SCRIPT=platformio PLATFORMIO_CI_SRC=src EXAMPLE_NAME=AdvancedLED_platformio EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
 
 
 install:
