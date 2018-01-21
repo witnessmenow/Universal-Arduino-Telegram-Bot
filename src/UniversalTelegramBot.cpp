@@ -343,6 +343,7 @@ int UniversalTelegramBot::getUpdates(long offset)  {
     } else {
       // Buffer may not be big enough, increase buffer or reduce max number of messages
       if (_debug) Serial.println("Failed to parse update, the message could be too big for the buffer");
+      last_message_received = last_message_received + 1;
     }
 
     return 0;
