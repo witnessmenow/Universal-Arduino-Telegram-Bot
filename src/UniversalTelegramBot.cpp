@@ -322,6 +322,7 @@ int UniversalTelegramBot::getUpdates(long offset)  {
               String chat_id = message["chat"]["id"];
               String from_id = message["from"]["id"];
               String from_name = message["from"]["first_name"];
+              String from_last_name = message["from"]["last_name"];
 
               messages[newMessageIndex].update_id = update_id;
               messages[newMessageIndex].text = text;
@@ -329,6 +330,7 @@ int UniversalTelegramBot::getUpdates(long offset)  {
               messages[newMessageIndex].chat_id = chat_id;
               messages[newMessageIndex].from_id = from_id;
               messages[newMessageIndex].from_name = from_name;
+              messages[newMessageIndex].from_last_name = from_last_name;
 
               newMessageIndex++;
             }
@@ -343,6 +345,7 @@ int UniversalTelegramBot::getUpdates(long offset)  {
     } else {
       // Buffer may not be big enough, increase buffer or reduce max number of messages
       if (_debug) Serial.println("Failed to parse update, the message could be too big for the buffer");
+      last_message_received = last_message_received + 1;
     }
 
     return 0;
