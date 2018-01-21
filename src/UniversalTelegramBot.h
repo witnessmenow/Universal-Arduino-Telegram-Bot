@@ -39,6 +39,7 @@ struct telegramMessage{
   String chat_id;
   String from_id;
   String from_name;
+  String from_last_name;
   String date;
   int update_id;
 };
