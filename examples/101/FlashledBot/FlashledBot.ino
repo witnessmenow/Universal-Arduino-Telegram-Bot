@@ -6,6 +6,7 @@
  *  adapted by Brian Lough                                         *
  *******************************************************************/
 
+ #include <SPI.h>
  #include <WiFiSSLClient.h>
  #include <WiFi101.h>
  #include <UniversalTelegramBot.h>
