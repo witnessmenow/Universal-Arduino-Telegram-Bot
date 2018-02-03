@@ -14,7 +14,7 @@ env:
     - SCRIPT=platformioSingle EXAMPLE_NAME=ReplyKeyboardMarkup EXAMPLE_FOLDER=/CustomKeyboard/ BOARDTYPE=ESP8266 BOARD=d1_mini
     - SCRIPT=platformioSingle EXAMPLE_NAME=InlineKeyboardMarkup EXAMPLE_FOLDER=/CustomKeyboard/ BOARDTYPE=ESP8266 BOARD=d1_mini
     - SCRIPT=platformioSingle EXAMPLE_NAME=FlashLED EXAMPLE_FOLDER=/ BOARDTYPE=ESP8266 BOARD=d1_mini
-    - SCRIPT=platformioSingle EXAMPLE_NAME=UsingWiFiManager EXAMPLE_FOLDER=/ BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE_NAME=UsingWiFiManager EXAMPLE_FOLDER=/ BOARDTYPE=ESP8266 BOARD=d1_mini LIBRARYDEPENDENCY=567
     - SCRIPT=platformioSingle EXAMPLE_NAME=BulkMessages EXAMPLE_FOLDER=/ BOARDTYPE=ESP8266 BOARD=d1_mini
     - SCRIPT=platformioSingle EXAMPLE_NAME=PhotoFromSD EXAMPLE_FOLDER=/SendPhoto/ BOARDTYPE=ESP8266 BOARD=d1_mini
     - SCRIPT=platformioSingle EXAMPLE_NAME=PhotoFromURL EXAMPLE_FOLDER=/SendPhoto/ BOARDTYPE=ESP8266 BOARD=d1_mini
@@ -41,6 +41,6 @@ install:
     #
     # http://platformio.org/lib/show/64/ArduinoJson
     - platformio lib -g install 64
-    # http://platformio.org/lib/show/567/WifiManager
-    - platformio lib -g install 567
+    # Install sketch-specific library dependency
+    - if [[ "$LIBRARYDEPENDENCY" != "" ]]; then platformio lib -g install "$LIBRARYDEPENDENCY"; fi
 script: scripts/travis/$SCRIPT.sh
