@@ -693,10 +693,8 @@ bool UniversalTelegramBot::sendChatAction(String chat_id, String text)  {
 }
 
 void UniversalTelegramBot::closeClient(){
-#ifdef ESP32
   if(client->connected()){
     if(_debug){Serial.println(F("Closing client")); }
     client->stop();
   }
-#endif
 }
