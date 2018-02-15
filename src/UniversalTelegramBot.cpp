@@ -2,7 +2,7 @@
 Copyright (c) 2015 Giancarlo Bacchio. All right reserved.
 
 TelegramBot - Library to create your own Telegram Bot using
-ESP8266 on Arduino IDE.
+ESP8266 or ESP32 on Arduino IDE.
 Ref. Library at https:github/esp8266/Arduino
 
 This library is free software; you can redistribute it and/or
@@ -20,6 +20,19 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
+/*           **** Note Regarding Client Connection Keeping ****
+  Client connection is established in functions that directly involve use of client,
+  i.e sendGetToTelegram, sendPostToTelegram, and sendMultipartFormDataToTelegram.
+  It is closed at the end of sendMultipartFormDataToTelegram, but not at the
+  end of sendGetToTelegram and sendPostToTelegram as these may need to keep the
+  connection alive for respose / response checking. Re-establishing a connection
+  then wastes time which is noticeable in user experience.
+  Due to this, it is important that connection be closed manually after calling
+  sendGetToTelegram or sendPostToTelegram by calling closeClient();
+  Failure to close connection causes memory leakage, and SSL errors on ESP32
+  Note: closeClient() only closes connections on ESP32 (#ifdef ESP32).
+*/
+
 #include "UniversalTelegramBot.h"
 
 UniversalTelegramBot::UniversalTelegramBot(String token, Client &client)	{
@@ -32,8 +45,14 @@ String UniversalTelegramBot::sendGetToTelegram(String command) {
 	long now;
 	bool avail;
 
-	// Connect with api.telegram.org
-	if (client->connect(HOST, SSL_PORT)) {
+	// Connect with api.telegram.org if not already connected
+  if(!client->connected()){
+    if (_debug) Serial.println(F("[BOT]Connecting to server"));
+    if(!client->connect(HOST, SSL_PORT)){
+      if (_debug) Serial.println(F("[BOT]Conection error"));
+    }
+  }
+	if (client->connected()) {
 
     if (_debug) Serial.println(F(".... connected to server"));
 
@@ -74,8 +93,14 @@ String UniversalTelegramBot::sendPostToTelegram(String command, JsonObject& payl
 	long now;
 	bool responseReceived;
 
-	// Connect with api.telegram.org
-	if (client->connect(HOST, SSL_PORT)) {
+	// Connect with api.telegram.org if not already connected
+  if(!client->connected()){
+    if (_debug) Serial.println(F("[BOT Client]Connecting to server"));
+    if(!client->connect(HOST, SSL_PORT)){
+      if (_debug) Serial.println(F("[BOT Client]Conection error"));
+    }
+  }
+  if (client->connected()) {
     // POST URI
     client->print("POST /" + command); client->println(F(" HTTP/1.1"));
     // Host header
@@ -153,8 +178,15 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(String command, Str
 	long now;
 	bool responseReceived;
   String boundry = F("------------------------b8f610217e83e29b");
-	// Connect with api.telegram.org
-  if (client->connect(HOST, SSL_PORT)) {
+
+  // Connect with api.telegram.org if not already connected
+  if(!client->connected()){
+    if (_debug) Serial.println(F("[BOT Client]Connecting to server"));
+    if(!client->connect(HOST, SSL_PORT)){
+      if (_debug) Serial.println(F("[BOT Client]Conection error"));
+    }
+  }
+  if (client->connected()) {
 
     String start_request = "";
     String end_request = "";
@@ -262,6 +294,7 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(String command, Str
     }
   }
 
+  closeClient();
   return body;
 }
 
@@ -270,6 +303,8 @@ bool UniversalTelegramBot::getMe() {
   String response = sendGetToTelegram(command); //receive reply from telegram.org
   DynamicJsonBuffer jsonBuffer;
   JsonObject& root = jsonBuffer.parseObject(response);
+
+  closeClient();
 
   if(root.success()) {
     if (root.containsKey("result")) {
@@ -299,7 +334,13 @@ int UniversalTelegramBot::getUpdates(long offset)  {
   }
   String response = sendGetToTelegram(command); //receive reply from telegram.org
 
-  if (response != "") {
+  if (response == "") {
+    if(_debug) Serial.println(F("Received empty string in response!"));
+    // close the client as there's nothing to do with an empty string
+    closeClient();
+    return 0;
+  }
+  else {
     if (_debug)  {
       Serial.print("incoming message length");
       Serial.println(response.length());
@@ -324,6 +365,7 @@ int UniversalTelegramBot::getUpdates(long offset)  {
               newMessageIndex++;
             }
           }
+          // We will keep the client open because there may be a response to be given
           return newMessageIndex;
         } else {
           if (_debug) Serial.println(F("no new messages"));
@@ -331,11 +373,17 @@ int UniversalTelegramBot::getUpdates(long offset)  {
       } else {
         if (_debug) Serial.println(F("Response contained no 'result'"));
       }
-    } else {
-      // Buffer may not be big enough, increase buffer or reduce max number of messages
-      if (_debug) Serial.println(F("Failed to parse update, the message could be too big for the buffer"));
+    } else { // Parsing failed
+      if(response.length() < 2){ // Too short a message. Maybe connection issue
+        if (_debug) Serial.println(F("Parsing error: Message too short"));
+      }
+      else{
+        // Buffer may not be big enough, increase buffer or reduce max number of messages
+        if (_debug) Serial.println(F("Failed to parse update, the message could be too big for the buffer"));
+      }
     }
-
+    // Close the client as no response is to be given
+    closeClient();
     return 0;
   }
 }
@@ -389,7 +437,7 @@ bool UniversalTelegramBot::processResult(JsonObject& result, int messageIndex) {
 
       messages[messageIndex].text = message["data"].as<String>();
       messages[messageIndex].date = message["date"].as<String>();
-      messages[messageIndex].chat_id = F("");
+      messages[messageIndex].chat_id = message["message"]["chat"]["id"].as<String>();
       messages[messageIndex].chat_title = F("");
     } else if (result.containsKey("edited_message")) {
       JsonObject& message = result["edited_message"];
@@ -437,7 +485,7 @@ bool UniversalTelegramBot::sendSimpleMessage(String chat_id, String text, String
       }
     }
   }
-
+  closeClient();
   return sent;
 }
 
@@ -536,6 +584,7 @@ bool UniversalTelegramBot::sendPostMessage(JsonObject& payload)  {
     }
   }
 
+  closeClient();
   return sent;
 }
 
@@ -558,6 +607,7 @@ String UniversalTelegramBot::sendPostPhoto(JsonObject& payload)  {
     }
   }
 
+  closeClient();
   return response;
 }
 
@@ -638,5 +688,15 @@ bool UniversalTelegramBot::sendChatAction(String chat_id, String text)  {
     }
   }
 
+  closeClient();
   return sent;
+}
+
+void UniversalTelegramBot::closeClient(){
+#ifdef ESP32
+  if(client->connected()){
+    if(_debug){Serial.println(F("Closing client")); }
+    client->stop();
+  }
+#endif
 }

@@ -2,7 +2,7 @@
 Copyright (c) 2015 Giancarlo Bacchio. All right reserved.
 
 TelegramBot - Library to create your own Telegram Bot using
-ESP8266 on Arduino IDE.
+ESP8266 or ESP32 on Arduino IDE.
 Ref. Library at https:github/esp8266/Arduino
 
 This library is free software; you can redistribute it and/or
@@ -93,6 +93,7 @@ class UniversalTelegramBot
     String _token;
     Client *client;
     bool processResult(JsonObject& result, int messageIndex);
+    void closeClient();
     const int maxMessageLength = 1300;
 };
 
