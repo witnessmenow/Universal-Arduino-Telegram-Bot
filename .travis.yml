@@ -25,8 +25,8 @@ env:
     - SCRIPT=platformioSingle EXAMPLE_NAME=LongPoll EXAMPLE_FOLDER=/ BOARDTYPE=ESP8266 BOARD=d1_mini
     # ESP32
     - SCRIPT=platformioSingle EXAMPLE_NAME=EchoBot EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
-    - SCRIPT=platformioSingle EXAMPLE_NAME=ReplyKeyboardMarkup EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
-    - SCRIPT=platformioSingle EXAMPLE_NAME=InlineKeyboardMarkup EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
+    - SCRIPT=platformioSingle EXAMPLE_NAME=ReplyKeyboardMarkup EXAMPLE_FOLDER=/CustomKeyboard/ BOARDTYPE=ESP32 BOARD=esp32dev
+    - SCRIPT=platformioSingle EXAMPLE_NAME=InlineKeyboardMarkup EXAMPLE_FOLDER=/CustomKeyboard/ BOARDTYPE=ESP32 BOARD=esp32dev
     - SCRIPT=platformioSingle EXAMPLE_NAME=FlashLED EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
     - SCRIPT=platformioSingle EXAMPLE_NAME=Location EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
     - SCRIPT=platformioSingle EXAMPLE_NAME=ChannelPost EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
