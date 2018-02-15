@@ -30,7 +30,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #define HOST "api.telegram.org"
 #define SSL_PORT 443
 #define HANDLE_MESSAGES 1
-
+//#define DEBUG_UNIVERSALTELEGRAMBOT
 typedef bool (*MoreDataAvailable)();
 typedef byte (*GetNextByte)();
 
@@ -87,7 +87,7 @@ class UniversalTelegramBot
     String _token;
     Client *client;
     const int maxMessageLength = 1300;
-    bool _debug = false;
+    //bool _debug=false;//please use #DEFINE above
 };
 
 #endif
