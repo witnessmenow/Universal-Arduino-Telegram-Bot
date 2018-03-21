@@ -87,6 +87,7 @@ class UniversalTelegramBot
     String userName;
     int longPoll = 0;
     bool _debug = false;
+    int waitForResponse = 1500;
 
   private:
     //JsonObject * parseUpdates(String response);

@@ -62,7 +62,7 @@ String UniversalTelegramBot::sendGetToTelegram(String command) {
 		client->println("GET /"+command);
 		now=millis();
 		avail=false;
-		while (millis() - now < longPoll * 1000 + 1500) {
+		while (millis() - now < longPoll * 1000 + waitForResponse) {
 			while (client->available()) {
 				char c = client->read();
 				//Serial.write(c);
@@ -125,7 +125,7 @@ String UniversalTelegramBot::sendPostToTelegram(String command, JsonObject& payl
 		responseReceived=false;
     bool finishedHeaders = false;
     bool currentLineIsBlank = true;
-		while (millis()-now<1500) {
+		while (millis() - now < waitForResponse) {
 			while (client->available()) {
 				char c = client->read();
 				responseReceived=true;
@@ -255,7 +255,7 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(String command, Str
     now=millis();
     bool finishedHeaders = false;
     bool currentLineIsBlank = true;
-    while (millis()-now<1500) {
+    while (millis() - now < waitForResponse) {
       while (client->available()) {
         char c = client->read();
         responseReceived=true;
