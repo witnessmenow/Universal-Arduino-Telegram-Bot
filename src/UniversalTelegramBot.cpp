@@ -326,7 +326,7 @@ bool UniversalTelegramBot::getMe() {
 ***************************************************************/
 int UniversalTelegramBot::getUpdates(long offset)  {
 
-  if (_debug) Serial.println("GET Update Messages");
+  if (_debug) Serial.println(F("GET Update Messages"));
 
   String command = "bot"+_token+"/getUpdates?offset="+String(offset)+"&limit="+String(HANDLE_MESSAGES);
   if(longPoll > 0) {
@@ -342,9 +342,9 @@ int UniversalTelegramBot::getUpdates(long offset)  {
   }
   else {
     if (_debug)  {
-      Serial.print("incoming message length");
+      Serial.print(F("incoming message length"));
       Serial.println(response.length());
-      Serial.println("Creating DynamicJsonBuffer");
+      Serial.println(F("Creating DynamicJsonBuffer"));
     }
 
     // Parse response into Json object
@@ -471,7 +471,7 @@ bool UniversalTelegramBot::processResult(JsonObject& result, int messageIndex) {
 bool UniversalTelegramBot::sendSimpleMessage(String chat_id, String text, String parse_mode)  {
 
   bool sent = false;
-  if (_debug) Serial.println("SEND Simple Message");
+  if (_debug) Serial.println(F("SEND Simple Message"));
   long sttime = millis();
 
   if (text!="") {
