@@ -4,7 +4,7 @@
 
      written by Vadim Sinitski (modified by Brian Lough)
  *******************************************************************/
-#include <ESP8266WiFi.h>
+#include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
 
@@ -58,14 +58,13 @@ void handleNewMessages(int numNewMessages) {
 void setup() {
   Serial.begin(115200);
 
-  // Set WiFi to station mode and disconnect from an AP if it was Previously connected
-  WiFi.mode(WIFI_STA);
-  WiFi.disconnect();
-  delay(100);
-
-  // attempt to connect to Wifi network:
+  // Attempt to connect to Wifi network:
   Serial.print("Connecting Wifi: ");
   Serial.println(ssid);
+
+  // Set WiFi to station mode and disconnect from an AP if it was Previously
+  // connected
+  WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED) {
