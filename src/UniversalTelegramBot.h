@@ -79,6 +79,18 @@ public:
   String sendPhoto(String chat_id, String photo, String caption = "",
                    bool disable_notification = false,
                    int reply_to_message_id = 0, String keyboard = "");
+  String sendMultipartFormSerialDataToTelegram(String command, String binaryProperyName,
+                                String fileName, String contentType,
+                                String chat_id, int fileSize,
+                                MoreDataAvailable moreDataAvailableCallback,
+                                GetNextBuffer getNextBufferCallback,
+                                GetNextBufferLen getNextBufferLenCallback);
+
+
+  String sendPhotoFromBuffer(String chat_id, String contentType, int fileSize,
+    MoreDataAvailable moreDataAvailableCallback,
+    GetNextBuffer getNextBufferCallback,
+    GetNextBufferLen getNextBufferLenCallback);
 
   int getUpdates(long offset);
   bool checkForOkResponse(String response);
