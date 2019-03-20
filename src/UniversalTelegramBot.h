@@ -22,6 +22,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #ifndef UniversalTelegramBot_h
 #define UniversalTelegramBot_h
 
+#define ARDUINOJSON_DECODE_UNICODE 1
+#define ARDUINOJSON_USE_LONG_LONG 1
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <Client.h>
@@ -32,6 +34,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 typedef bool (*MoreDataAvailable)();
 typedef byte (*GetNextByte)();
+typedef byte* (*GetNextBuffer)();
+typedef int (GetNextBufferLen)();
 
 struct telegramMessage {
   String text;
@@ -50,13 +54,15 @@ class UniversalTelegramBot {
 public:
   UniversalTelegramBot(String token, Client &client);
   String sendGetToTelegram(String command);
-  String sendPostToTelegram(String command, JsonObject &payload);
+  String sendPostToTelegram(String command, JsonObject payload);
   String
   sendMultipartFormDataToTelegram(String command, String binaryProperyName,
                                   String fileName, String contentType,
                                   String chat_id, int fileSize,
                                   MoreDataAvailable moreDataAvailableCallback,
-                                  GetNextByte getNextByteCallback);
+                                  GetNextByte getNextByteCallback, 
+								  GetNextBuffer getNextBufferCallback, 
+								  GetNextBufferLen getNextBufferLenCallback);
 
   bool getMe();
 
@@ -71,15 +77,18 @@ public:
 
   bool sendChatAction(String chat_id, String text);
 
-  bool sendPostMessage(JsonObject &payload);
-  String sendPostPhoto(JsonObject &payload);
+  bool sendPostMessage(JsonObject payload);
+  String sendPostPhoto(JsonObject payload);
   String sendPhotoByBinary(String chat_id, String contentType, int fileSize,
                            MoreDataAvailable moreDataAvailableCallback,
-                           GetNextByte getNextByteCallback);
+                           GetNextByte getNextByteCallback, 
+						   GetNextBuffer getNextBufferCallback, 
+						   GetNextBufferLen getNextBufferLenCallback);
   String sendPhoto(String chat_id, String photo, String caption = "",
                    bool disable_notification = false,
                    int reply_to_message_id = 0, String keyboard = "");
-  String sendMultipartFormSerialDataToTelegram(String command, String binaryProperyName,
+
+  /* String sendMultipartFormSerialDataToTelegram(String command, String binaryProperyName,
                                 String fileName, String contentType,
                                 String chat_id, int fileSize,
                                 MoreDataAvailable moreDataAvailableCallback,
@@ -90,7 +99,7 @@ public:
   String sendPhotoFromBuffer(String chat_id, String contentType, int fileSize,
     MoreDataAvailable moreDataAvailableCallback,
     GetNextBuffer getNextBufferCallback,
-    GetNextBufferLen getNextBufferLenCallback);
+    GetNextBufferLen getNextBufferLenCallback); */
 
   int getUpdates(long offset);
   bool checkForOkResponse(String response);
@@ -106,9 +115,9 @@ private:
   // JsonObject * parseUpdates(String response);
   String _token;
   Client *client;
-  bool processResult(JsonObject &result, int messageIndex);
   void closeClient();
-  const int maxMessageLength = 1300;
+  const int maxMessageLength = 1500;
+  bool processResult(JsonObject result, int messageIndex);
 };
 
 #endif
