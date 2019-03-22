@@ -94,7 +94,7 @@ String UniversalTelegramBot::sendPostToTelegram(String command, JsonObject paylo
   String body = "";
   String headers = "";
   long now;
-  bool responseReceived;
+  bool responseReceived = false;
 
   // Connect with api.telegram.org if not already connected
   if (!client->connected()) {
@@ -130,9 +130,8 @@ String UniversalTelegramBot::sendPostToTelegram(String command, JsonObject paylo
     client->println(out);
 
     int ch_count = 0;
-    char c;
+    //char c;
     now = millis();
-    responseReceived = false;
     bool finishedHeaders = false;
     bool currentLineIsBlank = true;
     while (millis() - now < waitForResponse) {
@@ -178,13 +177,17 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
     String command, String binaryProperyName, String fileName,
     String contentType, String chat_id, int fileSize,
     MoreDataAvailable moreDataAvailableCallback,
-    GetNextByte getNextByteCallback, GetNextBuffer getNextBufferCallback,
+    GetNextByte getNextByteCallback, 
+	GetNextBuffer getNextBufferCallback,
     GetNextBufferLen getNextBufferLenCallback) {
 
   String body = "";
   String headers = "";
   long now;
-  bool responseReceived;
+  bool responseReceived = false;
+  bool finishedHeaders = false;
+  bool currentLineIsBlank = true;
+  
   String boundry = F("------------------------b8f610217e83e29b");
 
   // Connect with api.telegram.org if not already connected
@@ -278,12 +281,11 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
     if (_debug)
       Serial.print("End request: " + end_request);
 
-    int count = 0;
+    //int count = 0;
     int ch_count = 0;
-    char c;
+    //char c;
     now = millis();
-    bool finishedHeaders = false;
-    bool currentLineIsBlank = true;
+    
     while (millis() - now < waitForResponse) {
       while (client->available()) {
         char c = client->read();
@@ -532,7 +534,7 @@ bool UniversalTelegramBot::sendSimpleMessage(String chat_id, String text,
 
   bool sent = false;
   if (_debug)
-    Serial.println(F("SEND Simple Message"));
+    Serial.println(F("sendSimpleMessage: SEND Simple Message"));
   long sttime = millis();
 
   if (text != "") {
@@ -654,7 +656,7 @@ bool UniversalTelegramBot::sendPostMessage(JsonObject payload) {
 
   bool sent = false;
   if (_debug){
-    Serial.print(F("SEND Post Message: "));
+    Serial.print(F("sendPostMessage: SEND Post Message: "));
 	serializeJson(payload, Serial);
 	Serial.println();
   }
@@ -682,7 +684,7 @@ String UniversalTelegramBot::sendPostPhoto(JsonObject payload) {
   bool sent = false;
   String response = "";
   if (_debug)
-    Serial.println(F("SEND Post Photo"));
+    Serial.println(F("sendPostPhoto: SEND Post Photo"));
   long sttime = millis();
 
   if (payload.containsKey("photo")) {
@@ -708,7 +710,7 @@ String UniversalTelegramBot::sendPhotoByBinary(
     GetNextByte getNextByteCallback, GetNextBuffer getNextBufferCallback, GetNextBufferLen getNextBufferLenCallback) {
 
   if (_debug)
-    Serial.println("SEND Photo");
+    Serial.println(F("sendPhotoByBinary: SEND Photo"));
 
   String response = sendMultipartFormDataToTelegram("sendPhoto", "photo", "img.jpg",
     contentType, chat_id, fileSize,

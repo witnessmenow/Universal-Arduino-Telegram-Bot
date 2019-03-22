@@ -109,7 +109,7 @@ public:
   String userName;
   int longPoll = 0;
   bool _debug = false;
-  int waitForResponse = 1500;
+  int waitForResponse = 3000;
 
 private:
   // JsonObject * parseUpdates(String response);
