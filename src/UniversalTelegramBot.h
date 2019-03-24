@@ -88,19 +88,6 @@ public:
                    bool disable_notification = false,
                    int reply_to_message_id = 0, String keyboard = "");
 
-  /* String sendMultipartFormSerialDataToTelegram(String command, String binaryProperyName,
-                                String fileName, String contentType,
-                                String chat_id, int fileSize,
-                                MoreDataAvailable moreDataAvailableCallback,
-                                GetNextBuffer getNextBufferCallback,
-                                GetNextBufferLen getNextBufferLenCallback);
-
-
-  String sendPhotoFromBuffer(String chat_id, String contentType, int fileSize,
-    MoreDataAvailable moreDataAvailableCallback,
-    GetNextBuffer getNextBufferCallback,
-    GetNextBufferLen getNextBufferLenCallback); */
-
   int getUpdates(long offset);
   bool checkForOkResponse(String response);
   telegramMessage messages[HANDLE_MESSAGES];
@@ -109,7 +96,7 @@ public:
   String userName;
   int longPoll = 0;
   bool _debug = false;
-  int waitForResponse = 3000;
+  int waitForResponse = 1500;
 
 private:
   // JsonObject * parseUpdates(String response);
