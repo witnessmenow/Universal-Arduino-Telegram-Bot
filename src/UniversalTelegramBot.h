@@ -27,10 +27,14 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <Client.h>
+#include <core_version.h> 
 
 #define HOST "api.telegram.org"
 #define SSL_PORT 443
 #define HANDLE_MESSAGES 1
+
+//unmark following line to enable debug mode
+//#define _debug
 
 typedef bool (*MoreDataAvailable)();
 typedef byte (*GetNextByte)();
@@ -95,7 +99,6 @@ public:
   String name;
   String userName;
   int longPoll = 0;
-  bool _debug = false;
   int waitForResponse = 1500;
 
 private:
