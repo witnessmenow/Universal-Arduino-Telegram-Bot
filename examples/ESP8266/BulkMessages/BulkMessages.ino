@@ -23,12 +23,12 @@ UniversalTelegramBot bot(BOTtoken, secured_client);
 int Bot_mtbs = 1000; // mean time between scan messages
 long Bot_lasttime;   // last time messages' scan has been done
 
+DynamicJsonDocument usersDoc(1500);
+
 int bulk_messages_mtbs = 1500; // mean time between send messages, 1.5 seconds
 int messages_limit_per_second = 25; // Telegram API have limit for bulk messages ~30 messages per second
 
 String subscribed_users_filename = "subscribed_users.json";
-
-DynamicJsonBuffer jsonBuffer;
 
 void handleNewMessages(int numNewMessages) {
   Serial.println("handleNewMessages");
@@ -94,7 +94,7 @@ void handleNewMessages(int numNewMessages) {
   }
 }
 
-JsonObject& getSubscribedUsers() {
+JsonObject getSubscribedUsers() {
   File subscribedUsersFile = SPIFFS.open("/"+subscribed_users_filename, "r");
 
   if (!subscribedUsersFile) {
@@ -104,35 +104,33 @@ JsonObject& getSubscribedUsers() {
     File f = SPIFFS.open("/"+subscribed_users_filename, "w");
     f.close();
 
-    JsonObject& users = jsonBuffer.createObject();
+    JsonObject users;
 
     return users;
   } else {
 
     size_t size = subscribedUsersFile.size();
 
-    if (size > 1024) {
+    if (size > 1500) {
       Serial.println("Subscribed users file is too large");
       //return users;
     }
 
     String file_content = subscribedUsersFile.readString();
-
-    JsonObject& users = jsonBuffer.parseObject(file_content);
-
-    if (!users.success()) {
+    DeserializationError error = deserializeJson(usersDoc, file_content);
+    JsonObject users = usersDoc.to<JsonObject>();
+    if (error) {
       Serial.println("Failed to parse subscribed users file");
       return users;
     }
 
     subscribedUsersFile.close();
-
     return users;
   }
 }
 
 bool addSubscribedUser(String chat_id, String from_name) {
-  JsonObject& users = getSubscribedUsers();
+  JsonObject users = getSubscribedUsers();
 
   File subscribedUsersFile = SPIFFS.open("/"+subscribed_users_filename, "w+");
 
@@ -140,9 +138,10 @@ bool addSubscribedUser(String chat_id, String from_name) {
     Serial.println("Failed to open subscribed users file for writing");
     //return false;
   }
-
-  users.set(chat_id, from_name);
-  users.printTo(subscribedUsersFile);
+  
+  //users.getOrCreateMember(chat_id, from_name);
+  users[chat_id] = from_name;
+  serializeJson(users, subscribedUsersFile);
 
   subscribedUsersFile.close();
 
@@ -150,7 +149,7 @@ bool addSubscribedUser(String chat_id, String from_name) {
 }
 
 bool removeSubscribedUser(String chat_id) {
-  JsonObject& users = getSubscribedUsers();
+  JsonObject users = getSubscribedUsers();
 
   File subscribedUsersFile = SPIFFS.open("/"+subscribed_users_filename, "w");
 
@@ -160,8 +159,7 @@ bool removeSubscribedUser(String chat_id) {
   }
 
   users.remove(chat_id);
-  users.printTo(subscribedUsersFile);
-
+  serializeJson(users, subscribedUsersFile);
   subscribedUsersFile.close();
 
   return true;
@@ -170,13 +168,13 @@ bool removeSubscribedUser(String chat_id) {
 void sendMessageToAllSubscribedUsers(String message) {
   int users_processed = 0;
 
-  JsonObject& users = getSubscribedUsers();
+  JsonObject users = getSubscribedUsers();
 
   for (JsonObject::iterator it=users.begin(); it!=users.end(); ++it) {
     users_processed++;
 
     if (users_processed < messages_limit_per_second)  {
-      const char* chat_id = it->key;
+      const char* chat_id = it->key().c_str();
       bot.sendMessage(chat_id, message, "");
     } else {
       delay(bulk_messages_mtbs);

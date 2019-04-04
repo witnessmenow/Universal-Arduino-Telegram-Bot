@@ -39,8 +39,8 @@ void handleNewMessages(int numNewMessages) {
       String response = bot.sendPhoto(chat_id, test_photo_url, "This photo was sent using URL");
 
       if (bot.checkForOkResponse(response)) {
-        DynamicJsonBuffer jsonBuffer;
-        JsonObject& images = jsonBuffer.parseObject(response);
+        DynamicJsonDocument images(1500);
+        DeserializationError error = deserializeJson(images, response);
 
         // There are 3 image sizes after Telegram has process photo
         // You may choose what you want, in example was choosed bigger size
