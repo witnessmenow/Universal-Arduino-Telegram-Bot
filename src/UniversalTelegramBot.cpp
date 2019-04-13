@@ -524,6 +524,26 @@ bool UniversalTelegramBot::sendSimpleMessage(String chat_id, String text,
   return sent;
 }
 
+String UniversalTelegramBot::sendLocation(String chat_id, float longitude, float latitude) {
+
+  bool sent = false;
+  String response = "";
+  if (_debug)
+    Serial.println(F("SEND Post Location"));
+  long sttime = millis();
+
+      String command = "bot" + _token + "/sendLocation?chat_id=" + chat_id +
+                       "&longitude=" + longitude + "&latitude=" + latitude;
+      response = sendGetToTelegram(command);
+	  
+  if (_debug)
+    Serial.println(response);
+  
+
+  closeClient();
+  return response;
+}
+
 bool UniversalTelegramBot::sendMessage(String chat_id, String text,
                                        String parse_mode) {
 
