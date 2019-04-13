@@ -61,6 +61,7 @@ public:
   bool getMe();
 
   bool sendSimpleMessage(String chat_id, String text, String parse_mode);
+  String sendLocation(String chat_id, float longitude, float latitude);
   bool sendMessage(String chat_id, String text, String parse_mode = "");
   bool sendMessageWithReplyKeyboard(String chat_id, String text,
                                     String parse_mode, String keyboard,
