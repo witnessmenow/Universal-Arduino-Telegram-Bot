@@ -44,6 +44,10 @@ void setup() {
   Serial.println("WiFi connected");
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
+  
+  // connect to the Telegram without checking the CERTS (BearSSL)
+  // on Arduino cores > 2.4.2 (e.g. 2.5.0) BearSSL is used
+  client.setInsecure();
 }
 
 void loop() {
