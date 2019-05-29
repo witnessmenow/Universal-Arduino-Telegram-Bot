@@ -80,7 +80,7 @@ void loop() {
         //Content type for PNG image/png
         String sent = bot.sendPhotoByBinary(chat_id, "image/jpeg", myFile.size(),
             isMoreDataAvailable,
-            getNextByte);
+            getNextByte,nullptr,nullptr);
 
         if (sent) {
           Serial.println("was successfully sent");
