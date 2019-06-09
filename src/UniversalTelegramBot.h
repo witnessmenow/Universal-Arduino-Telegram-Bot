@@ -89,14 +89,14 @@ public:
   int longPoll = 0;
   bool _debug = false;
   int waitForResponse = 1500;
+  int maxMessageLength = 1300;
 
-private:
+  private:
   // JsonObject * parseUpdates(String response);
   String _token;
   Client *client;
   bool processResult(JsonObject &result, int messageIndex);
   void closeClient();
-  const int maxMessageLength = 1300;
 };
 
 #endif
