@@ -23,7 +23,7 @@ The downloaded code can be included as a new library into the IDE selecting the 
 
      Sketch / include Library / Add .Zip library
 
-You also have to install the ArduinoJson library written by [Benoît Blanchon](https://github.com/bblanchon). Search for it on the Arduino Library manager or get it from [here](https://github.com/bblanchon/ArduinoJson).
+You also have to install the ArduinoJson library ( version 5.13.5 ) written by [Benoît Blanchon](https://github.com/bblanchon). Search for it on the Arduino Library manager or get it from [here](https://github.com/bblanchon/ArduinoJson).
 
 
 ## Getting Started
