@@ -65,13 +65,12 @@ String UniversalTelegramBot::sendGetToTelegram(String command) {
 		Serial.println(F(".... connected to server"));
 	#endif	
 
-    String a = "";
-    char c;
+    String a = String();
     int ch_count = 0;
     client->println("GET /" + command);
     now = millis();
     avail = false;
-    while (millis() - now < longPoll * 1000 + waitForResponse) {
+    while (millis() - now < longPoll * 1000 + (unsigned int) waitForResponse) {
       while (client->available()) {
         char c = client->read();
         if (ch_count < maxMessageLength) {
@@ -138,7 +137,7 @@ String UniversalTelegramBot::sendPostToTelegram(String command, JsonObject paylo
     now = millis();
     bool finishedHeaders = false;
     bool currentLineIsBlank = true;
-    while (millis() - now < waitForResponse) {
+    while (millis() - now < (unsigned int) waitForResponse) {
       while (client->available()) {
         char c = client->read();
         responseReceived = true;
@@ -255,7 +254,6 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
 		#endif
         byte buffer[512];
         int count = 0;
-        char ch;
         while (moreDataAvailableCallback()) {
             buffer[count] = getNextByteCallback();
             count++;
@@ -284,7 +282,7 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
     int ch_count = 0;
     now = millis();
     
-    while (millis() - now < waitForResponse) {
+    while (millis() - now < (unsigned int) waitForResponse) {
       while (client->available()) {
         char c = client->read();
         responseReceived = true;
@@ -514,7 +512,7 @@ bool UniversalTelegramBot::sendSimpleMessage(String chat_id, String text,
   long sttime = millis();
 
   if (text != "") {
-    while (millis() < sttime + 8000) { // loop for a while to send the message
+    while (millis() < sttime + (unsigned int) 8000) { // loop for a while to send the message
       String command = "bot" + _token + "/sendMessage?chat_id=" + chat_id +
                        "&text=" + text + "&parse_mode=" + parse_mode;
       String response = sendGetToTelegram(command);
@@ -612,7 +610,7 @@ bool UniversalTelegramBot::sendPostMessage(JsonObject payload) {
   long sttime = millis();
 
   if (payload.containsKey("text")) {
-    while (millis() < sttime + 8000) { // loop for a while to send the message
+    while (millis() < sttime + (unsigned int) 8000) { // loop for a while to send the message
       String command = "bot" + _token + "/sendMessage";
       String response = sendPostToTelegram(command, payload);
       #ifdef _debug  
@@ -637,7 +635,7 @@ String UniversalTelegramBot::sendPostPhoto(JsonObject payload) {
   long sttime = millis();
 
   if (payload.containsKey("photo")) {
-    while (millis() < sttime + 8000) { // loop for a while to send the message
+    while (millis() < sttime + (unsigned int) 8000) { // loop for a while to send the message
       String command = "bot" + _token + "/sendPhoto";
       response = sendPostToTelegram(command, payload);
       #ifdef _debug  
@@ -726,7 +724,7 @@ bool UniversalTelegramBot::sendChatAction(String chat_id, String text) {
   long sttime = millis();
 
   if (text != "") {
-    while (millis() < sttime + 8000) { // loop for a while to send the message
+    while (millis() < sttime + (unsigned int)8000) { // loop for a while to send the message
       String command = "bot" + _token + "/sendChatAction?chat_id=" + chat_id +
                        "&action=" + text;
       String response = sendGetToTelegram(command);

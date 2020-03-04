@@ -22,8 +22,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #ifndef UniversalTelegramBot_h
 #define UniversalTelegramBot_h
 
+#if !defined(ARDUINOJSON_DECODE_UNICODE) || !defined(ARDUINOJSON_USE_LONG_LONG)
 #define ARDUINOJSON_DECODE_UNICODE 1
 #define ARDUINOJSON_USE_LONG_LONG 1
+#endif
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <Client.h>
