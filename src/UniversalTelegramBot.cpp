@@ -40,6 +40,10 @@ UniversalTelegramBot::UniversalTelegramBot(String token, Client &client) {
   this->client = &client;
 }
 
+void UniversalTelegramBot::updateToken(String token) {
+  _token = token;
+}
+
 String UniversalTelegramBot::sendGetToTelegram(String command) {
   String mess = "";
   long now;
