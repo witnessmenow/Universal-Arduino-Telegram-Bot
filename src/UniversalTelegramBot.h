@@ -77,12 +77,11 @@ public:
                                     String parse_mode, String keyboard,
                                     bool resize = false, bool oneTime = false,
                                     bool selective = false);
-  bool sendMessageWithInlineKeyboard(String chat_id, String text,
-                                     String parse_mode, String keyboard);
+  bool sendMessageWithInlineKeyboard(String chat_id, String text, String parse_mode, String keyboard, int message_id = 0);
 
   bool sendChatAction(String chat_id, String text);
 
-  bool sendPostMessage(JsonObject payload);
+  bool sendPostMessage(JsonObject payload, bool edit = false);
   String sendPostPhoto(JsonObject payload);
   String sendPhotoByBinary(String chat_id, String contentType, int fileSize,
                            MoreDataAvailable moreDataAvailableCallback,

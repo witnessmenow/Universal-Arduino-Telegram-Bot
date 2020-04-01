@@ -438,7 +438,6 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
   if (last_message_received != update_id) {
     last_message_received = update_id;
     messages[messageIndex].update_id = update_id;
-    messages[messageIndex].message_id = message["message_id"].as<int>();
     messages[messageIndex].text = F("");
     messages[messageIndex].from_id = F("");
     messages[messageIndex].from_name = F("");
@@ -453,6 +452,7 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
       messages[messageIndex].date = message["date"].as<String>();
       messages[messageIndex].chat_id = message["chat"]["id"].as<String>();
       messages[messageIndex].chat_title = message["chat"]["title"].as<String>();
+      messages[messageIndex].message_id = message["message_id"].as<int>();
 
       if (message.containsKey("text")) {
         messages[messageIndex].text = message["text"].as<String>();
@@ -468,7 +468,7 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
       messages[messageIndex].date = message["date"].as<String>();
       messages[messageIndex].chat_id = message["chat"]["id"].as<String>();
       messages[messageIndex].chat_title = message["chat"]["title"].as<String>();
-
+      messages[messageIndex].message_id = message["message"]["message_id"].as<int>();
     } else if (result.containsKey("callback_query")) {
       JsonObject message = result["callback_query"];
       messages[messageIndex].type = F("callback_query");
@@ -478,7 +478,7 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
       messages[messageIndex].date = message["date"].as<String>();
       messages[messageIndex].chat_id = message["message"]["chat"]["id"].as<String>();
       messages[messageIndex].chat_title = F("");
-        
+      messages[messageIndex].message_id = message["message"]["message_id"].as<int>();
     } else if (result.containsKey("edited_message")) {
       JsonObject message = result["edited_message"];
       messages[messageIndex].type = F("edited_message");
@@ -487,7 +487,7 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
       messages[messageIndex].date = message["date"].as<String>();
       messages[messageIndex].chat_id = message["chat"]["id"].as<String>();
       messages[messageIndex].chat_title = message["chat"]["title"].as<String>();
-
+      messages[messageIndex].message_id = message["message"]["message_id"].as<int>();
       if (message.containsKey("text")) {
         messages[messageIndex].text = message["text"].as<String>();
           
@@ -582,12 +582,15 @@ bool UniversalTelegramBot::sendMessageWithReplyKeyboard(
 bool UniversalTelegramBot::sendMessageWithInlineKeyboard(String chat_id,
                                                          String text,
                                                          String parse_mode,
-                                                         String keyboard) {
+                                                         String keyboard,
+                                                         int message_id) {
 
   DynamicJsonDocument payload(maxMessageLength);
   payload["chat_id"] = chat_id;
   payload["text"] = text;
 
+  if (message_id != 0)
+    payload["message_id"] = message_id;
   if (parse_mode != "")
     payload["parse_mode"] = parse_mode;
 
@@ -595,14 +598,14 @@ bool UniversalTelegramBot::sendMessageWithInlineKeyboard(String chat_id,
   DynamicJsonDocument keyboardBuffer(maxMessageLength); // assuming keyboard buffer will alwas be limited to 1024 bytes
   deserializeJson(keyboardBuffer, keyboard);
   replyMarkup["inline_keyboard"] = keyboardBuffer.as<JsonArray>();
-  return sendPostMessage(payload.as<JsonObject>());
+  return sendPostMessage(payload.as<JsonObject>(), message_id != 0);
 }
 
 /***********************************************************************
  * SendPostMessage - function to send message to telegram                  *
  * (Arguments to pass: chat_id, text to transmit and markup(optional)) *
  ***********************************************************************/
-bool UniversalTelegramBot::sendPostMessage(JsonObject payload) {
+bool UniversalTelegramBot::sendPostMessage(JsonObject payload, bool edit) {
 
   bool sent = false;
   #ifdef _debug 
@@ -612,12 +615,12 @@ bool UniversalTelegramBot::sendPostMessage(JsonObject payload) {
   #endif 
   long sttime = millis();
 
-  if (payload.containsKey("text")) {
+  if (payload.containsKey("text") && (!edit || (edit && payload.containsKey("message_id")))) {
     while (millis() < sttime + 8000) { // loop for a while to send the message
-      String command = "bot" + _token + "/sendMessage";
+      String command = "bot" + _token + (edit ? "/editMessageText" : "/sendMessage");
       String response = sendPostToTelegram(command, payload);
-      #ifdef _debug  
-		Serial.println(response);
+    #ifdef _debug  
+		  Serial.println(response);
 	  #endif
       sent = checkForOkResponse(response);
       if (sent) break;
