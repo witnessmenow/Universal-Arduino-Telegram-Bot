@@ -438,6 +438,7 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
   if (last_message_received != update_id) {
     last_message_received = update_id;
     messages[messageIndex].update_id = update_id;
+    messages[messageIndex].message_id = message["message_id"].as<int>();
     messages[messageIndex].text = F("");
     messages[messageIndex].from_id = F("");
     messages[messageIndex].from_name = F("");
