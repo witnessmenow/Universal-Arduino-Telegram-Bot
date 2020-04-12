@@ -694,7 +694,7 @@ String UniversalTelegramBot::sendPhoto(String chat_id, String photo,
   if (reply_to_message_id && reply_to_message_id != 0)
       payload["reply_to_message_id"] = reply_to_message_id;
 
-  if (keyboard) {
+  if (!keyboard.isEmpty()) {
     JsonObject replyMarkup = payload.createNestedObject("reply_markup");
     DynamicJsonDocument keyboardBuffer(maxMessageLength); // assuming keyboard buffer will alwas be limited to 1024 bytes
     deserializeJson(keyboardBuffer, keyboard);
