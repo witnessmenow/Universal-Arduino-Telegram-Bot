@@ -699,7 +699,7 @@ String UniversalTelegramBot::sendPhoto(String chat_id, String photo,
     payload["reply_to_message_id"] = reply_to_message_id;
   }
 
-  if (keyboard) {
+  if (!keyboard.isEmpty()) {
     JsonObject &replyMarkup = payload.createNestedObject("reply_markup");
 
     DynamicJsonBuffer keyboardBuffer;
