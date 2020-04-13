@@ -685,7 +685,7 @@ String UniversalTelegramBot::sendPhoto(String chat_id, String photo,
   payload["chat_id"] = chat_id;
   payload["photo"] = photo;
 
-  if (caption)
+  if (!caption.isEmpty())
       payload["caption"] = caption;
 
   if (disable_notification)
