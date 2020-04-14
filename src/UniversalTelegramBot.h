@@ -92,6 +92,8 @@ public:
                    bool disable_notification = false,
                    int reply_to_message_id = 0, String keyboard = "");
 
+  bool setMyCommands(const String& commandArray);
+
   int getUpdates(long offset);
   bool checkForOkResponse(String response);
   telegramMessage messages[HANDLE_MESSAGES];
