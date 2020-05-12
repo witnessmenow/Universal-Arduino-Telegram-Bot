@@ -33,7 +33,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 typedef bool (*MoreDataAvailable)();
 typedef byte (*GetNextByte)();
 
-struct telegramMessage {
+struct telegramMessage
+{
   String text;
   String chat_id;
   String chat_title;
@@ -41,12 +42,18 @@ struct telegramMessage {
   String from_name;
   String date;
   String type;
+  String file_caption;
+  String file_path;
+  String file_name;
+  bool hasDocument;
+  long file_size;
   float longitude;
   float latitude;
   int update_id;
 };
 
-class UniversalTelegramBot {
+class UniversalTelegramBot
+{
 public:
   UniversalTelegramBot(String token, Client &client);
   String sendGetToTelegram(String command);
@@ -89,6 +96,7 @@ public:
   int longPoll = 0;
   bool _debug = false;
   int waitForResponse = 1500;
+  int _lastError;
 
 private:
   // JsonObject * parseUpdates(String response);
@@ -96,6 +104,7 @@ private:
   Client *client;
   bool processResult(JsonObject &result, int messageIndex);
   void closeClient();
+  bool getFile(String *, long *, String);
   const int maxMessageLength = 1300;
 };
 
