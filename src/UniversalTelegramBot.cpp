@@ -763,19 +763,16 @@ void UniversalTelegramBot::closeClient() {
 bool UniversalTelegramBot::getFile(String *file_path, long *file_size, String file_id)
 {
   String command = "bot" + _token + "/getFile?file_id=" + file_id;
-  String response =
-      sendGetToTelegram(command); // receive reply from telegram.org
-  DynamicJsonBuffer jsonBuffer;
-  JsonObject &root = jsonBuffer.parseObject(response);
-
+  String response = sendGetToTelegram(command); // receive reply from telegram.org
+  DynamicJsonDocument doc(maxMessageLength);
+  DeserializationError error = deserializeJson(doc, response);
+  JsonObject obj = doc.as<JsonObject>(); //there is nothing better right now to use obj.containsKey("result")
   closeClient();
 
-  if (root.success())
-  {
-    if (root.containsKey("result"))
-    {
-      *file_path = "https://api.telegram.org/file/bot" + _token + "/" + root["result"]["file_path"].as<String>();
-      *file_size = root["result"]["file_size"].as<long>();
+  if (!error) {
+    if (obj.containsKey("result")) {
+      *file_path = "https://api.telegram.org/file/bot" + _token + "/" + obj["result"]["file_path"].as<String>();
+      *file_size = obj["result"]["file_size"].as<long>();
       return true;
     }
   }
