@@ -71,8 +71,8 @@ public:
                                   String chat_id, int fileSize,
                                   MoreDataAvailable moreDataAvailableCallback,
                                   GetNextByte getNextByteCallback, 
-								  GetNextBuffer getNextBufferCallback, 
-								  GetNextBufferLen getNextBufferLenCallback);
+                                  GetNextBuffer getNextBufferCallback, 
+                                  GetNextBufferLen getNextBufferLenCallback);
 
   bool getMe();
 
@@ -92,8 +92,8 @@ public:
   String sendPhotoByBinary(String chat_id, String contentType, int fileSize,
                            MoreDataAvailable moreDataAvailableCallback,
                            GetNextByte getNextByteCallback, 
-						   GetNextBuffer getNextBufferCallback, 
-						   GetNextBufferLen getNextBufferLenCallback);
+                           GetNextBuffer getNextBufferCallback, 
+                           GetNextBufferLen getNextBufferLenCallback);
   String sendPhoto(String chat_id, String photo, String caption = "",
                    bool disable_notification = false,
                    int reply_to_message_id = 0, String keyboard = "");
