@@ -59,6 +59,7 @@ Here is a list of features that this library covers. (Note: The examples link to
 |*Location*|Your bot can receive location data, either from a single location data point or live location data. |Check the example.| [Location](https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot/tree/master/examples/ESP8266/Location/Location.ino)|
 |*Channel Post*|Reads posts from channels. |Check the example.| [ChannelPost](https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot/tree/master/examples/ESP8266/ChannelPost/ChannelPost.ino)|
 |*Long Poll*|Set how long the bot will wait checking for a new message before returning now messages. <br><br> This will decrease the amount of requests and data used by the bot, but it will tie up the arduino while it waits for messages  |`bot.longPoll = 60;` <br><br> Where 60 is the amount of seconds it should wait | [LongPoll](https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot/tree/master/examples/ESP8266/LongPoll/LongPoll.ino)|
+|*Update Firmware and SPIFFS*|You can update firmware and spiffs area through send files as a normal file with a specific caption.   |`update firmware` <br>or<br>`update spiffs`<br> These are captions for example. | [telegramOTA](https://github.com/solcer/Universal-Arduino-Telegram-Bot/blob/master/examples/ESP32/telegramOTA/telegramOTA.ino)|
 
 The full Telegram Bot API documentation can be read [here](https://core.telegram.org/bots/api). If there is a feature you would like added to the library please either raise a Github issue or please feel free to raise a Pull Request.
 

@@ -49,6 +49,11 @@ struct telegramMessage {
   String from_name;
   String date;
   String type;
+  String file_caption;
+  String file_path;
+  String file_name;
+  bool hasDocument;
+  long file_size;
   float longitude;
   float latitude;
   int update_id;
@@ -100,6 +105,7 @@ public:
   String userName;
   int longPoll = 0;
   int waitForResponse = 1500;
+  int _lastError;
 
 private:
   // JsonObject * parseUpdates(String response);
@@ -107,6 +113,7 @@ private:
   Client *client;
   void closeClient();
   const int maxMessageLength = 1500;
+  bool getFile(String *, long *, String);
   bool processResult(JsonObject result, int messageIndex);
 };
 

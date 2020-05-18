@@ -452,14 +452,22 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
       messages[messageIndex].date = message["date"].as<String>();
       messages[messageIndex].chat_id = message["chat"]["id"].as<String>();
       messages[messageIndex].chat_title = message["chat"]["title"].as<String>();
-
+      messages[messageIndex].hasDocument = false;
       if (message.containsKey("text")) {
         messages[messageIndex].text = message["text"].as<String>();
           
       } else if (message.containsKey("location")) {
         messages[messageIndex].longitude = message["location"]["longitude"].as<float>();
         messages[messageIndex].latitude  = message["location"]["latitude"].as<float>();
-      }
+      } else if (message.containsKey("document")) {
+        String file_id = message["document"]["file_id"].as<String>();
+        messages[messageIndex].file_caption = message["caption"].as<String>();
+        messages[messageIndex].file_name = message["document"]["file_name"].as<String>();
+        if (getFile(&messages[messageIndex].file_path, &messages[messageIndex].file_size, file_id) == true)
+          messages[messageIndex].hasDocument = true;
+        else
+          messages[messageIndex].hasDocument = false;
+      } 
     } else if (result.containsKey("channel_post")) {
       JsonObject message = result["channel_post"];
       messages[messageIndex].type = F("channel_post");
@@ -673,8 +681,6 @@ String UniversalTelegramBot::sendPhotoByBinary(
   return response;
 }
 
-
-
 String UniversalTelegramBot::sendPhoto(String chat_id, String photo,
                                        String caption,
                                        bool disable_notification,
@@ -752,4 +758,26 @@ void UniversalTelegramBot::closeClient() {
 	#endif
 	client->stop();
   }
+}
+
+bool UniversalTelegramBot::getFile(String *file_path, long *file_size, String file_id)
+{
+  String command = "bot" + _token + "/getFile?file_id=" + file_id;
+  String response =
+      sendGetToTelegram(command); // receive reply from telegram.org
+  DynamicJsonBuffer jsonBuffer;
+  JsonObject &root = jsonBuffer.parseObject(response);
+
+  closeClient();
+
+  if (root.success())
+  {
+    if (root.containsKey("result"))
+    {
+      *file_path = "https://api.telegram.org/file/bot" + _token + "/" + root["result"]["file_path"].as<String>();
+      *file_size = root["result"]["file_size"].as<long>();
+      return true;
+    }
+  }
+  return false;
 }
