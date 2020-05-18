@@ -343,6 +343,54 @@ bool UniversalTelegramBot::getMe() {
   return false;
 }
 
+/*********************************************************************************
+ * SetMyCommands - Update the command list of the bot on the telegram server     *
+ * (Argument to pass: Serialied array of BotCommand)                             *
+ * CAUTION: All commands must be lower-case                                      *
+ * Returns true, if the command list was updated successfully                    *
+ ********************************************************************************/
+bool UniversalTelegramBot::setMyCommands(const String& commandArray) {
+  if (commandArray.isEmpty()) {
+    #if defined(_debug)
+    Serial.println(F("sendSetMyCommands: commandArray is empty"));
+    #endif // defined(_debug)
+    return false;
+  }
+
+  DynamicJsonDocument _commandArray(maxMessageLength); 
+  DeserializationError err = deserializeJson(_commandArray, commandArray);
+  if (err) {
+    #if defined(_debug)
+    Serial.println(F("sendSetMyCommands: Deserialization Error"));
+    Serial.println(commandArray);
+    #endif // defined(_debug)
+    return false;
+  }
+
+  DynamicJsonDocument payload(maxMessageLength);
+  payload["commands"] = serialized(commandArray);
+  bool sent = false;
+  String response = "";
+  #if defined(_debug)
+	Serial.println(F("sendSetMyCommands: SEND Post /setMyCommands"));
+  #endif  // defined(_debug)
+  unsigned long sttime = millis();
+
+  while (millis() < sttime + 8000ul) { // loop for a while to send the message
+    String command = "bot" + _token + "/setMyCommands";
+    response = sendPostToTelegram(command, payload.as<JsonObject>());
+    #ifdef _debug  
+    Serial.println("setMyCommands response" + response);
+    #endif
+    sent = checkForOkResponse(response);
+    if (sent) break;
+    
+  }
+  closeClient();
+  return response;
+}
+
+
 /***************************************************************
  * GetUpdates - function to receive messages from telegram *
  * (Argument to pass: the last+1 message to read)             *
@@ -691,7 +739,7 @@ String UniversalTelegramBot::sendPhoto(String chat_id, String photo,
   payload["chat_id"] = chat_id;
   payload["photo"] = photo;
 
-  if (caption)
+  if (!caption.isEmpty())
       payload["caption"] = caption;
 
   if (disable_notification)
@@ -700,7 +748,7 @@ String UniversalTelegramBot::sendPhoto(String chat_id, String photo,
   if (reply_to_message_id && reply_to_message_id != 0)
       payload["reply_to_message_id"] = reply_to_message_id;
 
-  if (keyboard) {
+  if (!keyboard.isEmpty()) {
     JsonObject replyMarkup = payload.createNestedObject("reply_markup");
     DynamicJsonDocument keyboardBuffer(maxMessageLength); // assuming keyboard buffer will alwas be limited to 1024 bytes
     deserializeJson(keyboardBuffer, keyboard);
