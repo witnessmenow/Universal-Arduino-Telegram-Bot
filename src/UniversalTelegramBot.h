@@ -62,6 +62,7 @@ struct telegramMessage {
 class UniversalTelegramBot {
 public:
   UniversalTelegramBot(String token, Client &client);
+  void updateToken(String token);
   String sendGetToTelegram(String command);
   String sendPostToTelegram(String command, JsonObject payload);
   String
