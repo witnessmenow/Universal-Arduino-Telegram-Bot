@@ -388,10 +388,10 @@ bool UniversalTelegramBot::setMyCommands(const String& commandArray) {
     #endif
     sent = checkForOkResponse(response);
     if (sent) break;
-    
   }
+
   closeClient();
-  return response;
+  return sent;
 }
 
 
