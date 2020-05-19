@@ -763,16 +763,10 @@ String UniversalTelegramBot::sendPhoto(String chat_id, String photo,
 }
 
 bool UniversalTelegramBot::checkForOkResponse(String response) {
-  int responseLength = response.length();
+  DynamicJsonDocument doc(response.length());
+  deserializeJson(doc, response);
 
-  for (int m = 5; m < responseLength + 1; m++) {
-    if (response.substring(m - 10, m) ==
-        "{\"ok\":true") { // Chek if message has been properly sent
-      return true;
-    }
-  }
-
-  return false;
+  return doc["ok"] | false;  // default is false, but this is more explicit and clear
 }
 
 bool UniversalTelegramBot::sendChatAction(String chat_id, String text) {
