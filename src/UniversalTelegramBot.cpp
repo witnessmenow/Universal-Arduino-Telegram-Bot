@@ -763,8 +763,13 @@ String UniversalTelegramBot::sendPhoto(String chat_id, String photo,
 }
 
 bool UniversalTelegramBot::checkForOkResponse(String response) {
+  int last_id;
   DynamicJsonDocument doc(response.length());
   deserializeJson(doc, response);
+
+  // Save last sent message_id
+  last_id = doc["result"]["message_id"];
+  if (last_id > 0) last_sent_message_id = last_id;
 
   return doc["ok"] | false;  // default is false, but this is more explicit and clear
 }

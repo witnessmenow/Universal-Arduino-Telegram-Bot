@@ -109,6 +109,7 @@ public:
   int longPoll = 0;
   int waitForResponse = 1500;
   int _lastError;
+  int last_sent_message_id = 0;
 
 private:
   // JsonObject * parseUpdates(String response);
