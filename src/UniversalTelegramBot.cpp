@@ -495,6 +495,8 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
     messages[messageIndex].from_name = F("");
     messages[messageIndex].longitude = 0;
     messages[messageIndex].latitude = 0;
+    messages[messageIndex].reply_to_message_id = 0;
+    messages[messageIndex].reply_to_text = F("");
 
     if (result.containsKey("message")) {
       JsonObject message = result["message"];
@@ -519,6 +521,11 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
           messages[messageIndex].hasDocument = true;
         else
           messages[messageIndex].hasDocument = false;
+      }
+      if (message.containsKey("reply_to_message")) {
+        messages[messageIndex].reply_to_message_id = message["reply_to_message"]["message_id"];
+        // no need to check if containsKey["text"]. If it doesn't, it default to null
+        messages[messageIndex].reply_to_text = message["reply_to_message"]["text"].as<String>();
       } 
     } else if (result.containsKey("channel_post")) {
       JsonObject message = result["channel_post"];

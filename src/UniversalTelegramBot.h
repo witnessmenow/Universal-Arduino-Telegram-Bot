@@ -57,6 +57,9 @@ struct telegramMessage {
   float longitude;
   float latitude;
   int update_id;
+
+  int reply_to_message_id;
+  String reply_to_text;
 };
 
 class UniversalTelegramBot {
