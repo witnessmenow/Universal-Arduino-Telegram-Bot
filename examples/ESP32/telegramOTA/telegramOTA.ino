@@ -1,7 +1,7 @@
 /*******************************************************************
    An example of bot that can update firmware or spiffs and write file to spiffs.
 
-   written by Brian Lough
+   written by Selim Olcer
 *******************************************************************/
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
