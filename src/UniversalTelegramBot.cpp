@@ -35,6 +35,8 @@
 
 #include "UniversalTelegramBot.h"
 
+#define ZERO_COPY(STR)    ((char*)STR.c_str())
+
 UniversalTelegramBot::UniversalTelegramBot(String token, Client &client) {
   _token = token;
 #ifdef ARDUINO_ESP8266_RELEASE_2_5_0 
@@ -424,7 +426,7 @@ int UniversalTelegramBot::getUpdates(long offset) {
 
     // Parse response into Json object
       DynamicJsonDocument doc(maxMessageLength);
-      DeserializationError error = deserializeJson(doc, response);
+      DeserializationError error = deserializeJson(doc, ZERO_COPY(response));
       #ifdef _debug  
         Serial.print(F("GetUpdates parsed jsonDoc: "));
         serializeJson(doc, Serial);
