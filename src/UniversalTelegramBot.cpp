@@ -331,15 +331,12 @@ bool UniversalTelegramBot::getMe() {
   String response = sendGetToTelegram(command); // receive reply from telegram.org
   DynamicJsonDocument doc(maxMessageLength);
   DeserializationError error = deserializeJson(doc, response);
-  JsonObject obj = doc.as<JsonObject>(); //there is nothing better right now to use obj.containsKey("result")
   closeClient();
 
   if (!error) {
-    if (obj.containsKey("result")) {
-      String _name = doc["result"]["first_name"];
-      String _username = doc["result"]["username"];
-      name = _name;
-      userName = _username;
+    if (doc.containsKey("result")) {
+      name = doc["result"]["first_name"].as<String>();
+      userName = doc["result"]["username"].as<String>();
       return true;
     }
   }
