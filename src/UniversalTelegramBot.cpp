@@ -360,22 +360,12 @@ bool UniversalTelegramBot::setMyCommands(const String& commandArray) {
     return false;
   }
 
-  DynamicJsonDocument _commandArray(maxMessageLength); 
-  DeserializationError err = deserializeJson(_commandArray, commandArray);
-  if (err) {
-    #if defined(_debug)
-    Serial.println(F("sendSetMyCommands: Deserialization Error"));
-    Serial.println(commandArray);
-    #endif // defined(_debug)
-    return false;
-  }
-
   DynamicJsonDocument payload(maxMessageLength);
   payload["commands"] = serialized(commandArray);
   bool sent = false;
   String response = "";
   #if defined(_debug)
-	Serial.println(F("sendSetMyCommands: SEND Post /setMyCommands"));
+  Serial.println(F("sendSetMyCommands: SEND Post /setMyCommands"));
   #endif  // defined(_debug)
   unsigned long sttime = millis();
 
@@ -621,14 +611,7 @@ bool UniversalTelegramBot::sendMessageWithReplyKeyboard(
 
   JsonObject replyMarkup = payload.createNestedObject("reply_markup");
     
-  // Reply keyboard is an array of arrays.
-  // Outer array represents rows
-  // Inner arrays represents columns
-  // This example "ledon" and "ledoff" are two buttons on the top row
-  // and "status is a single button on the next row"
-  DynamicJsonDocument keyboardBuffer(maxMessageLength); // creating a buffer enough to keep keyboard string
-  deserializeJson(keyboardBuffer, keyboard);
-  replyMarkup["keyboard"] = keyboardBuffer.as<JsonArray>();
+  replyMarkup["keyboard"] = serialized(keyboard);
 
   // Telegram defaults these values to false, so to decrease the size of the
   // payload we will only send them if needed
@@ -657,9 +640,7 @@ bool UniversalTelegramBot::sendMessageWithInlineKeyboard(String chat_id,
     payload["parse_mode"] = parse_mode;
 
   JsonObject replyMarkup = payload.createNestedObject("reply_markup");
-  DynamicJsonDocument keyboardBuffer(maxMessageLength); // assuming keyboard buffer will alwas be limited to 1024 bytes
-  deserializeJson(keyboardBuffer, keyboard);
-  replyMarkup["inline_keyboard"] = keyboardBuffer.as<JsonArray>();
+  replyMarkup["inline_keyboard"] = serialized(keyboard);
   return sendPostMessage(payload.as<JsonObject>());
 }
 
@@ -760,15 +741,13 @@ String UniversalTelegramBot::sendPhoto(String chat_id, String photo,
 
   if (!keyboard.isEmpty()) {
     JsonObject replyMarkup = payload.createNestedObject("reply_markup");
-    DynamicJsonDocument keyboardBuffer(maxMessageLength); // assuming keyboard buffer will alwas be limited to 1024 bytes
-    deserializeJson(keyboardBuffer, keyboard);
-    replyMarkup["keyboard"] = keyboardBuffer.as<JsonArray>();
+    replyMarkup["keyboard"] = serialized(keyboard);
   }
 
   return sendPostPhoto(payload.as<JsonObject>());
 }
 
-bool UniversalTelegramBot::checkForOkResponse(String response) {
+bool UniversalTelegramBot::checkForOkResponse(String &response) {
   int last_id;
   DynamicJsonDocument doc(response.length());
   deserializeJson(doc, response);
