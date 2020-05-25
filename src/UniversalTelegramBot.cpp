@@ -353,13 +353,6 @@ bool UniversalTelegramBot::getMe() {
  * Returns true, if the command list was updated successfully                    *
  ********************************************************************************/
 bool UniversalTelegramBot::setMyCommands(const String& commandArray) {
-  if (commandArray.isEmpty()) {
-    #if defined(_debug)
-    Serial.println(F("sendSetMyCommands: commandArray is empty"));
-    #endif // defined(_debug)
-    return false;
-  }
-
   DynamicJsonDocument payload(maxMessageLength);
   payload["commands"] = serialized(commandArray);
   bool sent = false;
