@@ -758,7 +758,7 @@ String UniversalTelegramBot::sendPhoto(String chat_id, String photo,
   return sendPostPhoto(payload.as<JsonObject>());
 }
 
-bool UniversalTelegramBot::checkForOkResponse(String response) {
+bool UniversalTelegramBot::checkForOkResponse(String &response) {
   int last_id;
   DynamicJsonDocument doc(response.length());
   deserializeJson(doc, response);

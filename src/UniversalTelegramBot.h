@@ -104,7 +104,7 @@ public:
   bool setMyCommands(const String& commandArray);
 
   int getUpdates(long offset);
-  bool checkForOkResponse(String response);
+  bool checkForOkResponse(String &response);
   telegramMessage messages[HANDLE_MESSAGES];
   long last_message_received;
   String name;
