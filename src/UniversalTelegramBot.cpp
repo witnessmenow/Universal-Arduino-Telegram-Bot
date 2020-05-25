@@ -611,14 +611,7 @@ bool UniversalTelegramBot::sendMessageWithReplyKeyboard(
 
   JsonObject replyMarkup = payload.createNestedObject("reply_markup");
     
-  // Reply keyboard is an array of arrays.
-  // Outer array represents rows
-  // Inner arrays represents columns
-  // This example "ledon" and "ledoff" are two buttons on the top row
-  // and "status is a single button on the next row"
-  DynamicJsonDocument keyboardBuffer(maxMessageLength); // creating a buffer enough to keep keyboard string
-  deserializeJson(keyboardBuffer, keyboard);
-  replyMarkup["keyboard"] = keyboardBuffer.as<JsonArray>();
+  replyMarkup["keyboard"] = serialized(keyboard);
 
   // Telegram defaults these values to false, so to decrease the size of the
   // payload we will only send them if needed
@@ -647,9 +640,7 @@ bool UniversalTelegramBot::sendMessageWithInlineKeyboard(String chat_id,
     payload["parse_mode"] = parse_mode;
 
   JsonObject replyMarkup = payload.createNestedObject("reply_markup");
-  DynamicJsonDocument keyboardBuffer(maxMessageLength); // assuming keyboard buffer will alwas be limited to 1024 bytes
-  deserializeJson(keyboardBuffer, keyboard);
-  replyMarkup["inline_keyboard"] = keyboardBuffer.as<JsonArray>();
+  replyMarkup["inline_keyboard"] = serialized(keyboard);
   return sendPostMessage(payload.as<JsonObject>());
 }
 
