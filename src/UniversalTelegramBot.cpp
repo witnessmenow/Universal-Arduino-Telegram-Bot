@@ -741,9 +741,7 @@ String UniversalTelegramBot::sendPhoto(String chat_id, String photo,
 
   if (!keyboard.isEmpty()) {
     JsonObject replyMarkup = payload.createNestedObject("reply_markup");
-    DynamicJsonDocument keyboardBuffer(maxMessageLength); // assuming keyboard buffer will alwas be limited to 1024 bytes
-    deserializeJson(keyboardBuffer, keyboard);
-    replyMarkup["keyboard"] = keyboardBuffer.as<JsonArray>();
+    replyMarkup["keyboard"] = serialized(keyboard);
   }
 
   return sendPostPhoto(payload.as<JsonObject>());
