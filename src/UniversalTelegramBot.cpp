@@ -360,22 +360,12 @@ bool UniversalTelegramBot::setMyCommands(const String& commandArray) {
     return false;
   }
 
-  DynamicJsonDocument _commandArray(maxMessageLength); 
-  DeserializationError err = deserializeJson(_commandArray, commandArray);
-  if (err) {
-    #if defined(_debug)
-    Serial.println(F("sendSetMyCommands: Deserialization Error"));
-    Serial.println(commandArray);
-    #endif // defined(_debug)
-    return false;
-  }
-
   DynamicJsonDocument payload(maxMessageLength);
   payload["commands"] = serialized(commandArray);
   bool sent = false;
   String response = "";
   #if defined(_debug)
-	Serial.println(F("sendSetMyCommands: SEND Post /setMyCommands"));
+  Serial.println(F("sendSetMyCommands: SEND Post /setMyCommands"));
   #endif  // defined(_debug)
   unsigned long sttime = millis();
 
