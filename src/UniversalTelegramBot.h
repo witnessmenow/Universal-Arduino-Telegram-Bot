@@ -113,13 +113,13 @@ public:
   int waitForResponse = 1500;
   int _lastError;
   int last_sent_message_id = 0;
+  int maxMessageLength = 1500;
 
 private:
   // JsonObject * parseUpdates(String response);
   String _token;
   Client *client;
   void closeClient();
-  const int maxMessageLength = 1500;
   bool getFile(String *, long *, String);
   bool processResult(JsonObject result, int messageIndex);
 };
