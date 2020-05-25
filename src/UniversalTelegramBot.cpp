@@ -35,6 +35,8 @@
 
 #include "UniversalTelegramBot.h"
 
+#define ZERO_COPY(STR)    ((char*)STR.c_str())
+
 UniversalTelegramBot::UniversalTelegramBot(String token, Client &client) {
   _token = token;
 #ifdef ARDUINO_ESP8266_RELEASE_2_5_0 
@@ -330,7 +332,7 @@ bool UniversalTelegramBot::getMe() {
   String command = "bot" + _token + "/getMe";
   String response = sendGetToTelegram(command); // receive reply from telegram.org
   DynamicJsonDocument doc(maxMessageLength);
-  DeserializationError error = deserializeJson(doc, response);
+  DeserializationError error = deserializeJson(doc, ZERO_COPY(response));
   closeClient();
 
   if (!error) {
@@ -424,7 +426,7 @@ int UniversalTelegramBot::getUpdates(long offset) {
 
     // Parse response into Json object
       DynamicJsonDocument doc(maxMessageLength);
-      DeserializationError error = deserializeJson(doc, response);
+      DeserializationError error = deserializeJson(doc, ZERO_COPY(response));
       #ifdef _debug  
         Serial.print(F("GetUpdates parsed jsonDoc: "));
         serializeJson(doc, Serial);
@@ -820,7 +822,7 @@ bool UniversalTelegramBot::getFile(String *file_path, long *file_size, String fi
   String command = "bot" + _token + "/getFile?file_id=" + file_id;
   String response = sendGetToTelegram(command); // receive reply from telegram.org
   DynamicJsonDocument doc(maxMessageLength);
-  DeserializationError error = deserializeJson(doc, response);
+  DeserializationError error = deserializeJson(doc, ZERO_COPY(response));
   JsonObject obj = doc.as<JsonObject>(); //there is nothing better right now to use obj.containsKey("result")
   closeClient();
 
