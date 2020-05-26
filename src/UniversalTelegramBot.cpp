@@ -49,6 +49,15 @@ void UniversalTelegramBot::updateToken(String token) {
   _token = token;
 }
 
+String UniversalTelegramBot::buildCommand(String cmd) {
+  String command = F("bot");
+  command += _token;
+  command += F("/");
+  command += cmd;
+
+  return command;
+}
+
 String UniversalTelegramBot::sendGetToTelegram(String command) {
   String mess = "";
   long now;
@@ -329,8 +338,7 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
 
 
 bool UniversalTelegramBot::getMe() {
-  String command = "bot" + _token + "/getMe";
-  String response = sendGetToTelegram(command); // receive reply from telegram.org
+  String response = sendGetToTelegram(buildCommand(F("getMe"))); // receive reply from telegram.org
   DynamicJsonDocument doc(maxMessageLength);
   DeserializationError error = deserializeJson(doc, ZERO_COPY(response));
   closeClient();
@@ -363,8 +371,7 @@ bool UniversalTelegramBot::setMyCommands(const String& commandArray) {
   unsigned long sttime = millis();
 
   while (millis() < sttime + 8000ul) { // loop for a while to send the message
-    String command = "bot" + _token + "/setMyCommands";
-    response = sendPostToTelegram(command, payload.as<JsonObject>());
+    response = sendPostToTelegram(buildCommand(F("setMyCommands")), payload.as<JsonObject>());
     #ifdef _debug  
     Serial.println("setMyCommands response" + response);
     #endif
@@ -387,9 +394,14 @@ int UniversalTelegramBot::getUpdates(long offset) {
   #ifdef _debug  
     Serial.println(F("GET Update Messages"));
   #endif
-  String command = "bot" + _token + "/getUpdates?offset=" + String(offset) + "&limit=" + String(HANDLE_MESSAGES);
+  String command = buildCommand(F("getUpdates?offset="));
+  command += offset;
+  command += F("&limit=");
+  command += HANDLE_MESSAGES;
+
   if (longPoll > 0) {
-    command = command + "&timeout=" + String(longPoll);
+    command += F("&timeout=");
+    command += String(longPoll);
   }
   String response = sendGetToTelegram(command); // receive reply from telegram.org
 
@@ -564,8 +576,12 @@ bool UniversalTelegramBot::sendSimpleMessage(String chat_id, String text,
 
   if (text != "") {
     while (millis() < sttime + 8000) { // loop for a while to send the message
-      String command = "bot" + _token + "/sendMessage?chat_id=" + chat_id +
-                       "&text=" + text + "&parse_mode=" + parse_mode;
+      String command = buildCommand(F("sendMessage?chat_id="));
+      command += chat_id;
+      command += F("&text=");
+      command += text;
+      command += F("&parse_mode=");
+      command += parse_mode;
       String response = sendGetToTelegram(command);
       #ifdef _debug  
         Serial.println(response);
@@ -653,8 +669,7 @@ bool UniversalTelegramBot::sendPostMessage(JsonObject payload) {
 
   if (payload.containsKey("text")) {
     while (millis() < sttime + 8000) { // loop for a while to send the message
-      String command = "bot" + _token + "/sendMessage";
-      String response = sendPostToTelegram(command, payload);
+      String response = sendPostToTelegram(buildCommand(F("sendMessage")), payload);
       #ifdef _debug  
         Serial.println(response);
       #endif
@@ -678,8 +693,7 @@ String UniversalTelegramBot::sendPostPhoto(JsonObject payload) {
 
   if (payload.containsKey("photo")) {
     while (millis() < sttime + 8000) { // loop for a while to send the message
-      String command = "bot" + _token + "/sendPhoto";
-      response = sendPostToTelegram(command, payload);
+      response = sendPostToTelegram(buildCommand(F("sendPhoto")), payload);
       #ifdef _debug  
         Serial.println(response);
       #endif
@@ -762,8 +776,11 @@ bool UniversalTelegramBot::sendChatAction(String chat_id, String text) {
 
   if (text != "") {
     while (millis() < sttime + 8000) { // loop for a while to send the message
-      String command = "bot" + _token + "/sendChatAction?chat_id=" + chat_id +
-                       "&action=" + text;
+      String command = buildCommand(F("sendChatAction?chat_id="));
+      command += chat_id;
+      command += F("&action=");
+      command += text;
+
       String response = sendGetToTelegram(command);
 
       #ifdef _debug  
@@ -791,7 +808,8 @@ void UniversalTelegramBot::closeClient() {
 
 bool UniversalTelegramBot::getFile(String *file_path, long *file_size, String file_id)
 {
-  String command = "bot" + _token + "/getFile?file_id=" + file_id;
+  String command = buildCommand(F("getFile?file_id="));
+  command += file_id;
   String response = sendGetToTelegram(command); // receive reply from telegram.org
   DynamicJsonDocument doc(maxMessageLength);
   DeserializationError error = deserializeJson(doc, ZERO_COPY(response));
@@ -799,7 +817,8 @@ bool UniversalTelegramBot::getFile(String *file_path, long *file_size, String fi
 
   if (!error) {
     if (doc.containsKey("result")) {
-      *file_path = "https://api.telegram.org/file/bot" + _token + "/" + doc["result"]["file_path"].as<String>();
+      *file_path  = F("https://api.telegram.org/file/bot");
+      *file_path += buildCommand(doc["result"]["file_path"]);
       *file_size = doc["result"]["file_size"].as<long>();
       return true;
     }

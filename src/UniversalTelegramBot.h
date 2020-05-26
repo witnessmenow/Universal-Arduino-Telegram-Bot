@@ -103,6 +103,8 @@ public:
 
   bool setMyCommands(const String& commandArray);
 
+  String buildCommand(String cmd);
+
   int getUpdates(long offset);
   bool checkForOkResponse(String &response);
   telegramMessage messages[HANDLE_MESSAGES];
