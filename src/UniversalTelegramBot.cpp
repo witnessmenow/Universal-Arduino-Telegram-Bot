@@ -195,7 +195,7 @@ String UniversalTelegramBot::sendPostToTelegram(const String& command, JsonObjec
 }
 
 String UniversalTelegramBot::sendMultipartFormDataToTelegram(
-    const String& command, const String& binaryProperyName, const String& fileName,
+    const String& command, const String& binaryPropertyName, const String& fileName,
     const String& contentType, const String& chat_id, int fileSize,
     MoreDataAvailable moreDataAvailableCallback,
     GetNextByte getNextByteCallback, 
@@ -234,7 +234,7 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
     start_request += F("\r\n" "--");
     start_request += boundary;
     start_request += F("\r\ncontent-disposition: form-data; name=\"");
-    start_request += binaryProperyName;
+    start_request += binaryPropertyName;
     start_request += F("\"; filename=\"");
     start_request += fileName;
     start_request += F("\"\r\n" "Content-Type: ");

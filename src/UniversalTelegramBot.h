@@ -69,7 +69,7 @@ public:
   String sendGetToTelegram(const String& command);
   String sendPostToTelegram(const String& command, JsonObject payload);
   String
-  sendMultipartFormDataToTelegram(const String& command, const String& binaryProperyName,
+  sendMultipartFormDataToTelegram(const String& command, const String& binaryPropertyName,
                                   const String& fileName, const String& contentType,
                                   const String& chat_id, int fileSize,
                                   MoreDataAvailable moreDataAvailableCallback,
