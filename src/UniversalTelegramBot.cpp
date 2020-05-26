@@ -524,6 +524,7 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
       messages[messageIndex].text = message["data"].as<String>();
       messages[messageIndex].date = message["date"].as<String>();
       messages[messageIndex].chat_id = message["message"]["chat"]["id"].as<String>();
+      messages[messageIndex].reply_to_text = message["message"]["text"].as<String>();
       messages[messageIndex].chat_title = F("");
         
     } else if (result.containsKey("edited_message")) {
