@@ -64,14 +64,14 @@ struct telegramMessage {
 
 class UniversalTelegramBot {
 public:
-  UniversalTelegramBot(String token, Client &client);
-  void updateToken(String token);
-  String sendGetToTelegram(String command);
-  String sendPostToTelegram(String command, JsonObject payload);
+  UniversalTelegramBot(const String& token, Client &client);
+  void updateToken(const String& token);
+  String sendGetToTelegram(const String& command);
+  String sendPostToTelegram(const String& command, JsonObject payload);
   String
-  sendMultipartFormDataToTelegram(String command, String binaryProperyName,
-                                  String fileName, String contentType,
-                                  String chat_id, int fileSize,
+  sendMultipartFormDataToTelegram(const String& command, const String& binaryProperyName,
+                                  const String& fileName, const String& contentType,
+                                  const String& chat_id, int fileSize,
                                   MoreDataAvailable moreDataAvailableCallback,
                                   GetNextByte getNextByteCallback, 
                                   GetNextBuffer getNextBufferCallback, 
@@ -79,34 +79,34 @@ public:
 
   bool getMe();
 
-  bool sendSimpleMessage(String chat_id, String text, String parse_mode);
-  bool sendMessage(String chat_id, String text, String parse_mode = "");
-  bool sendMessageWithReplyKeyboard(String chat_id, String text,
-                                    String parse_mode, String keyboard,
+  bool sendSimpleMessage(const String& chat_id, const String& text, const String& parse_mode);
+  bool sendMessage(const String& chat_id, const String& text, const String& parse_mode = "");
+  bool sendMessageWithReplyKeyboard(const String& chat_id, const String& text,
+                                    const String& parse_mode, const String& keyboard,
                                     bool resize = false, bool oneTime = false,
                                     bool selective = false);
-  bool sendMessageWithInlineKeyboard(String chat_id, String text,
-                                     String parse_mode, String keyboard);
+  bool sendMessageWithInlineKeyboard(const String& chat_id, const String& text,
+                                     const String& parse_mode, const String& keyboard);
 
-  bool sendChatAction(String chat_id, String text);
+  bool sendChatAction(const String& chat_id, const String& text);
 
   bool sendPostMessage(JsonObject payload);
   String sendPostPhoto(JsonObject payload);
-  String sendPhotoByBinary(String chat_id, String contentType, int fileSize,
+  String sendPhotoByBinary(const String& chat_id, const String& contentType, int fileSize,
                            MoreDataAvailable moreDataAvailableCallback,
                            GetNextByte getNextByteCallback, 
                            GetNextBuffer getNextBufferCallback, 
                            GetNextBufferLen getNextBufferLenCallback);
-  String sendPhoto(String chat_id, String photo, String caption = "",
+  String sendPhoto(const String& chat_id, const String& photo, const String& caption = "",
                    bool disable_notification = false,
-                   int reply_to_message_id = 0, String keyboard = "");
+                   int reply_to_message_id = 0, const String& keyboard = "");
 
   bool setMyCommands(const String& commandArray);
 
-  String buildCommand(String cmd);
+  String buildCommand(const String& cmd);
 
   int getUpdates(long offset);
-  bool checkForOkResponse(String &response);
+  bool checkForOkResponse(const String& response);
   telegramMessage messages[HANDLE_MESSAGES];
   long last_message_received;
   String name;

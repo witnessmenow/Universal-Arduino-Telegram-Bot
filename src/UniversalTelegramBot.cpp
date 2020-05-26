@@ -38,19 +38,19 @@
 #define ZERO_COPY(STR)    ((char*)STR.c_str())
 #define BOT_CMD(STR)      buildCommand(F(STR))
 
-UniversalTelegramBot::UniversalTelegramBot(String token, Client &client) {
-  _token = token;
+UniversalTelegramBot::UniversalTelegramBot(const String& token, Client &client) {
+  updateToken(token);
 #ifdef ARDUINO_ESP8266_RELEASE_2_5_0 
     //client->setInsecure();
 #endif
   this->client = &client;
 }
 
-void UniversalTelegramBot::updateToken(String token) {
+void UniversalTelegramBot::updateToken(const String& token) {
   _token = token;
 }
 
-String UniversalTelegramBot::buildCommand(String cmd) {
+String UniversalTelegramBot::buildCommand(const String& cmd) {
   String command;
 
   command += F("bot");
@@ -61,7 +61,7 @@ String UniversalTelegramBot::buildCommand(String cmd) {
   return command;
 }
 
-String UniversalTelegramBot::sendGetToTelegram(String command) {
+String UniversalTelegramBot::sendGetToTelegram(const String& command) {
   String mess = "";
   long now;
   bool avail;
@@ -113,7 +113,7 @@ String UniversalTelegramBot::sendGetToTelegram(String command) {
   return mess;
 }
 
-String UniversalTelegramBot::sendPostToTelegram(String command, JsonObject payload) {
+String UniversalTelegramBot::sendPostToTelegram(const String& command, JsonObject payload) {
 
   String body = "";
   String headers = "";
@@ -195,8 +195,8 @@ String UniversalTelegramBot::sendPostToTelegram(String command, JsonObject paylo
 }
 
 String UniversalTelegramBot::sendMultipartFormDataToTelegram(
-    String command, String binaryProperyName, String fileName,
-    String contentType, String chat_id, int fileSize,
+    const String& command, const String& binaryProperyName, const String& fileName,
+    const String& contentType, const String& chat_id, int fileSize,
     MoreDataAvailable moreDataAvailableCallback,
     GetNextByte getNextByteCallback, 
     GetNextBuffer getNextBufferCallback,
@@ -577,8 +577,8 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
  * SendMessage - function to send message to telegram                  *
  * (Arguments to pass: chat_id, text to transmit and markup(optional)) *
  ***********************************************************************/
-bool UniversalTelegramBot::sendSimpleMessage(String chat_id, String text,
-                                             String parse_mode) {
+bool UniversalTelegramBot::sendSimpleMessage(const String& chat_id, const String& text,
+                                             const String& parse_mode) {
 
   bool sent = false;
   #ifdef _debug  
@@ -606,8 +606,8 @@ bool UniversalTelegramBot::sendSimpleMessage(String chat_id, String text,
   return sent;
 }
 
-bool UniversalTelegramBot::sendMessage(String chat_id, String text,
-                                       String parse_mode) {
+bool UniversalTelegramBot::sendMessage(const String& chat_id, const String& text,
+                                       const String& parse_mode) {
 
   DynamicJsonDocument payload(maxMessageLength);
   payload["chat_id"] = chat_id;
@@ -620,7 +620,7 @@ bool UniversalTelegramBot::sendMessage(String chat_id, String text,
 }
 
 bool UniversalTelegramBot::sendMessageWithReplyKeyboard(
-    String chat_id, String text, String parse_mode, String keyboard,
+    const String& chat_id, const String& text, const String& parse_mode, const String& keyboard,
     bool resize, bool oneTime, bool selective) {
     
   DynamicJsonDocument payload(maxMessageLength);
@@ -648,10 +648,10 @@ bool UniversalTelegramBot::sendMessageWithReplyKeyboard(
   return sendPostMessage(payload.as<JsonObject>());
 }
 
-bool UniversalTelegramBot::sendMessageWithInlineKeyboard(String chat_id,
-                                                         String text,
-                                                         String parse_mode,
-                                                         String keyboard) {
+bool UniversalTelegramBot::sendMessageWithInlineKeyboard(const String& chat_id,
+                                                         const String& text,
+                                                         const String& parse_mode,
+                                                         const String& keyboard) {
 
   DynamicJsonDocument payload(maxMessageLength);
   payload["chat_id"] = chat_id;
@@ -720,7 +720,7 @@ String UniversalTelegramBot::sendPostPhoto(JsonObject payload) {
 }
 
 String UniversalTelegramBot::sendPhotoByBinary(
-    String chat_id, String contentType, int fileSize,
+    const String& chat_id, const String& contentType, int fileSize,
     MoreDataAvailable moreDataAvailableCallback,
     GetNextByte getNextByteCallback, GetNextBuffer getNextBufferCallback, GetNextBufferLen getNextBufferLenCallback) {
 
@@ -739,11 +739,11 @@ String UniversalTelegramBot::sendPhotoByBinary(
   return response;
 }
 
-String UniversalTelegramBot::sendPhoto(String chat_id, String photo,
-                                       String caption,
+String UniversalTelegramBot::sendPhoto(const String& chat_id, const String& photo,
+                                       const String& caption,
                                        bool disable_notification,
                                        int reply_to_message_id,
-                                       String keyboard) {
+                                       const String& keyboard) {
 
   DynamicJsonDocument payload(maxMessageLength);
   payload["chat_id"] = chat_id;
@@ -766,7 +766,7 @@ String UniversalTelegramBot::sendPhoto(String chat_id, String photo,
   return sendPostPhoto(payload.as<JsonObject>());
 }
 
-bool UniversalTelegramBot::checkForOkResponse(String &response) {
+bool UniversalTelegramBot::checkForOkResponse(const String& response) {
   int last_id;
   DynamicJsonDocument doc(response.length());
   deserializeJson(doc, response);
@@ -778,7 +778,7 @@ bool UniversalTelegramBot::checkForOkResponse(String &response) {
   return doc["ok"] | false;  // default is false, but this is more explicit and clear
 }
 
-bool UniversalTelegramBot::sendChatAction(String chat_id, String text) {
+bool UniversalTelegramBot::sendChatAction(const String& chat_id, const String& text) {
 
   bool sent = false;
   #ifdef _debug  
