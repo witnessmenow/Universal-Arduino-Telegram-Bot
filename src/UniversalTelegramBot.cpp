@@ -795,13 +795,12 @@ bool UniversalTelegramBot::getFile(String *file_path, long *file_size, String fi
   String response = sendGetToTelegram(command); // receive reply from telegram.org
   DynamicJsonDocument doc(maxMessageLength);
   DeserializationError error = deserializeJson(doc, ZERO_COPY(response));
-  JsonObject obj = doc.as<JsonObject>(); //there is nothing better right now to use obj.containsKey("result")
   closeClient();
 
   if (!error) {
-    if (obj.containsKey("result")) {
-      *file_path = "https://api.telegram.org/file/bot" + _token + "/" + obj["result"]["file_path"].as<String>();
-      *file_size = obj["result"]["file_size"].as<long>();
+    if (doc.containsKey("result")) {
+      *file_path = "https://api.telegram.org/file/bot" + _token + "/" + doc["result"]["file_path"].as<String>();
+      *file_size = doc["result"]["file_size"].as<long>();
       return true;
     }
   }
