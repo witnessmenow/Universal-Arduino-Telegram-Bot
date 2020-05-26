@@ -51,7 +51,9 @@ void UniversalTelegramBot::updateToken(String token) {
 }
 
 String UniversalTelegramBot::buildCommand(String cmd) {
-  String command = F("bot");
+  String command;
+
+  command += F("bot");
   command += _token;
   command += F("/");
   command += cmd;
@@ -221,9 +223,11 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
     }
   }
   if (client->connected()) {
+    String start_request;
+    String end_request;
+    
 
-    String start_request = F("--");
-
+    start_request += F("--");
     start_request += boundry;
     start_request += F("\r\ncontent-disposition: form-data; name=\"chat_id\"\r\n\r\n");
     start_request += chat_id;
@@ -237,7 +241,7 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
     start_request += contentType;
     start_request += F("\r\n" "\r\n");
 
-    String end_request = F("\r\n" "--");
+    end_request += F("\r\n" "--");
     end_request += boundry;
     end_request += F("--" "\r\n");
 
