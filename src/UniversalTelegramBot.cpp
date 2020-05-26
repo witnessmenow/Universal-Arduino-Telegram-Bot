@@ -522,7 +522,7 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
         String file_id = message["document"]["file_id"].as<String>();
         messages[messageIndex].file_caption = message["caption"].as<String>();
         messages[messageIndex].file_name = message["document"]["file_name"].as<String>();
-        if (getFile(&messages[messageIndex].file_path, &messages[messageIndex].file_size, file_id) == true)
+        if (getFile(messages[messageIndex].file_path, messages[messageIndex].file_size, file_id) == true)
           messages[messageIndex].hasDocument = true;
         else
           messages[messageIndex].hasDocument = false;
@@ -818,7 +818,7 @@ void UniversalTelegramBot::closeClient() {
   }
 }
 
-bool UniversalTelegramBot::getFile(String *file_path, long *file_size, String file_id)
+bool UniversalTelegramBot::getFile(String& file_path, long& file_size, const String& file_id)
 {
   String command = BOT_CMD("getFile?file_id=");
   command += file_id;
@@ -829,9 +829,9 @@ bool UniversalTelegramBot::getFile(String *file_path, long *file_size, String fi
 
   if (!error) {
     if (doc.containsKey("result")) {
-      *file_path  = F("https://api.telegram.org/file/");
-      *file_path += buildCommand(doc["result"]["file_path"]);
-      *file_size = doc["result"]["file_size"].as<long>();
+      file_path  = F("https://api.telegram.org/file/");
+      file_path += buildCommand(doc["result"]["file_path"]);
+      file_size = doc["result"]["file_size"].as<long>();
       return true;
     }
   }

@@ -122,7 +122,7 @@ private:
   String _token;
   Client *client;
   void closeClient();
-  bool getFile(String *, long *, String);
+  bool getFile(String& file_path, long& file_size, const String& file_id);
   bool processResult(JsonObject result, int messageIndex);
 };
 
