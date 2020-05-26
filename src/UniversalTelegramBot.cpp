@@ -825,7 +825,7 @@ bool UniversalTelegramBot::getFile(String *file_path, long *file_size, String fi
 
   if (!error) {
     if (doc.containsKey("result")) {
-      *file_path  = F("https://api.telegram.org/file/bot");
+      *file_path  = F("https://api.telegram.org/file/");
       *file_path += buildCommand(doc["result"]["file_path"]);
       *file_size = doc["result"]["file_size"].as<long>();
       return true;
