@@ -209,7 +209,7 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
   bool finishedHeaders = false;
   bool currentLineIsBlank = true;
   
-  String boundry = F("------------------------b8f610217e83e29b");
+  const String boundary = F("------------------------b8f610217e83e29b");
 
   // Connect with api.telegram.org if not already connected
   if (!client->connected()) {
@@ -228,11 +228,11 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
     
 
     start_request += F("--");
-    start_request += boundry;
+    start_request += boundary;
     start_request += F("\r\ncontent-disposition: form-data; name=\"chat_id\"\r\n\r\n");
     start_request += chat_id;
     start_request += F("\r\n" "--");
-    start_request += boundry;
+    start_request += boundary;
     start_request += F("\r\ncontent-disposition: form-data; name=\"");
     start_request += binaryProperyName;
     start_request += F("\"; filename=\"");
@@ -242,7 +242,7 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
     start_request += F("\r\n" "\r\n");
 
     end_request += F("\r\n" "--");
-    end_request += boundry;
+    end_request += boundary;
     end_request += F("--" "\r\n");
 
     client->print(F("POST /"));
@@ -261,7 +261,7 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
     client->print(F("Content-Length: "));
     client->println(String(contentLength));
     client->print(F("Content-Type: multipart/form-data; boundary="));
-    client->println(boundry);
+    client->println(boundary);
     client->println(F(""));
     client->print(start_request);
 
