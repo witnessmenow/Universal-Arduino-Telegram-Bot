@@ -416,14 +416,13 @@ int UniversalTelegramBot::getUpdates(long offset) {
         Serial.println();
       #endif
       
-      JsonObject obj = doc.as<JsonObject>(); //there is nothing better right now
     if (!error) {
       #ifdef _debug  
         Serial.print(F("GetUpdates parsed jsonObj: "));
-        serializeJson(obj, Serial);
+        serializeJson(doc, Serial);
         Serial.println();
       #endif
-      if (obj.containsKey("result")) {
+      if (doc.containsKey("result")) {
         int resultArrayLength = doc["result"].size();
         if (resultArrayLength > 0) {
           int newMessageIndex = 0;
