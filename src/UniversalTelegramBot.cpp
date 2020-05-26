@@ -84,7 +84,8 @@ String UniversalTelegramBot::sendGetToTelegram(String command) {
     String a = "";
     char c;
     int ch_count = 0;
-    client->println("GET /" + command);
+    client->print(F("GET /"));
+    client->println(command);
     now = millis();
     avail = false;
     while (millis() - now < longPoll * 1000 + waitForResponse) {
@@ -130,11 +131,11 @@ String UniversalTelegramBot::sendPostToTelegram(String command, JsonObject paylo
   }
   if (client->connected()) {
     // POST URI
-    client->print("POST /" + command);
+    client->print(F("POST /"));
+    client->print(command);
     client->println(F(" HTTP/1.1"));
     // Host header
-    client->print(F("Host:"));
-    client->println(HOST);
+    client->println(F("Host:" HOST));
     // JSON content type
     client->println(F("Content-Type: application/json"));
 
@@ -221,22 +222,27 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
   }
   if (client->connected()) {
 
-    String start_request = "";
-    String end_request = "";
+    String start_request = F("--");
 
-    start_request = start_request + "--" + boundry + "\r\n";
-    start_request = start_request + "content-disposition: form-data; name=\"chat_id\"" + "\r\n";
-    start_request = start_request + "\r\n";
-    start_request = start_request + chat_id + "\r\n";
-    start_request = start_request + "--" + boundry + "\r\n";
-    start_request = start_request + "content-disposition: form-data; name=\"" + binaryProperyName + "\"; filename=\"" + fileName + "\"" + "\r\n";
-    start_request = start_request + "Content-Type: " + contentType + "\r\n";
-    start_request = start_request + "\r\n";
+    start_request += boundry;
+    start_request += F("\r\ncontent-disposition: form-data; name=\"chat_id\"\r\n\r\n");
+    start_request += chat_id;
+    start_request += F("\r\n" "--");
+    start_request += boundry;
+    start_request += F("\r\ncontent-disposition: form-data; name=\"");
+    start_request += binaryProperyName;
+    start_request += F("\"; filename=\"");
+    start_request += fileName;
+    start_request += F("\"\r\n" "Content-Type: ");
+    start_request += contentType;
+    start_request += F("\r\n" "\r\n");
 
-    end_request = end_request + "\r\n";
-    end_request = end_request + "--" + boundry + "--" + "\r\n";
+    String end_request = F("\r\n" "--");
+    end_request += boundry;
+    end_request += F("--" "\r\n");
 
-    client->print("POST /bot" + _token + "/" + command);
+    client->print(F("POST /"));
+    client->print(buildCommand(command));
     client->println(F(" HTTP/1.1"));
     // Host header
     client->print(F("Host: "));
@@ -248,10 +254,11 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
     #ifdef _debug  
         Serial.println("Content-Length: " + String(contentLength));
     #endif
-    client->print("Content-Length: ");
+    client->print(F("Content-Length: "));
     client->println(String(contentLength));
-    client->println("Content-Type: multipart/form-data; boundary=" + boundry);
-    client->println("");
+    client->print(F("Content-Type: multipart/form-data; boundary="));
+    client->println(boundry);
+    client->println(F(""));
     client->print(start_request);
 
     #ifdef _debug  
