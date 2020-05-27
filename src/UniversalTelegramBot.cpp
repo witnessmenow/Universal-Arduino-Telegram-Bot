@@ -62,7 +62,7 @@ String UniversalTelegramBot::buildCommand(const String& cmd) {
 }
 
 String UniversalTelegramBot::sendGetToTelegram(const String& command) {
-  String mess = "";
+  String mess;
   long now;
   bool avail;
   
@@ -94,7 +94,7 @@ String UniversalTelegramBot::sendGetToTelegram(const String& command) {
       while (client->available()) {
         char c = client->read();
         if (ch_count < maxMessageLength) {
-          mess = mess + c;
+          mess += c;
           ch_count++;
         }
         avail = true;
@@ -115,8 +115,8 @@ String UniversalTelegramBot::sendGetToTelegram(const String& command) {
 
 String UniversalTelegramBot::sendPostToTelegram(const String& command, JsonObject payload) {
 
-  String body = "";
-  String headers = "";
+  String body;
+  String headers;
   long now;
   bool responseReceived = false;
 
@@ -166,11 +166,11 @@ String UniversalTelegramBot::sendPostToTelegram(const String& command, JsonObjec
           if (currentLineIsBlank && c == '\n') {
             finishedHeaders = true;
           } else {
-            headers = headers + c;
+            headers += c;
           }
         } else {
           if (ch_count < maxMessageLength) {
-            body = body + c;
+            body += c;
             ch_count++;
           }
         }
@@ -202,8 +202,8 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
     GetNextBuffer getNextBufferCallback,
     GetNextBufferLen getNextBufferLenCallback) {
 
-  String body = "";
-  String headers = "";
+  String body;
+  String headers;
   long now;
   bool responseReceived = false;
   bool finishedHeaders = false;
@@ -320,11 +320,11 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
           if (currentLineIsBlank && c == '\n') {
             finishedHeaders = true;
           } else {
-            headers = headers + c;
+            headers += c;
           }
         } else {
           if (ch_count < maxMessageLength) {
-            body = body + c;
+            body += c;
             ch_count++;
           }
         }
