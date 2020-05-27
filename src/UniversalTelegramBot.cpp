@@ -80,7 +80,7 @@ String UniversalTelegramBot::sendGetToTelegram(const String& command) {
   if (client->connected()) {
 
     #ifdef _debug  
-        Serial.println(F(".... connected to server"));
+        Serial.println("sending: " + command);
     #endif  
 
     String a = "";
@@ -432,13 +432,8 @@ int UniversalTelegramBot::getUpdates(long offset) {
     #endif
 
     // Parse response into Json object
-      DynamicJsonDocument doc(maxMessageLength);
-      DeserializationError error = deserializeJson(doc, ZERO_COPY(response));
-      #ifdef _debug  
-        Serial.print(F("GetUpdates parsed jsonDoc: "));
-        serializeJson(doc, Serial);
-        Serial.println();
-      #endif
+    DynamicJsonDocument doc(maxMessageLength);
+    DeserializationError error = deserializeJson(doc, ZERO_COPY(response));
       
     if (!error) {
       #ifdef _debug  
