@@ -839,7 +839,7 @@ bool UniversalTelegramBot::getFile(String& file_path, long& file_size, const Str
 }
 
 bool UniversalTelegramBot::answerCallbackQuery(const String &query_id, const String &text, bool show_alert, const String &url, int cache_time) {
-  String command = BOT_CMD("answerCallbackQuery?query_id=");
+  String command = BOT_CMD("answerCallbackQuery?callback_query_id=");
   command += query_id;
   command += F("&show_alert=");
   command += show_alert;
