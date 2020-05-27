@@ -104,7 +104,7 @@ public:
   bool answerCallbackQuery(const String &query_id,
                            const String &text = "",
                            bool show_alert = false,
-                           const String &url = "", 
+                           const String &url = "",
                            int cache_time = 0);
 
   bool setMyCommands(const String& commandArray);
