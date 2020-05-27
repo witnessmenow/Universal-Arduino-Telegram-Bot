@@ -101,6 +101,12 @@ public:
                    bool disable_notification = false,
                    int reply_to_message_id = 0, const String& keyboard = "");
 
+  bool answerCallbackQuery(const String &query_id,
+                           const String &text = "",
+                           bool show_alert = false,
+                           const String &url = "", 
+                           int cache_time = 0);
+
   bool setMyCommands(const String& commandArray);
 
   String buildCommand(const String& cmd);

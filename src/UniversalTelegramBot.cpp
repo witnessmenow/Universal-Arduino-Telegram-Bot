@@ -837,3 +837,24 @@ bool UniversalTelegramBot::getFile(String& file_path, long& file_size, const Str
   }
   return false;
 }
+
+bool UniversalTelegramBot::answerCallbackQuery(const String &query_id, const String &text, bool show_alert, const String &url, int cache_time) {
+  String command = BOT_CMD("answerCallbackQuery?query_id=");
+  command += query_id;
+  command += F("&show_alert=");
+  command += show_alert;
+  command += F("&cache_time=");
+  command += cache_time;
+  if (!text.isEmpty()) {
+    command += F("&text=");
+    command += text;
+  }
+  if (!url.isEmpty()) {
+    command += F("&url=");
+    command += url;
+  }
+  String response = sendGetToTelegram(command); // receive reply from telegram.org
+  bool answer = checkForOkResponse(response);
+  closeClient();
+  return answer;
+}
