@@ -550,7 +550,7 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
       messages[messageIndex].chat_id = message["message"]["chat"]["id"].as<String>();
       messages[messageIndex].reply_to_text = message["message"]["text"].as<String>();
       messages[messageIndex].chat_title = F("");
-        
+      messages[messageIndex].query_id = message["id"].as<String>();
     } else if (result.containsKey("edited_message")) {
       JsonObject message = result["edited_message"];
       messages[messageIndex].type = F("edited_message");
