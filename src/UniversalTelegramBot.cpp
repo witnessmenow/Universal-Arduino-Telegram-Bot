@@ -152,6 +152,9 @@ String UniversalTelegramBot::sendPostToTelegram(const String& command, JsonObjec
     serializeJson(payload, out);
     
     client->println(out);
+    #ifdef _debug
+        Serial.println(String("Posting:") + out);
+    #endif
 
     int ch_count = 0;
     now = millis();
@@ -834,21 +837,20 @@ bool UniversalTelegramBot::getFile(String& file_path, long& file_size, const Str
 }
 
 bool UniversalTelegramBot::answerCallbackQuery(const String &query_id, const String &text, bool show_alert, const String &url, int cache_time) {
-  String command = BOT_CMD("answerCallbackQuery?callback_query_id=");
-  command += query_id;
-  command += F("&show_alert=");
-  command += show_alert;
-  command += F("&cache_time=");
-  command += cache_time;
-  if (!text.isEmpty()) {
-    command += F("&text=");
-    command += text;
-  }
-  if (!url.isEmpty()) {
-    command += F("&url=");
-    command += url;
-  }
-  String response = sendGetToTelegram(command); // receive reply from telegram.org
+  DynamicJsonDocument payload(maxMessageLength);
+
+  payload["callback_query_id"] = query_id;
+  payload["show_alert"] = show_alert;
+  payload["cache_time"] = cache_time;
+
+  if (!text.isEmpty()) payload["text"] = text;
+  if (!url.isEmpty()) payload["url"] = url;
+
+  String response = sendPostToTelegram(BOT_CMD("answerCallbackQuery"), payload.as<JsonObject>());
+  #ifdef _debug  
+     Serial.print(F("answerCallbackQuery response:"));
+     Serial.println(response);
+  #endif
   bool answer = checkForOkResponse(response);
   closeClient();
   return answer;
