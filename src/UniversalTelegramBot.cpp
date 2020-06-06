@@ -505,6 +505,7 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
     messages[messageIndex].latitude = 0;
     messages[messageIndex].reply_to_message_id = 0;
     messages[messageIndex].reply_to_text = F("");
+    messages[messageIndex].query_id = F("");
 
     if (result.containsKey("message")) {
       JsonObject message = result["message"];
