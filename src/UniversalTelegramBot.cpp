@@ -50,6 +50,10 @@ void UniversalTelegramBot::updateToken(const String& token) {
   _token = token;
 }
 
+String UniversalTelegramBot::getToken() {
+  return _token;
+}
+
 String UniversalTelegramBot::buildCommand(const String& cmd) {
   String command;
 
