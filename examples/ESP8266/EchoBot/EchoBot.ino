@@ -1,11 +1,39 @@
 /*******************************************************************
-*  An example of bot that echos back any messages received         *
-*                                                                  *
-*  written by Giacarlo Bacchio (Gianbacchio on Github)             *
-*  adapted by Brian Lough                                          *
-*******************************************************************/
+    A telegram bot for your ESP8266 that responds
+    with whatever message you send it.
+
+    Parts:
+    D1 Mini ESP8266 * - http://s.click.aliexpress.com/e/uzFUnIe
+    (or any ESP8266 board)
+
+      = Affilate
+
+    If you find what I do useful and would like to support me,
+    please consider becoming a sponsor on Github
+    https://github.com/sponsors/witnessmenow/
+
+
+    Written by Brian Lough
+    YouTube: https://www.youtube.com/brianlough
+    Tindie: https://www.tindie.com/stores/brianlough/
+    Twitter: https://twitter.com/witnessmenow
+ *******************************************************************/
+
+// The version of ESP8266 core needs to be 2.5 or higher
+// or else your bot will not connect.
+
+// ----------------------------
+// Standard ESP8266 Libraries
+// ----------------------------
+
 #include <ESP8266WiFi.h>
+
 #include <WiFiClientSecure.h>
+
+// ----------------------------
+// Additional Libraries - each one of these will need to be installed.
+// ----------------------------
+
 #include <UniversalTelegramBot.h>
 
 // Initialize Wifi connection to the router
@@ -18,11 +46,18 @@ char password[] = "YYYYYY"; // your network key
 WiFiClientSecure client;
 UniversalTelegramBot bot(BOTtoken, client);
 
-int Bot_mtbs = 1000; //mean time between scan messages
-long Bot_lasttime;   //last time messages' scan has been done
+//Checks for new messages every 1 second.
+int botRequestDelay = 1000;
+unsigned long lastTimeBotRan;
 
 void setup() {
   Serial.begin(115200);
+
+  // This is the simplest way of getting this working
+  // if you are passing sensitive information, or controlling
+  // something important, please either use certStore or at
+  // least client.setFingerPrint
+  client.setInsecure();
 
   // Set WiFi to station mode and disconnect from an AP if it was Previously
   // connected
@@ -47,17 +82,17 @@ void setup() {
 }
 
 void loop() {
-  if (millis() > Bot_lasttime + Bot_mtbs)  {
+  if (millis() > lastTimeBotRan + botRequestDelay)  {
     int numNewMessages = bot.getUpdates(bot.last_message_received + 1);
 
-    while(numNewMessages) {
+    while (numNewMessages) {
       Serial.println("got response");
-      for (int i=0; i<numNewMessages; i++) {
+      for (int i = 0; i < numNewMessages; i++) {
         bot.sendMessage(bot.messages[i].chat_id, bot.messages[i].text, "");
       }
       numNewMessages = bot.getUpdates(bot.last_message_received + 1);
     }
 
-    Bot_lasttime = millis();
+    lastTimeBotRan = millis();
   }
 }
