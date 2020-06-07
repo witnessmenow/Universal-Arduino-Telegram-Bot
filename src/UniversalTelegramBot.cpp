@@ -66,8 +66,7 @@ String UniversalTelegramBot::buildCommand(const String& cmd) {
 }
 
 String UniversalTelegramBot::sendGetToTelegram(const String& command) {
-  String mess;
-  long now;
+  String body, headers;
   bool avail;
   
   // Connect with api.telegram.org if not already connected
@@ -91,30 +90,14 @@ String UniversalTelegramBot::sendGetToTelegram(const String& command) {
     char c;
     int ch_count = 0;
     client->print(F("GET /"));
-    client->println(command);
-    now = millis();
-    avail = false;
-    while (millis() - now < longPoll * 1000 + waitForResponse) {
-      while (client->available()) {
-        char c = client->read();
-        if (ch_count < maxMessageLength) {
-          mess += c;
-          ch_count++;
-        }
-        avail = true;
-      }
-      if (avail) {
-        #ifdef _debug
-          Serial.println();
-          Serial.println(mess);
-          Serial.println();
-        #endif
-        break;
-      }
-    }
+    client->print(command);
+    client->println(F(" HTTP/1.0"));
+    client->println(F("Host: " HOST));
+    client->println(F(""));
+    readHTTPAnswer(body, headers);
   }
 
-  return mess;
+  return body;
 }
 
 bool UniversalTelegramBot::readHTTPAnswer(String &body, String &headers) {
