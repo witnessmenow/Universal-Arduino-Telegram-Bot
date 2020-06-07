@@ -75,7 +75,7 @@ String UniversalTelegramBot::sendGetToTelegram(String command) {
     now = millis();
     bool finishedHeaders = false;
     bool currentLineIsBlank = true;
-    while (millis() - now < waitForResponse) {
+    while (millis() - now < longPoll * 1000 + waitForResponse) {
       while (client->available()) {
         char c = client->read();
         responseReceived = true;
