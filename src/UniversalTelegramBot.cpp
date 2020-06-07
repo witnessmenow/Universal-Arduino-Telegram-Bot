@@ -215,10 +215,6 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
 
   String body;
   String headers;
-  long now;
-  bool responseReceived = false;
-  bool finishedHeaders = false;
-  bool currentLineIsBlank = true;
   
   const String boundary = F("------------------------b8f610217e83e29b");
 
@@ -319,40 +315,7 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
     #ifdef _debug  
         Serial.print("End request: " + end_request);
     #endif
-    int ch_count = 0;
-    now = millis();
-    
-    while (millis() - now < waitForResponse) {
-      while (client->available()) {
-        char c = client->read();
-        responseReceived = true;
-
-        if (!finishedHeaders) {
-          if (currentLineIsBlank && c == '\n') {
-            finishedHeaders = true;
-          } else {
-            headers += c;
-          }
-        } else {
-          if (ch_count < maxMessageLength) {
-            body += c;
-            ch_count++;
-          }
-        }
-
-        if (c == '\n') currentLineIsBlank = true;
-        else if (c != '\r') currentLineIsBlank = false;
-      }
-
-      if (responseReceived) {
-        #ifdef _debug  
-          Serial.println();
-          Serial.println(body);
-          Serial.println();
-        #endif
-        break;
-      }
-    }
+    readHTTPAnswer(body, headers);
   }
 
   closeClient();
