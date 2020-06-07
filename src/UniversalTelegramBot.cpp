@@ -117,12 +117,51 @@ String UniversalTelegramBot::sendGetToTelegram(const String& command) {
   return mess;
 }
 
+bool UniversalTelegramBot::readHTTPAnswer(String &body, String &headers) {
+  int ch_count = 0;
+  long now = millis();
+  bool finishedHeaders = false;
+  bool currentLineIsBlank = true;
+  bool responseReceived = false;
+
+  while (millis() - now < waitForResponse) {
+    while (client->available()) {
+      char c = client->read();
+      responseReceived = true;
+
+      if (!finishedHeaders) {
+        if (currentLineIsBlank && c == '\n') {
+          finishedHeaders = true;
+        } else {
+          headers += c;
+        }
+      } else {
+        if (ch_count < maxMessageLength) {
+          body += c;
+          ch_count++;
+        }
+      }
+
+      if (c == '\n') currentLineIsBlank = true;
+      else if (c != '\r') currentLineIsBlank = false;
+    }
+
+    if (responseReceived) {
+      #ifdef _debug  
+        Serial.println();
+        Serial.println(body);
+        Serial.println();
+      #endif
+      break;
+    }
+  }
+  return responseReceived;
+}
+
 String UniversalTelegramBot::sendPostToTelegram(const String& command, JsonObject payload) {
 
   String body;
   String headers;
-  long now;
-  bool responseReceived = false;
 
   // Connect with api.telegram.org if not already connected
   if (!client->connected()) {
@@ -160,42 +199,7 @@ String UniversalTelegramBot::sendPostToTelegram(const String& command, JsonObjec
         Serial.println(String("Posting:") + out);
     #endif
 
-    int ch_count = 0;
-    now = millis();
-    bool finishedHeaders = false;
-    bool currentLineIsBlank = true;
-    while (millis() - now < waitForResponse) {
-      while (client->available()) {
-        char c = client->read();
-        responseReceived = true;
-
-        if (!finishedHeaders) {
-          if (currentLineIsBlank && c == '\n') {
-            finishedHeaders = true;
-          } else {
-            headers += c;
-          }
-        } else {
-          if (ch_count < maxMessageLength) {
-            body += c;
-            ch_count++;
-          }
-        }
-
-        if (c == '\n') currentLineIsBlank = true;
-        else if (c != '\r') currentLineIsBlank = false;
-        
-      }
-
-      if (responseReceived) {
-        #ifdef _debug  
-          Serial.println();
-          Serial.println(body);
-          Serial.println();
-        #endif
-        break;
-      }
-    }
+    readHTTPAnswer(body, headers);
   }
 
   return body;

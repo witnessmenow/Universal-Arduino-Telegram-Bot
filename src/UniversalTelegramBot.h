@@ -79,6 +79,7 @@ public:
                                   GetNextBuffer getNextBufferCallback, 
                                   GetNextBufferLen getNextBufferLenCallback);
 
+  bool readHTTPAnswer(String &body, String &headers);
   bool getMe();
 
   bool sendSimpleMessage(const String& chat_id, const String& text, const String& parse_mode);
