@@ -107,7 +107,7 @@ bool UniversalTelegramBot::readHTTPAnswer(String &body, String &headers) {
   bool currentLineIsBlank = true;
   bool responseReceived = false;
 
-  while (millis() - now < waitForResponse) {
+  while (millis() - now < longPoll * 1000 + waitForResponse) {
     while (client->available()) {
       char c = client->read();
       responseReceived = true;
