@@ -2,7 +2,7 @@
 #include <ArduinoOTA.h>
 #include <UniversalTelegramBot.h>
 
-#define BOTtoken "1235351031:AAFy85Gc9y1raA9dYYSTe4S8_Yfr1J0D-lg" // "648272766:AAEkW5FaFMeHqWwuNBsZJckFEOdhlSVisEc"
+#define BOTtoken "XXXXXXXXXX:YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY" // Change it to your bot token
 
 WiFiClientSecure client;
 UniversalTelegramBot bot(BOTtoken, client);
