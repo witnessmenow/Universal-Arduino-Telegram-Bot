@@ -27,7 +27,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <Client.h>
-#include <core_version.h> 
 
 #define HOST "api.telegram.org"
 #define SSL_PORT 443
