@@ -19,7 +19,7 @@
     Twitter: https://twitter.com/witnessmenow
  *******************************************************************/
 
-// The version of ESP8266 core needs to be 2.5 or higher
+// NOTE: The version of ESP8266 core needs to be 2.5 or higher
 // or else your bot will not connect.
 
 // ----------------------------

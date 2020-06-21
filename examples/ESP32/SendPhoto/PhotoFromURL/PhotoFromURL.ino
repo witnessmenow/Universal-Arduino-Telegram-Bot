@@ -1,6 +1,6 @@
 /*******************************************************************
-    A telegram bot for your ESP32 that responds
-    with whatever message you send it.
+    A telegram bot for your ESP32 that demonstrates sending an image
+    from URL.
 
     Parts:
     ESP32 D1 Mini stlye Dev board* - http://s.click.aliexpress.com/e/C6ds4my
@@ -12,8 +12,9 @@
     please consider becoming a sponsor on Github
     https://github.com/sponsors/witnessmenow/
 
+    Example originally written by Vadim Sinitski 
 
-    Written by Brian Lough
+    Library written by Brian Lough
     YouTube: https://www.youtube.com/brianlough
     Tindie: https://www.tindie.com/stores/brianlough/
     Twitter: https://twitter.com/witnessmenow
@@ -52,16 +53,44 @@ UniversalTelegramBot bot(BOTtoken, client);
 int botRequestDelay = 1000;
 unsigned long lastTimeBotRan;
 
+String test_photo_url = "https://www.arduino.cc/en/uploads/Trademark/ArduinoCommunityLogo.png";
+
+void handleNewMessages(int numNewMessages) {
+  Serial.println("handleNewMessages");
+  Serial.println(String(numNewMessages));
+
+  for (int i=0; i<numNewMessages; i++) {
+    String chat_id = String(bot.messages[i].chat_id);
+    String text = bot.messages[i].text;
+
+    String from_name = bot.messages[i].from_name;
+    if (from_name == "") from_name = "Guest";
+
+    if (text == "/get_test_photo") {
+      bot.sendPhoto(chat_id, test_photo_url, "Caption is optional, you may not use photo caption");
+    }
+
+    if (text == "/start") {
+      String welcome = "Welcome to Universal Arduino Telegram Bot library, " + from_name + ".\n";
+      welcome += "This is Send Image From URL example.\n\n";
+      welcome += "/get_test_photo : getting test photo\n";
+
+      bot.sendMessage(chat_id, welcome, "");
+    }
+  }
+}
+
 void setup() {
   Serial.begin(115200);
 
-  // Attempt to connect to Wifi network:
+  // Set WiFi to station mode and disconnect from an AP if it was Previously connected
+  WiFi.mode(WIFI_STA);
+  WiFi.disconnect();
+  delay(100);
+
+  // attempt to connect to Wifi network:
   Serial.print("Connecting Wifi: ");
   Serial.println(ssid);
-
-  // Set WiFi to station mode and disconnect from an AP if it was Previously
-  // connected
-  WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED) {
@@ -81,9 +110,7 @@ void loop() {
 
     while(numNewMessages) {
       Serial.println("got response");
-      for (int i=0; i<numNewMessages; i++) {
-        bot.sendMessage(bot.messages[i].chat_id, bot.messages[i].text, "");
-      }
+      handleNewMessages(numNewMessages);
       numNewMessages = bot.getUpdates(bot.last_message_received + 1);
     }
 
