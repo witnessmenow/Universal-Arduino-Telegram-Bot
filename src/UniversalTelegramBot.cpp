@@ -698,7 +698,7 @@ String UniversalTelegramBot::sendPhoto(const String& chat_id, const String& phot
   payload["chat_id"] = chat_id;
   payload["photo"] = photo;
 
-  if (!caption.isEmpty())
+  if (caption.length() > 0)
       payload["caption"] = caption;
 
   if (disable_notification)
@@ -707,7 +707,7 @@ String UniversalTelegramBot::sendPhoto(const String& chat_id, const String& phot
   if (reply_to_message_id && reply_to_message_id != 0)
       payload["reply_to_message_id"] = reply_to_message_id;
 
-  if (!keyboard.isEmpty()) {
+  if (!keyboard.length() > 0) {
     JsonObject replyMarkup = payload.createNestedObject("reply_markup");
     replyMarkup["keyboard"] = serialized(keyboard);
   }
@@ -794,8 +794,8 @@ bool UniversalTelegramBot::answerCallbackQuery(const String &query_id, const Str
   payload["show_alert"] = show_alert;
   payload["cache_time"] = cache_time;
 
-  if (!text.isEmpty()) payload["text"] = text;
-  if (!url.isEmpty()) payload["url"] = url;
+  if (text.length() > 0) payload["text"] = text;
+  if (url.length() > 0) payload["url"] = url;
 
   String response = sendPostToTelegram(BOT_CMD("answerCallbackQuery"), payload.as<JsonObject>());
   #ifdef _debug  
