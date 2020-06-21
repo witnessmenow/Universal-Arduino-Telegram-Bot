@@ -707,7 +707,7 @@ String UniversalTelegramBot::sendPhoto(const String& chat_id, const String& phot
   if (reply_to_message_id && reply_to_message_id != 0)
       payload["reply_to_message_id"] = reply_to_message_id;
 
-  if (!keyboard.length() > 0) {
+  if (keyboard.length() > 0) {
     JsonObject replyMarkup = payload.createNestedObject("reply_markup");
     replyMarkup["keyboard"] = serialized(keyboard);
   }
