@@ -1,4 +1,23 @@
 /*******************************************************************
+    An example of bot that echos back any messages received,
+    including ones from channels
+
+    Parts:
+    D1 Mini ESP8266 * - http://s.click.aliexpress.com/e/uzFUnIe
+    (or any ESP8266 board)
+
+      = Affilate
+
+    If you find what I do useful and would like to support me,
+    please consider becoming a sponsor on Github
+    https://github.com/sponsors/witnessmenow/
+
+
+    Written by Brian Lough
+    YouTube: https://www.youtube.com/brianlough
+    Tindie: https://www.tindie.com/stores/brianlough/
+    Twitter: https://twitter.com/witnessmenow
+ *******************************************************************//*******************************************************************
 *  An example of bot that echos back any messages received,
 *  including ones from channels
 *                                                                           
@@ -24,6 +43,12 @@ long Bot_lasttime;   //last time messages' scan has been done
 void setup() {
   Serial.begin(115200);
 
+  // This is the simplest way of getting this working
+  // if you are passing sensitive information, or controlling
+  // something important, please either use certStore or at
+  // least client.setFingerPrint
+  client.setInsecure();
+
   // Set WiFi to station mode and disconnect from an AP if it was Previously
   // connected
   WiFi.mode(WIFI_STA);
@@ -47,7 +72,7 @@ void setup() {
 }
 
 void loop() {
-  if (millis() > Bot_lasttime + Bot_mtbs)  {
+  if (millis() > lastTimeBotRan + botRequestDelay)  {
     int numNewMessages = bot.getUpdates(bot.last_message_received + 1);
 
     while(numNewMessages) {
@@ -63,6 +88,6 @@ void loop() {
       numNewMessages = bot.getUpdates(bot.last_message_received + 1);
     }
 
-    Bot_lasttime = millis();
+    lastTimeBotRan = millis();
   }
 }
