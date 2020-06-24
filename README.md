@@ -21,7 +21,9 @@ Each library only supported a single type of Arduino and had different features 
 
 The downloaded code can be included as a new library into the IDE selecting the menu:
 
-     Sketch / include Library / Add .Zip library
+```
+ Sketch / include Library / Add .Zip library
+```
 
 You also have to install the ArduinoJson library written by [Benoît Blanchon](https://github.com/bblanchon). Search for it on the Arduino Library manager or get it from [here](https://github.com/bblanchon/ArduinoJson).
 
@@ -33,14 +35,18 @@ To generate your new Bot, you need an Access Token. Talk to [BotFather](https://
 
 Include UniversalTelegramBot in your project:
 
-    #include <UniversalTelegramBot.h>
+```ino
+#include <UniversalTelegramBot.h>
+```
 
 and pass it a Bot token and a SSL Client (See the [examples](https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot/tree/master/examples) for more details)
 
-    #define BOTtoken "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-    // WiFiSSLClient client; //For 101 boards
-    WiFiClientSecure client; //For ESP8266 boards
-    UniversalTelegramBot bot(BOTtoken, client);
+```ino
+#define BOTtoken "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+// WiFiSSLClient client; //For 101 boards
+WiFiClientSecure client; //For ESP8266 boards
+UniversalTelegramBot bot(BOTtoken, client);
+```
 
 *NOTE:* This library has not been tested with the 101 boards as I do not have a compatible board. [If you can help please let us know!](https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot/issues/2)
 
