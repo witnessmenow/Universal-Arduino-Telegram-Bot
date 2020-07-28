@@ -64,7 +64,7 @@ String UniversalTelegramBot::buildCommand(const String& cmd) {
 
 String UniversalTelegramBot::sendGetToTelegram(const String& command) {
   String body, headers;
-  bool avail;
+  //bool avail; // bugfix FJvK
   
   // Connect with api.telegram.org if not already connected
   if (!client->connected()) {
@@ -236,7 +236,7 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
     client->print(buildCommand(command));
     client->println(F(" HTTP/1.1"));
     // Host header
-    client->print(F("Host: " TELEGRAM_HOST));
+    client->println(F("Host: " TELEGRAM_HOST)); // bugfix - https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot/issues/186
     client->println(F("User-Agent: arduino/1.0"));
     client->println(F("Accept: */*"));
 
@@ -268,7 +268,7 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
         #endif
         byte buffer[512];
         int count = 0;
-        char ch;
+        //char ch;  // bugfix FJvK
         while (moreDataAvailableCallback()) {
             buffer[count] = getNextByteCallback();
             count++;
