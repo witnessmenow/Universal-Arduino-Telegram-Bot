@@ -562,16 +562,19 @@ bool UniversalTelegramBot::sendSimpleMessage(const String& chat_id, const String
 }
 
 bool UniversalTelegramBot::sendMessage(const String& chat_id, const String& text,
-                                       const String& parse_mode) {
+                                       const String& parse_mode, int message_id) { // added message_id
 
   DynamicJsonDocument payload(maxMessageLength);
   payload["chat_id"] = chat_id;
   payload["text"] = text;
 
+  if (message_id != 0)
+    payload["message_id"] = message_id; // added message_id
+
   if (parse_mode != "")
     payload["parse_mode"] = parse_mode;
 
-  return sendPostMessage(payload.as<JsonObject>());
+  return sendPostMessage(payload.as<JsonObject>(), message_id); // if message id == 0 then edit is false, else edit is true
 }
 
 bool UniversalTelegramBot::sendMessageWithReplyKeyboard(
