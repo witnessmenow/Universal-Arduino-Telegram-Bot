@@ -607,7 +607,7 @@ bool UniversalTelegramBot::sendMessageWithInlineKeyboard(const String& chat_id,
                                                          const String& text,
                                                          const String& parse_mode,
                                                          const String& keyboard,
-                                                         const int& message_id) {   // added message_id
+                                                         int message_id) {   // added message_id
 
   DynamicJsonDocument payload(maxMessageLength);
   payload["chat_id"] = chat_id;
@@ -628,7 +628,7 @@ bool UniversalTelegramBot::sendMessageWithInlineKeyboard(const String& chat_id,
  * SendPostMessage - function to send message to telegram              *
  * (Arguments to pass: chat_id, text to transmit and markup(optional)) *
  ***********************************************************************/
-bool UniversalTelegramBot::sendPostMessage(JsonObject payload, bool edit = false) { // added message_id
+bool UniversalTelegramBot::sendPostMessage(JsonObject payload, bool edit) { // added message_id
 
   bool sent = false;
   #ifdef TELEGRAM_DEBUG 

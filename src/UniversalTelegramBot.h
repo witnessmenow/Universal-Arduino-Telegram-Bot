@@ -90,7 +90,7 @@ public:
                                     bool resize = false, bool oneTime = false,
                                     bool selective = false);
   bool sendMessageWithInlineKeyboard(const String& chat_id, const String& text,
-                                     const String& parse_mode, const String& keyboard, const int& message_id = 0); // added message id 
+                                     const String& parse_mode, const String& keyboard, int message_id = 0); // added message id 
 
   bool sendChatAction(const String& chat_id, const String& text);
 
