@@ -461,6 +461,7 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
       messages[messageIndex].chat_id = message["chat"]["id"].as<String>();
       messages[messageIndex].chat_title = message["chat"]["title"].as<String>();
       messages[messageIndex].hasDocument = false;
+      messages[messageIndex].message_id = message["message_id"].as<int>();  // added message id
       if (message.containsKey("text")) {
         messages[messageIndex].text = message["text"].as<String>();
           
@@ -480,7 +481,8 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
         messages[messageIndex].reply_to_message_id = message["reply_to_message"]["message_id"];
         // no need to check if containsKey["text"]. If it doesn't, it default to null
         messages[messageIndex].reply_to_text = message["reply_to_message"]["text"].as<String>();
-      } 
+      }
+
     } else if (result.containsKey("channel_post")) {
       JsonObject message = result["channel_post"];
       messages[messageIndex].type = F("channel_post");
@@ -488,6 +490,7 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
       messages[messageIndex].date = message["date"].as<String>();
       messages[messageIndex].chat_id = message["chat"]["id"].as<String>();
       messages[messageIndex].chat_title = message["chat"]["title"].as<String>();
+      messages[messageIndex].message_id = message["message_id"].as<int>();  // added message id
 
     } else if (result.containsKey("callback_query")) {
       JsonObject message = result["callback_query"];
@@ -500,6 +503,8 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
       messages[messageIndex].reply_to_text = message["message"]["text"].as<String>();
       messages[messageIndex].chat_title = F("");
       messages[messageIndex].query_id = message["id"].as<String>();
+      messages[messageIndex].message_id = message["message"]["message_id"].as<int>();  // added message id
+
     } else if (result.containsKey("edited_message")) {
       JsonObject message = result["edited_message"];
       messages[messageIndex].type = F("edited_message");
@@ -508,6 +513,7 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
       messages[messageIndex].date = message["date"].as<String>();
       messages[messageIndex].chat_id = message["chat"]["id"].as<String>();
       messages[messageIndex].chat_title = message["chat"]["title"].as<String>();
+      messages[messageIndex].message_id = message["message_id"].as<int>();  // added message id
 
       if (message.containsKey("text")) {
         messages[messageIndex].text = message["text"].as<String>();
