@@ -1,6 +1,6 @@
 /*******************************************************************
-    A telegram bot for your ESP32 that demonstrates sending an image
-    from URL.
+    A telegram bot for your ESP32 that controls the 
+    onboard LED. The LED in this example is active low.
 
     Parts:
     ESP32 D1 Mini stlye Dev board* - http://s.click.aliexpress.com/e/C6ds4my
@@ -12,13 +12,13 @@
     please consider becoming a sponsor on Github
     https://github.com/sponsors/witnessmenow/
 
-    Example originally written by Vadim Sinitski 
 
-    Library written by Brian Lough
+    Written by Brian Lough
     YouTube: https://www.youtube.com/brianlough
     Tindie: https://www.tindie.com/stores/brianlough/
     Twitter: https://twitter.com/witnessmenow
  *******************************************************************/
+
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
@@ -31,41 +31,74 @@
 
 const unsigned long BOT_MTBS = 1000; // mean time between scan messages
 
-unsigned long bot_lasttime;          // last time messages' scan has been done
 WiFiClientSecure secured_client;
 UniversalTelegramBot bot(BOT_TOKEN, secured_client);
+unsigned long bot_lasttime; // last time messages' scan has been done
 
-String test_photo_url = "https://www.arduino.cc/en/uploads/Trademark/ArduinoCommunityLogo.png";
+const int ledPin = LED_BUILTIN;
+int ledStatus = 0;
 
-void handleNewMessages(int numNewMessages) {
+void handleNewMessages(int numNewMessages)
+{
   Serial.print("handleNewMessages ");
   Serial.println(numNewMessages);
 
-  for (int i=0; i<numNewMessages; i++) {
+  for (int i = 0; i < numNewMessages; i++)
+  {
     String chat_id = bot.messages[i].chat_id;
     String text = bot.messages[i].text;
 
     String from_name = bot.messages[i].from_name;
-    if (from_name == "") from_name = "Guest";
+    if (from_name == "")
+      from_name = "Guest";
 
-    if (text == "/get_test_photo") {
-      bot.sendPhoto(chat_id, test_photo_url, "Caption is optional, you may not use photo caption");
+    if (text == "/ledon")
+    {
+      digitalWrite(ledPin, LOW); // turn the LED on (HIGH is the voltage level)
+      ledStatus = 1;
+      bot.sendMessage(chat_id, "Led is ON", "");
     }
 
-    if (text == "/start") {
-      String welcome = "Welcome to Universal Arduino Telegram Bot library, " + from_name + ".\n";
-      welcome += "This is Send Image From URL example.\n\n";
-      welcome += "/get_test_photo : getting test photo\n";
+    if (text == "/ledoff")
+    {
+      ledStatus = 0;
+      digitalWrite(ledPin, HIGH); // turn the LED off (LOW is the voltage level)
+      bot.sendMessage(chat_id, "Led is OFF", "");
+    }
 
-      bot.sendMessage(chat_id, welcome, "");
+    if (text == "/status")
+    {
+      if (ledStatus)
+      {
+        bot.sendMessage(chat_id, "Led is ON", "");
+      }
+      else
+      {
+        bot.sendMessage(chat_id, "Led is OFF", "");
+      }
+    }
+
+    if (text == "/start")
+    {
+      String welcome = "Welcome to Universal Arduino Telegram Bot library, " + from_name + ".\n";
+      welcome += "This is Flash Led Bot example.\n\n";
+      welcome += "/ledon : to switch the Led ON\n";
+      welcome += "/ledoff : to switch the Led OFF\n";
+      welcome += "/status : Returns current status of LED\n";
+      bot.sendMessage(chat_id, welcome, "Markdown");
     }
   }
 }
+
 
 void setup()
 {
   Serial.begin(115200);
   Serial.println();
+
+  pinMode(ledPin, OUTPUT); // initialize digital ledPin as an output.
+  delay(10);
+  digitalWrite(ledPin, HIGH); // initialize pin as off (active LOW)
 
   // attempt to connect to Wifi network:
   Serial.print("Connecting to Wifi SSID ");

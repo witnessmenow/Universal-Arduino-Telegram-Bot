@@ -1,24 +1,12 @@
 /*******************************************************************
-    A telegram bot for your ESP32 that demonstrates sending an image
-    from URL.
-
-    Parts:
-    ESP32 D1 Mini stlye Dev board* - http://s.click.aliexpress.com/e/C6ds4my
-    (or any ESP32 board)
-
-      = Affilate
-
-    If you find what I do useful and would like to support me,
-    please consider becoming a sponsor on Github
-    https://github.com/sponsors/witnessmenow/
-
-    Example originally written by Vadim Sinitski 
-
-    Library written by Brian Lough
-    YouTube: https://www.youtube.com/brianlough
-    Tindie: https://www.tindie.com/stores/brianlough/
-    Twitter: https://twitter.com/witnessmenow
- *******************************************************************/
+*  An example of setting a long poll, this will mean the request
+*  for new messages will wait the specified amount of time before
+*  returning with no messages
+*
+*  This should reduce amount of data used by the bot
+*
+*  written by Brian Lough
+*******************************************************************/
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
@@ -35,30 +23,11 @@ unsigned long bot_lasttime;          // last time messages' scan has been done
 WiFiClientSecure secured_client;
 UniversalTelegramBot bot(BOT_TOKEN, secured_client);
 
-String test_photo_url = "https://www.arduino.cc/en/uploads/Trademark/ArduinoCommunityLogo.png";
-
-void handleNewMessages(int numNewMessages) {
-  Serial.print("handleNewMessages ");
-  Serial.println(numNewMessages);
-
-  for (int i=0; i<numNewMessages; i++) {
-    String chat_id = bot.messages[i].chat_id;
-    String text = bot.messages[i].text;
-
-    String from_name = bot.messages[i].from_name;
-    if (from_name == "") from_name = "Guest";
-
-    if (text == "/get_test_photo") {
-      bot.sendPhoto(chat_id, test_photo_url, "Caption is optional, you may not use photo caption");
-    }
-
-    if (text == "/start") {
-      String welcome = "Welcome to Universal Arduino Telegram Bot library, " + from_name + ".\n";
-      welcome += "This is Send Image From URL example.\n\n";
-      welcome += "/get_test_photo : getting test photo\n";
-
-      bot.sendMessage(chat_id, welcome, "");
-    }
+void handleNewMessages(int numNewMessages)
+{
+  for (int i = 0; i < numNewMessages; i++)
+  {
+    bot.sendMessage(bot.messages[i].chat_id, bot.messages[i].text, "");
   }
 }
 
@@ -90,6 +59,8 @@ void setup()
     now = time(nullptr);
   }
   Serial.println(now);
+
+  bot.longPoll = 60;
 }
 
 void loop()
@@ -105,6 +76,7 @@ void loop()
       numNewMessages = bot.getUpdates(bot.last_message_received + 1);
     }
 
+    Serial.println("I will happen much less often with a long poll");
     bot_lasttime = millis();
   }
 }

@@ -1,6 +1,6 @@
 /*******************************************************************
     A telegram bot for your ESP32 that demonstrates sending an image
-    from URL.
+    from FileID.
 
     Parts:
     ESP32 D1 Mini stlye Dev board* - http://s.click.aliexpress.com/e/C6ds4my
@@ -22,6 +22,7 @@
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
+#include <ArduinoJson.h>
 
 // Wifi network station credentials
 #define WIFI_SSID "YOUR_SSID"
@@ -37,24 +38,58 @@ UniversalTelegramBot bot(BOT_TOKEN, secured_client);
 
 String test_photo_url = "https://www.arduino.cc/en/uploads/Trademark/ArduinoCommunityLogo.png";
 
-void handleNewMessages(int numNewMessages) {
+void handleNewMessages(int numNewMessages)
+{
   Serial.print("handleNewMessages ");
   Serial.println(numNewMessages);
 
-  for (int i=0; i<numNewMessages; i++) {
+  for (int i = 0; i < numNewMessages; i++)
+  {
     String chat_id = bot.messages[i].chat_id;
     String text = bot.messages[i].text;
 
     String from_name = bot.messages[i].from_name;
-    if (from_name == "") from_name = "Guest";
+    if (from_name == "")
+      from_name = "Guest";
 
-    if (text == "/get_test_photo") {
-      bot.sendPhoto(chat_id, test_photo_url, "Caption is optional, you may not use photo caption");
+    if (text == "/get_test_photo")
+    {
+      String response = bot.sendPhoto(chat_id, test_photo_url, "This photo was sent using URL");
+
+      if (bot.checkForOkResponse(response))
+      {
+        DynamicJsonDocument images(1500);
+        DeserializationError error = deserializeJson(images, response);
+
+        // There are 3 image sizes after Telegram has process photo
+        // You may choose what you want, in example was choosed bigger size
+        int photosArrayLength = images["result"]["photo"].size();
+
+        if (photosArrayLength > 0)
+        {
+          String file_id = images["result"]["photo"][photosArrayLength - 1]["file_id"];
+
+          if (file_id)
+          {
+            String send_photo_by_file_id_response = bot.sendPhoto(chat_id, file_id, "This photo was sent using File ID");
+
+            if (bot.checkForOkResponse(send_photo_by_file_id_response))
+            {
+              // do something
+            }
+            else
+            {
+              // or not to do
+            }
+          }
+        }
+      }
     }
 
-    if (text == "/start") {
+    if (text == "/start")
+    {
       String welcome = "Welcome to Universal Arduino Telegram Bot library, " + from_name + ".\n";
-      welcome += "This is Send Image From URL example.\n\n";
+      welcome += "This is Send Photo From File ID example.\n\n";
       welcome += "/get_test_photo : getting test photo\n";
 
       bot.sendMessage(chat_id, welcome, "");
@@ -65,6 +100,9 @@ void handleNewMessages(int numNewMessages) {
 void setup()
 {
   Serial.begin(115200);
+  Serial.println();
+
+    Serial.begin(115200);
   Serial.println();
 
   // attempt to connect to Wifi network:

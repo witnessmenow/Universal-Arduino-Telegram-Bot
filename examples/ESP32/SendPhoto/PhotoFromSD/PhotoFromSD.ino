@@ -1,6 +1,6 @@
 /*******************************************************************
     A telegram bot for your ESP32 that demonstrates sending an image
-    from URL.
+    from SD.
 
     Parts:
     ESP32 D1 Mini stlye Dev board* - http://s.click.aliexpress.com/e/C6ds4my
@@ -22,6 +22,9 @@
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
+#include <ArduinoJson.h>
+#include <SPI.h>
+#include <SD.h>
 
 // Wifi network station credentials
 #define WIFI_SSID "YOUR_SSID"
@@ -30,35 +33,58 @@
 #define BOT_TOKEN "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
 const unsigned long BOT_MTBS = 1000; // mean time between scan messages
+#define SD_CS 5
 
 unsigned long bot_lasttime;          // last time messages' scan has been done
 WiFiClientSecure secured_client;
 UniversalTelegramBot bot(BOT_TOKEN, secured_client);
 
-String test_photo_url = "https://www.arduino.cc/en/uploads/Trademark/ArduinoCommunityLogo.png";
+File myFile;
+bool isMoreDataAvailable();
+byte getNextByte();
 
-void handleNewMessages(int numNewMessages) {
-  Serial.print("handleNewMessages ");
-  Serial.println(numNewMessages);
+bool isMoreDataAvailable()
+{
+  return myFile.available();
+}
 
-  for (int i=0; i<numNewMessages; i++) {
-    String chat_id = bot.messages[i].chat_id;
-    String text = bot.messages[i].text;
+byte getNextByte()
+{
+  return myFile.read();
+}
 
-    String from_name = bot.messages[i].from_name;
-    if (from_name == "") from_name = "Guest";
+void handleNewMessages(int numNewMessages)
+{
+  String chat_id = bot.messages[0].chat_id;
+  String file_name = "box.jpg";
 
-    if (text == "/get_test_photo") {
-      bot.sendPhoto(chat_id, test_photo_url, "Caption is optional, you may not use photo caption");
+  myFile = SD.open(file_name);
+
+  if (myFile)
+  {
+    Serial.print(file_name);
+    Serial.print("....");
+
+    //Content type for PNG image/png
+    String sent = bot.sendPhotoByBinary(chat_id, "image/jpeg", myFile.size(),
+                                        isMoreDataAvailable,
+                                        getNextByte, nullptr, nullptr);
+
+    if (sent)
+    {
+      Serial.println("was successfully sent");
+    }
+    else
+    {
+      Serial.println("was not sent");
     }
 
-    if (text == "/start") {
-      String welcome = "Welcome to Universal Arduino Telegram Bot library, " + from_name + ".\n";
-      welcome += "This is Send Image From URL example.\n\n";
-      welcome += "/get_test_photo : getting test photo\n";
-
-      bot.sendMessage(chat_id, welcome, "");
-    }
+    myFile.close();
+  }
+  else
+  {
+    // if the file didn't open, print an error:
+    Serial.println("error opening photo");
   }
 }
 
@@ -66,6 +92,14 @@ void setup()
 {
   Serial.begin(115200);
   Serial.println();
+
+  Serial.print("Initializing SD card....");
+  if (!SD.begin(SD_CS))
+  {
+    Serial.println("failed!");
+    return;
+  }
+  Serial.println("done.");
 
   // attempt to connect to Wifi network:
   Serial.print("Connecting to Wifi SSID ");

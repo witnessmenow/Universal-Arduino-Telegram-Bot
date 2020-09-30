@@ -1,6 +1,6 @@
 /*******************************************************************
-    A telegram bot that sends you a message when ESP
-    starts up
+    An example of bot that echos back any messages received,
+    including ones from channels
 
     Parts:
     ESP32 D1 Mini stlye Dev board* - http://s.click.aliexpress.com/e/C6ds4my
@@ -18,11 +18,15 @@
     Tindie: https://www.tindie.com/stores/brianlough/
     Twitter: https://twitter.com/witnessmenow
  *******************************************************************/
-
+/*******************************************************************
+*  An example of bot that echos back any messages received,
+*  including ones from channels
+*                                                                           
+*  written by Brian Lough
+*******************************************************************/
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
-#include <ArduinoJson.h>
 
 // Wifi network station credentials
 #define WIFI_SSID "YOUR_SSID"
@@ -30,19 +34,33 @@
 // Telegram BOT Token (Get from Botfather)
 #define BOT_TOKEN "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
-// Use @myidbot (IDBot) to find out the chat ID of an individual or a group
-// Also note that you need to click "start" on a bot before it can
-// message you
-#define CHAT_ID "175753388"
+const unsigned long BOT_MTBS = 1000; // mean time between scan messages
 
 WiFiClientSecure secured_client;
 UniversalTelegramBot bot(BOT_TOKEN, secured_client);
+unsigned long bot_lasttime;          // last time messages' scan has been done
 
-void setup() {
+void handleNewMessages(int numNewMessages)
+{
+  for (int i = 0; i < numNewMessages; i++)
+  {
+    if (bot.messages[i].type == "channel_post")
+    {
+      bot.sendMessage(bot.messages[i].chat_id, bot.messages[i].chat_title + " " + bot.messages[i].text, "");
+    }
+    else
+    {
+      bot.sendMessage(bot.messages[i].chat_id, bot.messages[i].text, "");
+    }
+  }
+}
+
+void setup()
+{
   Serial.begin(115200);
   Serial.println();
 
- // attempt to connect to Wifi network:
+  // attempt to connect to Wifi network:
   Serial.print("Connecting to Wifi SSID ");
   Serial.print(WIFI_SSID);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
@@ -65,10 +83,21 @@ void setup() {
     now = time(nullptr);
   }
   Serial.println(now);
-
-  bot.sendMessage(CHAT_ID, "Bot started up", "");
 }
 
-void loop() {
+void loop()
+{
+  if (millis() - bot_lasttime > BOT_MTBS)
+  {
+    int numNewMessages = bot.getUpdates(bot.last_message_received + 1);
 
+    while (numNewMessages)
+    {
+      Serial.println("got response");
+      handleNewMessages(numNewMessages);
+      numNewMessages = bot.getUpdates(bot.last_message_received + 1);
+    }
+
+    bot_lasttime = millis();
+  }
 }

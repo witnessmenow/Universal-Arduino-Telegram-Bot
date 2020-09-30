@@ -1,6 +1,8 @@
-#ESP8266 - Chat Action
+#ESP32 - Flash LED
 
-This is a basic example of how to use chat action using UniversalTelegramBot for ESP8266 based boards.
+This is a basic example of how to receive commands using UniversalTelegramBot for ESP32 based boards.
+
+The application will turn on and off an LED based on commands received via telegram.
 
 Application originally written by [Giancarlo Bacchio](giancarlo.bacchio@gmail.com) for [ESP8266-TelegramBot library](https://github.com/Gianbacchio/ESP8266-TelegramBot)
 

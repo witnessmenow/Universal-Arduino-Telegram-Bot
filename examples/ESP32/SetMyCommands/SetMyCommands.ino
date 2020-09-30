@@ -1,24 +1,3 @@
-/*******************************************************************
-    A telegram bot for your ESP32 that responds
-    with whatever message you send it.
-
-    Parts:
-    ESP32 D1 Mini stlye Dev board* - http://s.click.aliexpress.com/e/C6ds4my
-    (or any ESP32 board)
-
-      = Affilate
-
-    If you find what I do useful and would like to support me,
-    please consider becoming a sponsor on Github
-    https://github.com/sponsors/witnessmenow/
-
-
-    Written by Brian Lough
-    YouTube: https://www.youtube.com/brianlough
-    Tindie: https://www.tindie.com/stores/brianlough/
-    Twitter: https://twitter.com/witnessmenow
- *******************************************************************/
-
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
@@ -31,16 +10,42 @@
 
 const unsigned long BOT_MTBS = 1000; // mean time between scan messages
 
+unsigned long bot_lasttime; // last time messages' scan has been done
 WiFiClientSecure secured_client;
 UniversalTelegramBot bot(BOT_TOKEN, secured_client);
-unsigned long bot_lasttime; // last time messages' scan has been done
 
 void handleNewMessages(int numNewMessages)
 {
+  Serial.print("handleNewMessages ");
+  Serial.println(numNewMessages);
+  
+  String answer;
   for (int i = 0; i < numNewMessages; i++)
   {
-    bot.sendMessage(bot.messages[i].chat_id, bot.messages[i].text, "");
+    telegramMessage &msg = bot.messages[i];
+    Serial.println("Received " + msg.text);
+    if (msg.text == "/help")
+      answer = "So you need _help_, uh? me too! use /start or /status";
+    else if (msg.text == "/start")
+      answer = "Welcome my new friend! You are the first *" + msg.from_name + "* I've ever met";
+    else if (msg.text == "/status")
+      answer = "All is good here, thanks for asking!";
+    else
+      answer = "Say what?";
+
+    bot.sendMessage(msg.chat_id, answer, "Markdown");
   }
+}
+
+void bot_setup()
+{
+  const String commands = F("["
+                            "{\"command\":\"help\",  \"description\":\"Get bot usage help\"},"
+                            "{\"command\":\"start\", \"description\":\"Message sent when you open a chat with a bot\"},"
+                            "{\"command\":\"status\",\"description\":\"Answer device current status\"}" // no comma on last command
+                            "]");
+  bot.setMyCommands(commands);
+  //bot.sendMessage("25235518", "Hola amigo!", "Markdown");
 }
 
 void setup()
@@ -71,6 +76,8 @@ void setup()
     now = time(nullptr);
   }
   Serial.println(now);
+
+  bot_setup();
 }
 
 void loop()

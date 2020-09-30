@@ -1,27 +1,14 @@
 /*******************************************************************
-    A telegram bot for your ESP32 that demonstrates sending an image
-    from URL.
-
-    Parts:
-    ESP32 D1 Mini stlye Dev board* - http://s.click.aliexpress.com/e/C6ds4my
-    (or any ESP32 board)
-
-      = Affilate
-
-    If you find what I do useful and would like to support me,
-    please consider becoming a sponsor on Github
-    https://github.com/sponsors/witnessmenow/
-
-    Example originally written by Vadim Sinitski 
-
-    Library written by Brian Lough
-    YouTube: https://www.youtube.com/brianlough
-    Tindie: https://www.tindie.com/stores/brianlough/
-    Twitter: https://twitter.com/witnessmenow
+ *  An example of recieving location Data
+ *
+ *
+ *  By Brian Lough
  *******************************************************************/
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
+
+const unsigned long BOT_MTBS = 1000; // mean time between scan messages
 
 // Wifi network station credentials
 #define WIFI_SSID "YOUR_SSID"
@@ -29,35 +16,38 @@
 // Telegram BOT Token (Get from Botfather)
 #define BOT_TOKEN "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
-const unsigned long BOT_MTBS = 1000; // mean time between scan messages
-
 unsigned long bot_lasttime;          // last time messages' scan has been done
 WiFiClientSecure secured_client;
 UniversalTelegramBot bot(BOT_TOKEN, secured_client);
 
-String test_photo_url = "https://www.arduino.cc/en/uploads/Trademark/ArduinoCommunityLogo.png";
-
-void handleNewMessages(int numNewMessages) {
-  Serial.print("handleNewMessages ");
-  Serial.println(numNewMessages);
-
-  for (int i=0; i<numNewMessages; i++) {
+void handleNewMessages(int numNewMessages)
+{
+  for (int i = 0; i < numNewMessages; i++)
+  {
     String chat_id = bot.messages[i].chat_id;
     String text = bot.messages[i].text;
 
     String from_name = bot.messages[i].from_name;
-    if (from_name == "") from_name = "Guest";
+    if (from_name == "")
+      from_name = "Guest";
 
-    if (text == "/get_test_photo") {
-      bot.sendPhoto(chat_id, test_photo_url, "Caption is optional, you may not use photo caption");
+    if (bot.messages[i].longitude != 0 || bot.messages[i].latitude != 0)
+    {
+      Serial.print("Long: ");
+      Serial.println(String(bot.messages[i].longitude, 6));
+      Serial.print("Lat: ");
+      Serial.println(String(bot.messages[i].latitude, 6));
+
+      String message = "Long: " + String(bot.messages[i].longitude, 6) + "\n";
+      message += "Lat: " + String(bot.messages[i].latitude, 6) + "\n";
+      bot.sendMessage(chat_id, message, "Markdown");
     }
-
-    if (text == "/start") {
+    else if (text == "/start")
+    {
       String welcome = "Welcome to Universal Arduino Telegram Bot library, " + from_name + ".\n";
-      welcome += "This is Send Image From URL example.\n\n";
-      welcome += "/get_test_photo : getting test photo\n";
+      welcome += "Share a location or a live location and the bot will respond with the co-ords\n";
 
-      bot.sendMessage(chat_id, welcome, "");
+      bot.sendMessage(chat_id, welcome, "Markdown");
     }
   }
 }
@@ -108,3 +98,4 @@ void loop()
     bot_lasttime = millis();
   }
 }
+

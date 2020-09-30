@@ -27,16 +27,22 @@ env:
     #- SCRIPT=platformioSingle EXAMPLE_NAME=UsingWiFiManager EXAMPLE_FOLDER=/ BOARDTYPE=ESP8266 BOARD=d1_mini
 
     # ESP32
+    - SCRIPT=platformioSingle EXAMPLE_NAME=ChannelPost EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
+    - SCRIPT=platformioSingle EXAMPLE_NAME=ChatAction EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
+    - SCRIPT=platformioSingle EXAMPLE_NAME=InlineKeyboardMarkup EXAMPLE_FOLDER=/CustomKeyboard/ BOARDTYPE=ESP32 BOARD=esp32dev
+    - SCRIPT=platformioSingle EXAMPLE_NAME=ReplyKeyboardMarkup EXAMPLE_FOLDER=/CustomKeyboard/ BOARDTYPE=ESP32 BOARD=esp32doit-devkit-v1
     - SCRIPT=platformioSingle EXAMPLE_NAME=EchoBot EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
+    - SCRIPT=platformioSingle EXAMPLE_NAME=FlashLED EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32doit-devkit-v1
+    - SCRIPT=platformioSingle EXAMPLE_NAME=Location EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
+    - SCRIPT=platformioSingle EXAMPLE_NAME=LongPoll EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
     - SCRIPT=platformioSingle EXAMPLE_NAME=SendMessageFromEvent EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
-    #- SCRIPT=platformioSingle EXAMPLE_NAME=ReplyKeyboardMarkup EXAMPLE_FOLDER=/CustomKeyboard/ BOARDTYPE=ESP32 BOARD=esp32dev
-    #- SCRIPT=platformioSingle EXAMPLE_NAME=InlineKeyboardMarkup EXAMPLE_FOLDER=/CustomKeyboard/ BOARDTYPE=ESP32 BOARD=esp32dev
-    #- SCRIPT=platformioSingle EXAMPLE_NAME=FlashLED EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
-    #- SCRIPT=platformioSingle EXAMPLE_NAME=Location EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
-    #- SCRIPT=platformioSingle EXAMPLE_NAME=ChannelPost EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
-    #- SCRIPT=platformioSingle EXAMPLE_NAME=ChatAction EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
-    #- SCRIPT=platformioSingle EXAMPLE_NAME=LongPoll EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
-
+    #- SCRIPT=platformioSingle EXAMPLE_NAME=ESP32-Cam EXAMPLE_FOLDER=/SendPhoto/ BOARDTYPE=ESP32 BOARD=esp32dev
+    - SCRIPT=platformioSingle EXAMPLE_NAME=PhotoFromFileID EXAMPLE_FOLDER=/SendPhoto/ BOARDTYPE=ESP32 BOARD=esp32dev
+    - SCRIPT=platformioSingle EXAMPLE_NAME=PhotoFromSD EXAMPLE_FOLDER=/SendPhoto/ BOARDTYPE=ESP32 BOARD=esp32dev
+    - SCRIPT=platformioSingle EXAMPLE_NAME=PhotoFromSerial EXAMPLE_FOLDER=/SendPhoto/ BOARDTYPE=ESP32 BOARD=esp32dev
+    - SCRIPT=platformioSingle EXAMPLE_NAME=PhotoFromURL EXAMPLE_FOLDER=/SendPhoto/ BOARDTYPE=ESP32 BOARD=esp32dev
+    - SCRIPT=platformioSingle EXAMPLE_NAME=SetMyCommands EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
+    #- SCRIPT=platformioSingle EXAMPLE_NAME=telegramOTA EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
 
 install:
     - pip install -U platformio
