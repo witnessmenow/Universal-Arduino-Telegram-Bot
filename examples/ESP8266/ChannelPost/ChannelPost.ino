@@ -1,6 +1,6 @@
 /*******************************************************************
-    A telegram bot for your ESP8266 that responds
-    with whatever message you send it.
+    An example of bot that echos back any messages received,
+    including ones from channels
 
     Parts:
     D1 Mini ESP8266 * - http://s.click.aliexpress.com/e/uzFUnIe
@@ -18,7 +18,12 @@
     Tindie: https://www.tindie.com/stores/brianlough/
     Twitter: https://twitter.com/witnessmenow
  *******************************************************************/
-
+/*******************************************************************
+*  An example of bot that echos back any messages received,
+*  including ones from channels
+*                                                                           
+*  written by Brian Lough
+*******************************************************************/
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
@@ -31,16 +36,23 @@
 
 const unsigned long BOT_MTBS = 1000; // mean time between scan messages
 
-X509List cert(TELEGRAM_CERTIFICATE_ROOT);
 WiFiClientSecure secured_client;
+X509List cert(TELEGRAM_CERTIFICATE_ROOT);
 UniversalTelegramBot bot(BOT_TOKEN, secured_client);
-unsigned long bot_lasttime; // last time messages' scan has been done
+unsigned long bot_lasttime;          // last time messages' scan has been done
 
 void handleNewMessages(int numNewMessages)
 {
   for (int i = 0; i < numNewMessages; i++)
   {
-    bot.sendMessage(bot.messages[i].chat_id, bot.messages[i].text, "");
+    if (bot.messages[i].type == "channel_post")
+    {
+      bot.sendMessage(bot.messages[i].chat_id, bot.messages[i].chat_title + " " + bot.messages[i].text, "");
+    }
+    else
+    {
+      bot.sendMessage(bot.messages[i].chat_id, bot.messages[i].text, "");
+    }
   }
 }
 
@@ -50,11 +62,11 @@ void setup()
   Serial.println();
 
   // attempt to connect to Wifi network:
+  configTime(0, 0, "pool.ntp.org");      // get UTC time via NTP
+  secured_client.setTrustAnchors(&cert); // Add root certificate for api.telegram.org
   Serial.print("Connecting to Wifi SSID ");
   Serial.print(WIFI_SSID);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  secured_client.setTrustAnchors(&cert); // Add root certificate for api.telegram.org
-  
   while (WiFi.status() != WL_CONNECTED)
   {
     Serial.print(".");
@@ -63,8 +75,8 @@ void setup()
   Serial.print("\nWiFi connected. IP address: ");
   Serial.println(WiFi.localIP());
 
+  // Check NTP/Time, usually it is instantaneous and you can delete the code below.
   Serial.print("Retrieving time: ");
-  configTime(0, 0, "pool.ntp.org"); // get UTC time via NTP
   time_t now = time(nullptr);
   while (now < 24 * 3600)
   {

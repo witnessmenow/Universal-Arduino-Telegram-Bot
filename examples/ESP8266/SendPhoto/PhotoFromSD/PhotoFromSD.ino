@@ -1,6 +1,15 @@
+/*******************************************************************
+ *  An example of bot that echos back any messages received        *
+ *                                                                 *
+ *  written by Giacarlo Bacchio (Gianbacchio on Github)            *
+ *  adapted by Brian Lough                                         *
+ *******************************************************************/
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
+#include <ArduinoJson.h>
+#include <SPI.h>
+#include <SD.h>
 
 // Wifi network station credentials
 #define WIFI_SSID "YOUR_SSID"
@@ -10,49 +19,72 @@
 
 const unsigned long BOT_MTBS = 1000; // mean time between scan messages
 
-unsigned long bot_lasttime; // last time messages' scan has been done
+unsigned long bot_lasttime;          // last time messages' scan has been done
 X509List cert(TELEGRAM_CERTIFICATE_ROOT);
 WiFiClientSecure secured_client;
 UniversalTelegramBot bot(BOT_TOKEN, secured_client);
 
-void handleNewMessages(int numNewMessages)
-{
-  Serial.print("handleNewMessages ");
-  Serial.println(numNewMessages);
-  
-  String answer;
-  for (int i = 0; i < numNewMessages; i++)
-  {
-    telegramMessage &msg = bot.messages[i];
-    Serial.println("Received " + msg.text);
-    if (msg.text == "/help")
-      answer = "So you need _help_, uh? me too! use /start or /status";
-    else if (msg.text == "/start")
-      answer = "Welcome my new friend! You are the first *" + msg.from_name + "* I've ever met";
-    else if (msg.text == "/status")
-      answer = "All is good here, thanks for asking!";
-    else
-      answer = "Say what?";
+File myFile;
+bool isMoreDataAvailable();
+byte getNextByte();
 
-    bot.sendMessage(msg.chat_id, answer, "Markdown");
-  }
+bool isMoreDataAvailable()
+{
+  return myFile.available();
 }
 
-void bot_setup()
+byte getNextByte()
 {
-  const String commands = F("["
-                            "{\"command\":\"help\",  \"description\":\"Get bot usage help\"},"
-                            "{\"command\":\"start\", \"description\":\"Message sent when you open a chat with a bot\"},"
-                            "{\"command\":\"status\",\"description\":\"Answer device current status\"}" // no comma on last command
-                            "]");
-  bot.setMyCommands(commands);
-  //bot.sendMessage("25235518", "Hola amigo!", "Markdown");
+  return myFile.read();
+}
+
+void handleNewMessages(int numNewMessages)
+{
+  String chat_id = bot.messages[0].chat_id;
+  String file_name = "box.jpg";
+
+  myFile = SD.open(file_name);
+
+  if (myFile)
+  {
+    Serial.print(file_name);
+    Serial.print("....");
+
+    //Content type for PNG image/png
+    String sent = bot.sendPhotoByBinary(chat_id, "image/jpeg", myFile.size(),
+                                        isMoreDataAvailable,
+                                        getNextByte, nullptr, nullptr);
+
+    if (sent)
+    {
+      Serial.println("was successfully sent");
+    }
+    else
+    {
+      Serial.println("was not sent");
+    }
+
+    myFile.close();
+  }
+  else
+  {
+    // if the file didn't open, print an error:
+    Serial.println("error opening photo");
+  }
 }
 
 void setup()
 {
   Serial.begin(115200);
   Serial.println();
+
+  Serial.print("Initializing SD card....");
+  if (!SD.begin(D0))
+  {
+    Serial.println("failed!");
+    return;
+  }
+  Serial.println("done.");
 
   // attempt to connect to Wifi network:
   configTime(0, 0, "pool.ntp.org");      // get UTC time via NTP
@@ -78,8 +110,6 @@ void setup()
     now = time(nullptr);
   }
   Serial.println(now);
-
-  bot_setup();
 }
 
 void loop()

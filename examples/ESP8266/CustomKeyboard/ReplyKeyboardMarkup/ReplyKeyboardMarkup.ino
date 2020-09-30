@@ -8,59 +8,69 @@
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
 
-// Initialize Wifi connection to the router
-char ssid[] = "XXXXXX";     // your network SSID (name)
-char password[] = "YYYYYY"; // your network key
+// Wifi network station credentials
+#define WIFI_SSID "YOUR_SSID"
+#define WIFI_PASSWORD "YOUR_PASSWORD"
+// Telegram BOT Token (Get from Botfather)
+#define BOT_TOKEN "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
-// Initialize Telegram BOT
-#define BOTtoken "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  // your Bot Token (Get from Botfather)
-
-WiFiClientSecure client;
-UniversalTelegramBot bot(BOTtoken, client);
-
-int Bot_mtbs = 1000; //mean time between scan messages
-long Bot_lasttime;   //last time messages' scan has been done
-
+const unsigned long BOT_MTBS = 1000; // mean time between scan messages
 const int ledPin = 13;
+
+X509List cert(TELEGRAM_CERTIFICATE_ROOT);
+WiFiClientSecure secured_client;
+UniversalTelegramBot bot(BOT_TOKEN, secured_client);
+unsigned long bot_lasttime;          // last time messages' scan has been done
 int ledStatus = 0;
 
-void handleNewMessages(int numNewMessages) {
+void handleNewMessages(int numNewMessages)
+{
   Serial.println("handleNewMessages");
   Serial.println(String(numNewMessages));
 
-  for (int i=0; i<numNewMessages; i++) {
-    String chat_id = String(bot.messages[i].chat_id);
+  for (int i = 0; i < numNewMessages; i++)
+  {
+    String chat_id = bot.messages[i].chat_id;
     String text = bot.messages[i].text;
 
     String from_name = bot.messages[i].from_name;
-    if (from_name == "") from_name = "Guest";
+    if (from_name == "")
+      from_name = "Guest";
 
-    if (text == "/ledon") {
-      digitalWrite(ledPin, HIGH);   // turn the LED on (HIGH is the voltage level)
+    if (text == "/ledon")
+    {
+      digitalWrite(ledPin, HIGH); // turn the LED on (HIGH is the voltage level)
       ledStatus = 1;
       bot.sendMessage(chat_id, "Led is ON", "");
     }
 
-    if (text == "/ledoff") {
+    if (text == "/ledoff")
+    {
       ledStatus = 0;
-      digitalWrite(ledPin, LOW);    // turn the LED off (LOW is the voltage level)
+      digitalWrite(ledPin, LOW); // turn the LED off (LOW is the voltage level)
       bot.sendMessage(chat_id, "Led is OFF", "");
     }
 
-    if (text == "/status") {
-      if(ledStatus){
+    if (text == "/status")
+    {
+      if (ledStatus)
+      {
         bot.sendMessage(chat_id, "Led is ON", "");
-      } else {
+      }
+      else
+      {
         bot.sendMessage(chat_id, "Led is OFF", "");
       }
     }
 
-    if (text == "/options") {
+    if (text == "/options")
+    {
       String keyboardJson = "[[\"/ledon\", \"/ledoff\"],[\"/status\"]]";
       bot.sendMessageWithReplyKeyboard(chat_id, "Choose from one of the following options", "", keyboardJson, true);
     }
 
-    if (text == "/start") {
+    if (text == "/start")
+    {
       String welcome = "Welcome to Universal Arduino Telegram Bot library, " + from_name + ".\n";
       welcome += "This is Reply Keyboard Markup example.\n\n";
       welcome += "/ledon : to switch the Led ON\n";
@@ -72,7 +82,8 @@ void handleNewMessages(int numNewMessages) {
   }
 }
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
 
   // Set WiFi to station mode and disconnect from an AP if it was Previously connected
@@ -81,18 +92,19 @@ void setup() {
   delay(100);
 
   // attempt to connect to Wifi network:
-  Serial.print("Connecting Wifi: ");
-  Serial.println(ssid);
-  WiFi.begin(ssid, password);
-
-  while (WiFi.status() != WL_CONNECTED) {
+  Serial.print("Connecting to Wifi SSID ");
+  Serial.print(WIFI_SSID);
+  Serial.print(" ");
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  secured_client.setTrustAnchors(&cert); // Add root certificate for api.telegram.org
+  while (WiFi.status() != WL_CONNECTED)
+  {
     Serial.print(".");
     delay(500);
   }
+  Serial.println();
 
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.print("IP address: ");
+  Serial.print("WiFi connected. IP address: ");
   Serial.println(WiFi.localIP());
 
   pinMode(ledPin, OUTPUT); // initialize digital ledPin as an output.
@@ -100,16 +112,19 @@ void setup() {
   digitalWrite(ledPin, HIGH); // initialize pin as off
 }
 
-void loop() {
-  if (millis() > Bot_lasttime + Bot_mtbs)  {
+void loop()
+{
+  if (millis() - bot_lasttime > BOT_MTBS)
+  {
     int numNewMessages = bot.getUpdates(bot.last_message_received + 1);
 
-    while(numNewMessages) {
+    while (numNewMessages)
+    {
       Serial.println("got response");
       handleNewMessages(numNewMessages);
       numNewMessages = bot.getUpdates(bot.last_message_received + 1);
     }
 
-    Bot_lasttime = millis();
+    bot_lasttime = millis();
   }
 }

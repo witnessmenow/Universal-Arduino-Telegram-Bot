@@ -9,36 +9,41 @@
 #include <UniversalTelegramBot.h>
 #include <ArduinoJson.h>
 
-// Initialize Wifi connection to the router
-char ssid[] = "XXXXXX";     // your network SSID (name)
-char password[] = "YYYYYY"; // your network key
+// Wifi network station credentials
+#define WIFI_SSID "YOUR_SSID"
+#define WIFI_PASSWORD "YOUR_PASSWORD"
+// Telegram BOT Token (Get from Botfather)
+#define BOT_TOKEN "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
-// Initialize Telegram BOT
-#define BOTtoken "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  // your Bot Token (Get from Botfather)
+const unsigned long BOT_MTBS = 1000; // mean time between scan messages
 
-WiFiClientSecure client;
-UniversalTelegramBot bot(BOTtoken, client);
-
-int Bot_mtbs = 1000; //mean time between scan messages
-long Bot_lasttime;   //last time messages' scan has been done
+unsigned long bot_lasttime;          // last time messages' scan has been done
+X509List cert(TELEGRAM_CERTIFICATE_ROOT);
+WiFiClientSecure secured_client;
+UniversalTelegramBot bot(BOT_TOKEN, secured_client);
 
 String test_photo_url = "https://www.arduino.cc/en/uploads/Trademark/ArduinoCommunityLogo.png";
 
-void handleNewMessages(int numNewMessages) {
-  Serial.println("handleNewMessages");
-  Serial.println(String(numNewMessages));
+void handleNewMessages(int numNewMessages)
+{
+  Serial.print("handleNewMessages ");
+  Serial.println(numNewMessages);
 
-  for (int i=0; i<numNewMessages; i++) {
-    String chat_id = String(bot.messages[i].chat_id);
+  for (int i = 0; i < numNewMessages; i++)
+  {
+    String chat_id = bot.messages[i].chat_id;
     String text = bot.messages[i].text;
 
     String from_name = bot.messages[i].from_name;
-    if (from_name == "") from_name = "Guest";
+    if (from_name == "")
+      from_name = "Guest";
 
-    if (text == "/get_test_photo") {
+    if (text == "/get_test_photo")
+    {
       String response = bot.sendPhoto(chat_id, test_photo_url, "This photo was sent using URL");
 
-      if (bot.checkForOkResponse(response)) {
+      if (bot.checkForOkResponse(response))
+      {
         DynamicJsonDocument images(1500);
         DeserializationError error = deserializeJson(images, response);
 
@@ -46,15 +51,20 @@ void handleNewMessages(int numNewMessages) {
         // You may choose what you want, in example was choosed bigger size
         int photosArrayLength = images["result"]["photo"].size();
 
-        if (photosArrayLength > 0) {
-          String file_id = images["result"]["photo"][photosArrayLength-1]["file_id"];
+        if (photosArrayLength > 0)
+        {
+          String file_id = images["result"]["photo"][photosArrayLength - 1]["file_id"];
 
-          if (file_id) {
+          if (file_id)
+          {
             String send_photo_by_file_id_response = bot.sendPhoto(chat_id, file_id, "This photo was sent using File ID");
 
-            if (bot.checkForOkResponse(send_photo_by_file_id_response)) {
+            if (bot.checkForOkResponse(send_photo_by_file_id_response))
+            {
               // do something
-            } else {
+            }
+            else
+            {
               // or not to do
             }
           }
@@ -62,7 +72,8 @@ void handleNewMessages(int numNewMessages) {
       }
     }
 
-    if (text == "/start") {
+    if (text == "/start")
+    {
       String welcome = "Welcome to Universal Arduino Telegram Bot library, " + from_name + ".\n";
       welcome += "This is Send Photo From File ID example.\n\n";
       welcome += "/get_test_photo : getting test photo\n";
@@ -72,40 +83,50 @@ void handleNewMessages(int numNewMessages) {
   }
 }
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
-
-  // Set WiFi to station mode and disconnect from an AP if it was Previously connected
-  WiFi.mode(WIFI_STA);
-  WiFi.disconnect();
-  delay(100);
+  Serial.println();
 
   // attempt to connect to Wifi network:
-  Serial.print("Connecting Wifi: ");
-  Serial.println(ssid);
-  WiFi.begin(ssid, password);
-
-  while (WiFi.status() != WL_CONNECTED) {
+  configTime(0, 0, "pool.ntp.org");      // get UTC time via NTP
+  secured_client.setTrustAnchors(&cert); // Add root certificate for api.telegram.org
+  Serial.print("Connecting to Wifi SSID ");
+  Serial.print(WIFI_SSID);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  while (WiFi.status() != WL_CONNECTED)
+  {
     Serial.print(".");
     delay(500);
   }
-
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.print("IP address: ");
+  Serial.print("\nWiFi connected. IP address: ");
   Serial.println(WiFi.localIP());
+
+  // Check NTP/Time, usually it is instantaneous and you can delete the code below.
+  Serial.print("Retrieving time: ");
+  time_t now = time(nullptr);
+  while (now < 24 * 3600)
+  {
+    Serial.print(".");
+    delay(100);
+    now = time(nullptr);
+  }
+  Serial.println(now);
 }
 
-void loop() {
-  if (millis() > Bot_lasttime + Bot_mtbs)  {
+void loop()
+{
+  if (millis() - bot_lasttime > BOT_MTBS)
+  {
     int numNewMessages = bot.getUpdates(bot.last_message_received + 1);
 
-    while(numNewMessages) {
+    while (numNewMessages)
+    {
       Serial.println("got response");
       handleNewMessages(numNewMessages);
       numNewMessages = bot.getUpdates(bot.last_message_received + 1);
     }
 
-    Bot_lasttime = millis();
+    bot_lasttime = millis();
   }
 }

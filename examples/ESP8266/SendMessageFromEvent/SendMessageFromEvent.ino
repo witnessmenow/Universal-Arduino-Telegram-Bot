@@ -1,6 +1,6 @@
 /*******************************************************************
-    A telegram bot for your ESP8266 that responds
-    with whatever message you send it.
+    A telegram bot that sends you a message when ESP
+    starts up
 
     Parts:
     D1 Mini ESP8266 * - http://s.click.aliexpress.com/e/uzFUnIe
@@ -22,6 +22,7 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
+#include <ArduinoJson.h>
 
 // Wifi network station credentials
 #define WIFI_SSID "YOUR_SSID"
@@ -29,32 +30,24 @@
 // Telegram BOT Token (Get from Botfather)
 #define BOT_TOKEN "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
-const unsigned long BOT_MTBS = 1000; // mean time between scan messages
+// Use @myidbot (IDBot) to find out the chat ID of an individual or a group
+// Also note that you need to click "start" on a bot before it can
+// message you
+#define CHAT_ID "175753388"
 
 X509List cert(TELEGRAM_CERTIFICATE_ROOT);
 WiFiClientSecure secured_client;
 UniversalTelegramBot bot(BOT_TOKEN, secured_client);
-unsigned long bot_lasttime; // last time messages' scan has been done
 
-void handleNewMessages(int numNewMessages)
-{
-  for (int i = 0; i < numNewMessages; i++)
-  {
-    bot.sendMessage(bot.messages[i].chat_id, bot.messages[i].text, "");
-  }
-}
-
-void setup()
-{
+void setup() {
   Serial.begin(115200);
   Serial.println();
 
-  // attempt to connect to Wifi network:
+ // attempt to connect to Wifi network:
   Serial.print("Connecting to Wifi SSID ");
   Serial.print(WIFI_SSID);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   secured_client.setTrustAnchors(&cert); // Add root certificate for api.telegram.org
-  
   while (WiFi.status() != WL_CONNECTED)
   {
     Serial.print(".");
@@ -73,21 +66,10 @@ void setup()
     now = time(nullptr);
   }
   Serial.println(now);
+
+  bot.sendMessage(CHAT_ID, "Bot started up", "");
 }
 
-void loop()
-{
-  if (millis() - bot_lasttime > BOT_MTBS)
-  {
-    int numNewMessages = bot.getUpdates(bot.last_message_received + 1);
+void loop() {
 
-    while (numNewMessages)
-    {
-      Serial.println("got response");
-      handleNewMessages(numNewMessages);
-      numNewMessages = bot.getUpdates(bot.last_message_received + 1);
-    }
-
-    bot_lasttime = millis();
-  }
 }
