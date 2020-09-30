@@ -19,61 +19,52 @@
     Twitter: https://twitter.com/witnessmenow
  *******************************************************************/
 
-// ----------------------------
-// Standard ESP32 Libraries
-// ----------------------------
-
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
-
-// ----------------------------
-// Additional Libraries - each one of these will need to be installed.
-// ----------------------------
-
 #include <UniversalTelegramBot.h>
-
 #include <ArduinoJson.h>
-// Library used for parsing Json from the API responses
 
-// Search for "Arduino Json" in the Arduino Library manager
-// https://github.com/bblanchon/ArduinoJson
+// Wifi network station credentials
+#define WIFI_SSID "YOUR_SSID"
+#define WIFI_PASSWORD "YOUR_PASSWORD"
+// Telegram BOT Token (Get from Botfather)
+#define BOT_TOKEN "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
-// Initialize Wifi connection to the router
-char ssid[] = "XXXXXX";     // your network SSID (name)
-char password[] = "YYYYYY"; // your network key
-
-// Use @myidbot to find out the chat ID of an individual or a group
+// Use @myidbot (IDBot) to find out the chat ID of an individual or a group
 // Also note that you need to click "start" on a bot before it can
 // message you
 #define CHAT_ID "175753388"
 
-// Initialize Telegram BOT
-#define BOTtoken "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  // your Bot Token (Get from Botfather)
-
-WiFiClientSecure client;
-UniversalTelegramBot bot(BOTtoken, client);
+WiFiClientSecure secured_client;
+UniversalTelegramBot bot(BOT_TOKEN, secured_client);
 
 void setup() {
   Serial.begin(115200);
+  Serial.println();
 
-  // Attempt to connect to Wifi network:
-  Serial.print("Connecting Wifi: ");
-  Serial.println(ssid);
-
-  // Set WiFi to station mode and disconnect from an AP if it was Previously
-  // connected
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-
-  while (WiFi.status() != WL_CONNECTED) {
+ // attempt to connect to Wifi network:
+  Serial.print("Connecting to Wifi SSID ");
+  Serial.print(WIFI_SSID);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  secured_client.setCACert(TELEGRAM_CERTIFICATE_ROOT); // Add root certificate for api.telegram.org
+  while (WiFi.status() != WL_CONNECTED)
+  {
     Serial.print(".");
     delay(500);
   }
-
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.print("IP address: ");
+  Serial.print("\nWiFi connected. IP address: ");
   Serial.println(WiFi.localIP());
+
+  Serial.print("Retrieving time: ");
+  configTime(0, 0, "pool.ntp.org"); // get UTC time via NTP
+  time_t now = time(nullptr);
+  while (now < 24 * 3600)
+  {
+    Serial.print(".");
+    delay(100);
+    now = time(nullptr);
+  }
+  Serial.println(now);
 
   bot.sendMessage(CHAT_ID, "Bot started up", "");
 }

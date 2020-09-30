@@ -27,23 +27,11 @@
 
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
-#include "esp_camera.h"
-
-// ----------------------------
-// Additional Libraries - each one of these will need to be installed.
-// ----------------------------
-
 #include <UniversalTelegramBot.h>
-// Library for interacting with the Telegram API
-// Search for "Telegegram" in the Library manager and install
-// The universal Telegram library
-// https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot
-
+#include "esp_camera.h"
 #include <ArduinoJson.h>
-// Library used for parsing Json from the API responses
-// Search for "Arduino Json" in the Arduino Library manager
-// https://github.com/bblanchon/ArduinoJson
-
+#include "camera_pins.h"
+#include "camera_code.h"
 
 //------- Replace the following! ------
 
@@ -53,59 +41,57 @@
 //#define CAMERA_MODEL_M5STACK_WIDE
 #define CAMERA_MODEL_AI_THINKER
 
-// Initialize Wifi connection to the router
-char ssid[] = "XXXXXX";     // your network SSID (name)
-char password[] = "YYYYYY"; // your network key
-
-// Initialize Telegram BOT
-#define BOTtoken "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  // your Bot Token (Get from Botfather)
-
-//------- ------------------------ ------
-
-#include "camera_pins.h"
-#include "camera_code.h"
+// Wifi network station credentials
+#define WIFI_SSID "YOUR_SSID"
+#define WIFI_PASSWORD "YOUR_PASSWORD"
+// Telegram BOT Token (Get from Botfather)
+#define BOT_TOKEN "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
 #define FLASH_LED_PIN 4
 
-WiFiClientSecure client;
-UniversalTelegramBot bot(BOTtoken, client);
+const unsigned long BOT_MTBS = 1000; // mean time between scan messages
 
-int Bot_mtbs = 1000; //mean time between scan messages
-long Bot_lasttime;   //last time messages' scan has been done
+unsigned long bot_lasttime; // last time messages' scan has been done
+WiFiClientSecure secured_client;
+UniversalTelegramBot bot(BOT_TOKEN, secured_client);
 
 bool flashState = LOW;
 
-camera_fb_t * fb = NULL;
+camera_fb_t *fb = NULL;
 
 bool isMoreDataAvailable();
-byte* getNextBuffer();
+byte *getNextBuffer();
 int getNextBufferLen();
 
 bool dataAvailable = false;
 
-void handleNewMessages(int numNewMessages) {
+void handleNewMessages(int numNewMessages)
+{
   Serial.println("handleNewMessages");
   Serial.println(String(numNewMessages));
 
-  for (int i = 0; i < numNewMessages; i++) {
+  for (int i = 0; i < numNewMessages; i++)
+  {
     String chat_id = String(bot.messages[i].chat_id);
     String text = bot.messages[i].text;
 
     String from_name = bot.messages[i].from_name;
-    if (from_name == "") from_name = "Guest";
+    if (from_name == "")
+      from_name = "Guest";
 
-    if (text == "/flash") {
+    if (text == "/flash")
+    {
       flashState = !flashState;
       digitalWrite(FLASH_LED_PIN, flashState);
     }
 
-    if (text == "/photo") {
-
+    if (text == "/photo")
+    {
       fb = NULL;
-
       // Take Picture with Camera
       fb = esp_camera_fb_get();
-      if (!fb) {
+      if (!fb)
+      {
         Serial.println("Camera capture failed");
         bot.sendMessage(chat_id, "Camera capture failed", "");
         return;
@@ -118,10 +104,11 @@ void handleNewMessages(int numNewMessages) {
 
       Serial.println("done!");
 
-      esp_camera_fb_return(fb); 
+      esp_camera_fb_return(fb);
     }
 
-    if (text == "/start") {
+    if (text == "/start")
+    {
       String welcome = "Welcome to the ESP32Cam Telegram bot.\n\n";
       welcome += "/photo : will take a photo\n";
       welcome += "/flash : toggle flash LED (VERY BRIGHT!)\n";
@@ -130,78 +117,101 @@ void handleNewMessages(int numNewMessages) {
   }
 }
 
-bool isMoreDataAvailable() {
+bool isMoreDataAvailable()
+{
   if (dataAvailable)
   {
     dataAvailable = false;
     return true;
-  } else {
+  }
+  else
+  {
     return false;
   }
 }
 
-byte* getNextBuffer(){
-  if (fb){
+byte *getNextBuffer()
+{
+  if (fb)
+  {
     return fb->buf;
-  } else {
+  }
+  else
+  {
     return nullptr;
   }
 }
 
-int getNextBufferLen(){
-  if (fb){
+int getNextBufferLen()
+{
+  if (fb)
+  {
     return fb->len;
-  } else {
+  }
+  else
+  {
     return 0;
   }
 }
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
+  Serial.println();
 
   pinMode(FLASH_LED_PIN, OUTPUT);
   digitalWrite(FLASH_LED_PIN, flashState); //defaults to low
 
-  if (!setupCamera()) {
+  if (!setupCamera())
+  {
     Serial.println("Camera Setup Failed!");
-    while (true) {
+    while (true)
+    {
       delay(100);
     }
   }
 
-  // Attempt to connect to Wifi network:
-  Serial.print("Connecting Wifi: ");
-  Serial.println(ssid);
-
-  // Set WiFi to station mode and disconnect from an AP if it was Previously
-  // connected
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-
-  while (WiFi.status() != WL_CONNECTED) {
+  // attempt to connect to Wifi network:
+  Serial.print("Connecting to Wifi SSID ");
+  Serial.print(WIFI_SSID);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  secured_client.setCACert(TELEGRAM_CERTIFICATE_ROOT); // Add root certificate for api.telegram.org
+  while (WiFi.status() != WL_CONNECTED)
+  {
     Serial.print(".");
     delay(500);
   }
-
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.print("IP address: ");
+  Serial.print("\nWiFi connected. IP address: ");
   Serial.println(WiFi.localIP());
+
+  Serial.print("Retrieving time: ");
+  configTime(0, 0, "pool.ntp.org"); // get UTC time via NTP
+  time_t now = time(nullptr);
+  while (now < 24 * 3600)
+  {
+    Serial.print(".");
+    delay(100);
+    now = time(nullptr);
+  }
+  Serial.println(now);
 
   // Make the bot wait for a new message for up to 60seconds
   bot.longPoll = 60;
 }
 
-void loop() {
-  if (millis() > Bot_lasttime + Bot_mtbs)  {
+void loop()
+{
+  if (millis() - bot_lasttime > BOT_MTBS)
+  {
     int numNewMessages = bot.getUpdates(bot.last_message_received + 1);
 
-    while (numNewMessages) {
+    while (numNewMessages)
+    {
       Serial.println("got response");
       handleNewMessages(numNewMessages);
       numNewMessages = bot.getUpdates(bot.last_message_received + 1);
     }
 
-    Bot_lasttime = millis();
+    bot_lasttime = millis();
   }
 }

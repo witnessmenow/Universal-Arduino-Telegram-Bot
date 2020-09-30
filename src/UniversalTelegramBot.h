@@ -28,6 +28,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <Client.h>
+#include <TelegramCertificate.h>
 
 #define TELEGRAM_HOST "api.telegram.org"
 #define TELEGRAM_SSL_PORT 443
@@ -122,7 +123,7 @@ public:
   String name;
   String userName;
   int longPoll = 0;
-  int waitForResponse = 1500;
+  unsigned int waitForResponse = 1500;
   int _lastError;
   int last_sent_message_id = 0;
   int maxMessageLength = 1500;

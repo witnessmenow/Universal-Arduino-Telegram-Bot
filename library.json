@@ -1,0 +1,26 @@
+{
+  "name":"UniversalTelegramBot",
+  "description":"Arduino Telegram Bot library for multiple different architectures.",
+  "keywords":"Communication,Telegram,Arduino",
+  "authors":
+  {
+    "name": "Brian Lough <brian.d.lough@gmail.com>",
+    "maintainer": true
+  },
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot"
+  },
+  "version": "1.2.0",
+  "license": "MIT",
+  "frameworks": "arduino",
+  "platforms": "*",
+  "dependencies": [
+    {
+      "name": "ArduinoJson"
+    }
+  ],
+  "build": {
+  }
+}

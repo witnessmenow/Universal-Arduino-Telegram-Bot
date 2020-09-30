@@ -1,6 +1,6 @@
 language: python
 python:
-    - "2.7"
+    - "3.7"
 
 # Cache PlatformIO packages using Travis CI container-based infrastructure
 sudo: false
@@ -10,40 +10,48 @@ cache:
 
 env:
     # ESP8266
+    - SCRIPT=platformioSingle EXAMPLE_NAME=BulkMessages EXAMPLE_FOLDER=/ BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE_NAME=ChannelPost EXAMPLE_FOLDER=/ BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE_NAME=ChatAction EXAMPLE_FOLDER=/ BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE_NAME=InlineKeyboardMarkup EXAMPLE_FOLDER=/CustomKeyboard/ BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE_NAME=ReplyKeyboardMarkup EXAMPLE_FOLDER=/CustomKeyboard/ BOARDTYPE=ESP8266 BOARD=d1_mini
     - SCRIPT=platformioSingle EXAMPLE_NAME=EchoBot EXAMPLE_FOLDER=/ BOARDTYPE=ESP8266 BOARD=d1_mini
-    #- SCRIPT=platformioSingle EXAMPLE_NAME=ReplyKeyboardMarkup EXAMPLE_FOLDER=/CustomKeyboard/ BOARDTYPE=ESP8266 BOARD=d1_mini
-    #- SCRIPT=platformioSingle EXAMPLE_NAME=InlineKeyboardMarkup EXAMPLE_FOLDER=/CustomKeyboard/ BOARDTYPE=ESP8266 BOARD=d1_mini
     - SCRIPT=platformioSingle EXAMPLE_NAME=FlashLED EXAMPLE_FOLDER=/ BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE_NAME=Location EXAMPLE_FOLDER=/ BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE_NAME=LongPoll EXAMPLE_FOLDER=/ BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE_NAME=PhotoFromFileID EXAMPLE_FOLDER=/SendPhoto/ BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE_NAME=PhotoFromSD EXAMPLE_FOLDER=/SendPhoto/ BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE_NAME=PhotoFromSerial EXAMPLE_FOLDER=/SendPhoto/ BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE_NAME=PhotoFromURL EXAMPLE_FOLDER=/SendPhoto/ BOARDTYPE=ESP8266 BOARD=d1_mini
+    - SCRIPT=platformioSingle EXAMPLE_NAME=SetMyCommands EXAMPLE_FOLDER=/ BOARDTYPE=ESP8266 BOARD=d1_mini
     #- SCRIPT=platformioSingle EXAMPLE_NAME=UsingWiFiManager EXAMPLE_FOLDER=/ BOARDTYPE=ESP8266 BOARD=d1_mini
-    #- SCRIPT=platformioSingle EXAMPLE_NAME=BulkMessages EXAMPLE_FOLDER=/ BOARDTYPE=ESP8266 BOARD=d1_mini
-    #- SCRIPT=platformioSingle EXAMPLE_NAME=PhotoFromSD EXAMPLE_FOLDER=/SendPhoto/ BOARDTYPE=ESP8266 BOARD=d1_mini
-    #- SCRIPT=platformioSingle EXAMPLE_NAME=PhotoFromURL EXAMPLE_FOLDER=/SendPhoto/ BOARDTYPE=ESP8266 BOARD=d1_mini
-    #- SCRIPT=platformioSingle EXAMPLE_NAME=PhotoFromFileID EXAMPLE_FOLDER=/SendPhoto/ BOARDTYPE=ESP8266 BOARD=d1_mini
-    #- SCRIPT=platformioSingle EXAMPLE_NAME=Location EXAMPLE_FOLDER=/ BOARDTYPE=ESP8266 BOARD=d1_mini
-    #- SCRIPT=platformioSingle EXAMPLE_NAME=ChannelPost EXAMPLE_FOLDER=/ BOARDTYPE=ESP8266 BOARD=d1_mini
-    #- SCRIPT=platformioSingle EXAMPLE_NAME=ChatAction EXAMPLE_FOLDER=/ BOARDTYPE=ESP8266 BOARD=d1_mini
-    #- SCRIPT=platformioSingle EXAMPLE_NAME=LongPoll EXAMPLE_FOLDER=/ BOARDTYPE=ESP8266 BOARD=d1_mini
-    - SCRIPT=platformioSingle EXAMPLE_NAME=SetMyCommand EXAMPLE_FOLDER=/ BOARDTYPE=ESP8266 BOARD=d1_mini
 
     # ESP32
+    - SCRIPT=platformioSingle EXAMPLE_NAME=ChannelPost EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
+    - SCRIPT=platformioSingle EXAMPLE_NAME=ChatAction EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
+    - SCRIPT=platformioSingle EXAMPLE_NAME=InlineKeyboardMarkup EXAMPLE_FOLDER=/CustomKeyboard/ BOARDTYPE=ESP32 BOARD=esp32dev
+    - SCRIPT=platformioSingle EXAMPLE_NAME=ReplyKeyboardMarkup EXAMPLE_FOLDER=/CustomKeyboard/ BOARDTYPE=ESP32 BOARD=esp32doit-devkit-v1
     - SCRIPT=platformioSingle EXAMPLE_NAME=EchoBot EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
+    - SCRIPT=platformioSingle EXAMPLE_NAME=FlashLED EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32doit-devkit-v1
+    - SCRIPT=platformioSingle EXAMPLE_NAME=Location EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
+    - SCRIPT=platformioSingle EXAMPLE_NAME=LongPoll EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
     - SCRIPT=platformioSingle EXAMPLE_NAME=SendMessageFromEvent EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
-    #- SCRIPT=platformioSingle EXAMPLE_NAME=ReplyKeyboardMarkup EXAMPLE_FOLDER=/CustomKeyboard/ BOARDTYPE=ESP32 BOARD=esp32dev
-    #- SCRIPT=platformioSingle EXAMPLE_NAME=InlineKeyboardMarkup EXAMPLE_FOLDER=/CustomKeyboard/ BOARDTYPE=ESP32 BOARD=esp32dev
-    #- SCRIPT=platformioSingle EXAMPLE_NAME=FlashLED EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
-    #- SCRIPT=platformioSingle EXAMPLE_NAME=Location EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
-    #- SCRIPT=platformioSingle EXAMPLE_NAME=ChannelPost EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
-    #- SCRIPT=platformioSingle EXAMPLE_NAME=ChatAction EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
-    #- SCRIPT=platformioSingle EXAMPLE_NAME=LongPoll EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
-
+    #- SCRIPT=platformioSingle EXAMPLE_NAME=ESP32-Cam EXAMPLE_FOLDER=/SendPhoto/ BOARDTYPE=ESP32 BOARD=esp32dev
+    - SCRIPT=platformioSingle EXAMPLE_NAME=PhotoFromFileID EXAMPLE_FOLDER=/SendPhoto/ BOARDTYPE=ESP32 BOARD=esp32dev
+    - SCRIPT=platformioSingle EXAMPLE_NAME=PhotoFromSD EXAMPLE_FOLDER=/SendPhoto/ BOARDTYPE=ESP32 BOARD=esp32dev
+    - SCRIPT=platformioSingle EXAMPLE_NAME=PhotoFromSerial EXAMPLE_FOLDER=/SendPhoto/ BOARDTYPE=ESP32 BOARD=esp32dev
+    - SCRIPT=platformioSingle EXAMPLE_NAME=PhotoFromURL EXAMPLE_FOLDER=/SendPhoto/ BOARDTYPE=ESP32 BOARD=esp32dev
+    - SCRIPT=platformioSingle EXAMPLE_NAME=SetMyCommands EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
+    #- SCRIPT=platformioSingle EXAMPLE_NAME=telegramOTA EXAMPLE_FOLDER=/ BOARDTYPE=ESP32 BOARD=esp32dev
 
 install:
     - pip install -U platformio
+    - platformio update
     #
     # Libraries from PlatformIO Library Registry:
     #
     # http://platformio.org/lib/show/64/ArduinoJson
     - platformio lib -g install 64
-    # http://platformio.org/lib/show/567/WifiManager
-    - platformio lib -g install 567
-script: scripts/travis/$SCRIPT.sh
+
+script: 
+    - scripts/travis/$SCRIPT.sh

@@ -19,80 +19,75 @@
     Twitter: https://twitter.com/witnessmenow
  *******************************************************************/
 
-// NOTE: The version of ESP8266 core needs to be 2.5 or higher
-// or else your bot will not connect.
-
-// ----------------------------
-// Standard ESP8266 Libraries
-// ----------------------------
-
 #include <ESP8266WiFi.h>
-
 #include <WiFiClientSecure.h>
-
-// ----------------------------
-// Additional Libraries - each one of these will need to be installed.
-// ----------------------------
-
 #include <UniversalTelegramBot.h>
 
-// Initialize Wifi connection to the router
-char ssid[] = "XXXXXX";     // your network SSID (name)
-char password[] = "YYYYYY"; // your network key
+// Wifi network station credentials
+#define WIFI_SSID "YOUR_SSID"
+#define WIFI_PASSWORD "YOUR_PASSWORD"
+// Telegram BOT Token (Get from Botfather)
+#define BOT_TOKEN "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
-// Initialize Telegram BOT
-#define BOTtoken "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  // your Bot Token (Get from Botfather)
+const unsigned long BOT_MTBS = 1000; // mean time between scan messages
 
-WiFiClientSecure client;
-UniversalTelegramBot bot(BOTtoken, client);
+X509List cert(TELEGRAM_CERTIFICATE_ROOT);
+WiFiClientSecure secured_client;
+UniversalTelegramBot bot(BOT_TOKEN, secured_client);
+unsigned long bot_lasttime; // last time messages' scan has been done
 
-//Checks for new messages every 1 second.
-int botRequestDelay = 1000;
-unsigned long lastTimeBotRan;
+void handleNewMessages(int numNewMessages)
+{
+  for (int i = 0; i < numNewMessages; i++)
+  {
+    bot.sendMessage(bot.messages[i].chat_id, bot.messages[i].text, "");
+  }
+}
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
+  Serial.println();
 
-  // This is the simplest way of getting this working
-  // if you are passing sensitive information, or controlling
-  // something important, please either use certStore or at
-  // least client.setFingerPrint
-  client.setInsecure();
-
-  // Set WiFi to station mode and disconnect from an AP if it was Previously
-  // connected
-  WiFi.mode(WIFI_STA);
-  WiFi.disconnect();
-  delay(100);
-
-  // Attempt to connect to Wifi network:
-  Serial.print("Connecting Wifi: ");
-  Serial.println(ssid);
-  WiFi.begin(ssid, password);
-
-  while (WiFi.status() != WL_CONNECTED) {
+  // attempt to connect to Wifi network:
+  Serial.print("Connecting to Wifi SSID ");
+  Serial.print(WIFI_SSID);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  secured_client.setTrustAnchors(&cert); // Add root certificate for api.telegram.org
+  
+  while (WiFi.status() != WL_CONNECTED)
+  {
     Serial.print(".");
     delay(500);
   }
-
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.print("IP address: ");
+  Serial.print("\nWiFi connected. IP address: ");
   Serial.println(WiFi.localIP());
+
+  Serial.print("Retrieving time: ");
+  configTime(0, 0, "pool.ntp.org"); // get UTC time via NTP
+  time_t now = time(nullptr);
+  while (now < 24 * 3600)
+  {
+    Serial.print(".");
+    delay(100);
+    now = time(nullptr);
+  }
+  Serial.println(now);
 }
 
-void loop() {
-  if (millis() > lastTimeBotRan + botRequestDelay)  {
+void loop()
+{
+  if (millis() - bot_lasttime > BOT_MTBS)
+  {
     int numNewMessages = bot.getUpdates(bot.last_message_received + 1);
 
-    while (numNewMessages) {
+    while (numNewMessages)
+    {
       Serial.println("got response");
-      for (int i = 0; i < numNewMessages; i++) {
-        bot.sendMessage(bot.messages[i].chat_id, bot.messages[i].text, "");
-      }
+      handleNewMessages(numNewMessages);
       numNewMessages = bot.getUpdates(bot.last_message_received + 1);
     }
 
-    lastTimeBotRan = millis();
+    bot_lasttime = millis();
   }
 }
