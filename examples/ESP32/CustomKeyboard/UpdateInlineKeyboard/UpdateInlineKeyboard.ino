@@ -1,6 +1,8 @@
 /*******************************************************************
-    An example of how to use message_id to update an inline keyboard
-    message and buttons to toggle a LED
+    An example to show how to edit an existing inline keyboard.
+
+    In this example the keyboard is updated with the state of
+    the LED.
     
     written by Frits Jan van Kempen
  *******************************************************************/
