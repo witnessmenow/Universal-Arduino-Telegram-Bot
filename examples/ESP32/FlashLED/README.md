@@ -1,14 +1,14 @@
-#ESP32 - Echo Bot
+#ESP32 - Flash LED
 
-This is a basic example of how to use UniversalTelegramBot on ESP32 based boards.
+This is a basic example of how to receive commands using UniversalTelegramBot for ESP32 based boards.
 
-The application will echo an message it received back to the user.
-
-NOTE: You will need to enter your SSID, password and bot Token for the example to work.
+The application will turn on and off an LED based on commands received via telegram.
 
 Application originally written by [Giancarlo Bacchio](giancarlo.bacchio@gmail.com) for [ESP8266-TelegramBot library](https://github.com/Gianbacchio/ESP8266-TelegramBot)
 
 Adapted by [Brian Lough](https://github.com/witnessmenow)
+
+NOTE: You will need to enter your SSID, password and bot Token for the example to work.
 
 ## License
 

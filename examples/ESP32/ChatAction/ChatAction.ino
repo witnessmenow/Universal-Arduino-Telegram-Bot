@@ -1,10 +1,10 @@
 /*******************************************************************
-    A telegram bot for your ESP8266 that responds
-    with whatever message you send it.
+    A telegram bot for your ESP32 that demonstrates a bot
+    that show bot action message
 
     Parts:
-    D1 Mini ESP8266 * - http://s.click.aliexpress.com/e/uzFUnIe
-    (or any ESP8266 board)
+    ESP32 D1 Mini stlye Dev board* - http://s.click.aliexpress.com/e/C6ds4my
+    (or any ESP32 board)
 
       = Affilate
 
@@ -12,14 +12,14 @@
     please consider becoming a sponsor on Github
     https://github.com/sponsors/witnessmenow/
 
+    Example originally written by Vadim Sinitski 
 
-    Written by Brian Lough
+    Library written by Brian Lough
     YouTube: https://www.youtube.com/brianlough
     Tindie: https://www.tindie.com/stores/brianlough/
     Twitter: https://twitter.com/witnessmenow
  *******************************************************************/
-
-#include <ESP8266WiFi.h>
+#include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
 
@@ -31,16 +31,50 @@
 
 const unsigned long BOT_MTBS = 1000; // mean time between scan messages
 
-X509List cert(TELEGRAM_CERTIFICATE_ROOT);
 WiFiClientSecure secured_client;
 UniversalTelegramBot bot(BOT_TOKEN, secured_client);
-unsigned long bot_lasttime; // last time messages' scan has been done
+unsigned long bot_lasttime;          // last time messages' scan has been done
+bool Start = false;
 
 void handleNewMessages(int numNewMessages)
 {
+  Serial.println("handleNewMessages");
+  Serial.println(String(numNewMessages));
+
   for (int i = 0; i < numNewMessages; i++)
   {
-    bot.sendMessage(bot.messages[i].chat_id, bot.messages[i].text, "");
+    String chat_id = bot.messages[i].chat_id;
+    String text = bot.messages[i].text;
+
+    String from_name = bot.messages[i].from_name;
+    if (from_name == "")
+      from_name = "Guest";
+
+    if (text == "/send_test_action")
+    {
+      bot.sendChatAction(chat_id, "typing");
+      delay(4000);
+      bot.sendMessage(chat_id, "Did you see the action message?");
+
+      // You can't use own message, just choose from one of bellow
+
+      //typing for text messages
+      //upload_photo for photos
+      //record_video or upload_video for videos
+      //record_audio or upload_audio for audio files
+      //upload_document for general files
+      //find_location for location data
+
+      //more info here - https://core.telegram.org/bots/api#sendchataction
+    }
+
+    if (text == "/start")
+    {
+      String welcome = "Welcome to Universal Arduino Telegram Bot library, " + from_name + ".\n";
+      welcome += "This is Chat Action Bot example.\n\n";
+      welcome += "/send_test_action : to send test chat action message\n";
+      bot.sendMessage(chat_id, welcome);
+    }
   }
 }
 
@@ -53,8 +87,7 @@ void setup()
   Serial.print("Connecting to Wifi SSID ");
   Serial.print(WIFI_SSID);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  secured_client.setTrustAnchors(&cert); // Add root certificate for api.telegram.org
-  
+  secured_client.setCACert(TELEGRAM_CERTIFICATE_ROOT); // Add root certificate for api.telegram.org
   while (WiFi.status() != WL_CONNECTED)
   {
     Serial.print(".");

@@ -1,27 +1,14 @@
 /*******************************************************************
-    A telegram bot for your ESP8266 that responds
-    with whatever message you send it.
-
-    Parts:
-    D1 Mini ESP8266 * - http://s.click.aliexpress.com/e/uzFUnIe
-    (or any ESP8266 board)
-
-      = Affilate
-
-    If you find what I do useful and would like to support me,
-    please consider becoming a sponsor on Github
-    https://github.com/sponsors/witnessmenow/
-
-
-    Written by Brian Lough
-    YouTube: https://www.youtube.com/brianlough
-    Tindie: https://www.tindie.com/stores/brianlough/
-    Twitter: https://twitter.com/witnessmenow
+ *  An example of recieving location Data
+ *
+ *
+ *  By Brian Lough
  *******************************************************************/
-
-#include <ESP8266WiFi.h>
+#include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
+
+const unsigned long BOT_MTBS = 1000; // mean time between scan messages
 
 // Wifi network station credentials
 #define WIFI_SSID "YOUR_SSID"
@@ -29,18 +16,39 @@
 // Telegram BOT Token (Get from Botfather)
 #define BOT_TOKEN "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
-const unsigned long BOT_MTBS = 1000; // mean time between scan messages
-
-X509List cert(TELEGRAM_CERTIFICATE_ROOT);
+unsigned long bot_lasttime;          // last time messages' scan has been done
 WiFiClientSecure secured_client;
 UniversalTelegramBot bot(BOT_TOKEN, secured_client);
-unsigned long bot_lasttime; // last time messages' scan has been done
 
 void handleNewMessages(int numNewMessages)
 {
   for (int i = 0; i < numNewMessages; i++)
   {
-    bot.sendMessage(bot.messages[i].chat_id, bot.messages[i].text, "");
+    String chat_id = bot.messages[i].chat_id;
+    String text = bot.messages[i].text;
+
+    String from_name = bot.messages[i].from_name;
+    if (from_name == "")
+      from_name = "Guest";
+
+    if (bot.messages[i].longitude != 0 || bot.messages[i].latitude != 0)
+    {
+      Serial.print("Long: ");
+      Serial.println(String(bot.messages[i].longitude, 6));
+      Serial.print("Lat: ");
+      Serial.println(String(bot.messages[i].latitude, 6));
+
+      String message = "Long: " + String(bot.messages[i].longitude, 6) + "\n";
+      message += "Lat: " + String(bot.messages[i].latitude, 6) + "\n";
+      bot.sendMessage(chat_id, message, "Markdown");
+    }
+    else if (text == "/start")
+    {
+      String welcome = "Welcome to Universal Arduino Telegram Bot library, " + from_name + ".\n";
+      welcome += "Share a location or a live location and the bot will respond with the co-ords\n";
+
+      bot.sendMessage(chat_id, welcome, "Markdown");
+    }
   }
 }
 
@@ -53,8 +61,7 @@ void setup()
   Serial.print("Connecting to Wifi SSID ");
   Serial.print(WIFI_SSID);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  secured_client.setTrustAnchors(&cert); // Add root certificate for api.telegram.org
-  
+  secured_client.setCACert(TELEGRAM_CERTIFICATE_ROOT); // Add root certificate for api.telegram.org
   while (WiFi.status() != WL_CONNECTED)
   {
     Serial.print(".");
@@ -91,3 +98,4 @@ void loop()
     bot_lasttime = millis();
   }
 }
+

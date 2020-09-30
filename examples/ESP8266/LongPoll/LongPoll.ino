@@ -1,24 +1,12 @@
 /*******************************************************************
-    A telegram bot for your ESP8266 that responds
-    with whatever message you send it.
-
-    Parts:
-    D1 Mini ESP8266 * - http://s.click.aliexpress.com/e/uzFUnIe
-    (or any ESP8266 board)
-
-      = Affilate
-
-    If you find what I do useful and would like to support me,
-    please consider becoming a sponsor on Github
-    https://github.com/sponsors/witnessmenow/
-
-
-    Written by Brian Lough
-    YouTube: https://www.youtube.com/brianlough
-    Tindie: https://www.tindie.com/stores/brianlough/
-    Twitter: https://twitter.com/witnessmenow
- *******************************************************************/
-
+*  An example of setting a long poll, this will mean the request
+*  for new messages will wait the specified amount of time before
+*  returning with no messages
+*
+*  This should reduce amount of data used by the bot
+*
+*  written by Brian Lough
+*******************************************************************/
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
@@ -31,10 +19,10 @@
 
 const unsigned long BOT_MTBS = 1000; // mean time between scan messages
 
+unsigned long bot_lasttime;          // last time messages' scan has been done
 X509List cert(TELEGRAM_CERTIFICATE_ROOT);
 WiFiClientSecure secured_client;
 UniversalTelegramBot bot(BOT_TOKEN, secured_client);
-unsigned long bot_lasttime; // last time messages' scan has been done
 
 void handleNewMessages(int numNewMessages)
 {
@@ -50,11 +38,11 @@ void setup()
   Serial.println();
 
   // attempt to connect to Wifi network:
+  configTime(0, 0, "pool.ntp.org");      // get UTC time via NTP
+  secured_client.setTrustAnchors(&cert); // Add root certificate for api.telegram.org
   Serial.print("Connecting to Wifi SSID ");
   Serial.print(WIFI_SSID);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  secured_client.setTrustAnchors(&cert); // Add root certificate for api.telegram.org
-  
   while (WiFi.status() != WL_CONNECTED)
   {
     Serial.print(".");
@@ -63,8 +51,8 @@ void setup()
   Serial.print("\nWiFi connected. IP address: ");
   Serial.println(WiFi.localIP());
 
+  // Check NTP/Time, usually it is instantaneous and you can delete the code below.
   Serial.print("Retrieving time: ");
-  configTime(0, 0, "pool.ntp.org"); // get UTC time via NTP
   time_t now = time(nullptr);
   while (now < 24 * 3600)
   {
@@ -73,6 +61,8 @@ void setup()
     now = time(nullptr);
   }
   Serial.println(now);
+
+  bot.longPoll = 60;
 }
 
 void loop()
@@ -88,6 +78,7 @@ void loop()
       numNewMessages = bot.getUpdates(bot.last_message_received + 1);
     }
 
+    Serial.println("I will happen much less often with a long poll");
     bot_lasttime = millis();
   }
 }

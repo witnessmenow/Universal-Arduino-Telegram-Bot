@@ -3,8 +3,8 @@
     starts up
 
     Parts:
-    ESP32 D1 Mini stlye Dev board* - http://s.click.aliexpress.com/e/C6ds4my
-    (or any ESP32 board)
+    D1 Mini ESP8266 * - http://s.click.aliexpress.com/e/uzFUnIe
+    (or any ESP8266 board)
 
       = Affilate
 
@@ -19,7 +19,7 @@
     Twitter: https://twitter.com/witnessmenow
  *******************************************************************/
 
-#include <WiFi.h>
+#include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
 #include <ArduinoJson.h>
@@ -35,6 +35,7 @@
 // message you
 #define CHAT_ID "175753388"
 
+X509List cert(TELEGRAM_CERTIFICATE_ROOT);
 WiFiClientSecure secured_client;
 UniversalTelegramBot bot(BOT_TOKEN, secured_client);
 
@@ -46,7 +47,7 @@ void setup() {
   Serial.print("Connecting to Wifi SSID ");
   Serial.print(WIFI_SSID);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  secured_client.setCACert(TELEGRAM_CERTIFICATE_ROOT); // Add root certificate for api.telegram.org
+  secured_client.setTrustAnchors(&cert); // Add root certificate for api.telegram.org
   while (WiFi.status() != WL_CONNECTED)
   {
     Serial.print(".");

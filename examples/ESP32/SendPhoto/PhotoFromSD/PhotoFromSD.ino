@@ -1,10 +1,10 @@
 /*******************************************************************
-    A telegram bot for your ESP8266 that responds
-    with whatever message you send it.
+    A telegram bot for your ESP32 that demonstrates sending an image
+    from SD.
 
     Parts:
-    D1 Mini ESP8266 * - http://s.click.aliexpress.com/e/uzFUnIe
-    (or any ESP8266 board)
+    ESP32 D1 Mini stlye Dev board* - http://s.click.aliexpress.com/e/C6ds4my
+    (or any ESP32 board)
 
       = Affilate
 
@@ -12,16 +12,19 @@
     please consider becoming a sponsor on Github
     https://github.com/sponsors/witnessmenow/
 
+    Example originally written by Vadim Sinitski 
 
-    Written by Brian Lough
+    Library written by Brian Lough
     YouTube: https://www.youtube.com/brianlough
     Tindie: https://www.tindie.com/stores/brianlough/
     Twitter: https://twitter.com/witnessmenow
  *******************************************************************/
-
-#include <ESP8266WiFi.h>
+#include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
+#include <ArduinoJson.h>
+#include <SPI.h>
+#include <SD.h>
 
 // Wifi network station credentials
 #define WIFI_SSID "YOUR_SSID"
@@ -30,17 +33,58 @@
 #define BOT_TOKEN "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
 const unsigned long BOT_MTBS = 1000; // mean time between scan messages
+#define SD_CS 5
 
-X509List cert(TELEGRAM_CERTIFICATE_ROOT);
+unsigned long bot_lasttime;          // last time messages' scan has been done
 WiFiClientSecure secured_client;
 UniversalTelegramBot bot(BOT_TOKEN, secured_client);
-unsigned long bot_lasttime; // last time messages' scan has been done
+
+File myFile;
+bool isMoreDataAvailable();
+byte getNextByte();
+
+bool isMoreDataAvailable()
+{
+  return myFile.available();
+}
+
+byte getNextByte()
+{
+  return myFile.read();
+}
 
 void handleNewMessages(int numNewMessages)
 {
-  for (int i = 0; i < numNewMessages; i++)
+  String chat_id = bot.messages[0].chat_id;
+  String file_name = "box.jpg";
+
+  myFile = SD.open(file_name);
+
+  if (myFile)
   {
-    bot.sendMessage(bot.messages[i].chat_id, bot.messages[i].text, "");
+    Serial.print(file_name);
+    Serial.print("....");
+
+    //Content type for PNG image/png
+    String sent = bot.sendPhotoByBinary(chat_id, "image/jpeg", myFile.size(),
+                                        isMoreDataAvailable,
+                                        getNextByte, nullptr, nullptr);
+
+    if (sent)
+    {
+      Serial.println("was successfully sent");
+    }
+    else
+    {
+      Serial.println("was not sent");
+    }
+
+    myFile.close();
+  }
+  else
+  {
+    // if the file didn't open, print an error:
+    Serial.println("error opening photo");
   }
 }
 
@@ -49,12 +93,19 @@ void setup()
   Serial.begin(115200);
   Serial.println();
 
+  Serial.print("Initializing SD card....");
+  if (!SD.begin(SD_CS))
+  {
+    Serial.println("failed!");
+    return;
+  }
+  Serial.println("done.");
+
   // attempt to connect to Wifi network:
   Serial.print("Connecting to Wifi SSID ");
   Serial.print(WIFI_SSID);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  secured_client.setTrustAnchors(&cert); // Add root certificate for api.telegram.org
-  
+  secured_client.setCACert(TELEGRAM_CERTIFICATE_ROOT); // Add root certificate for api.telegram.org
   while (WiFi.status() != WL_CONNECTED)
   {
     Serial.print(".");
