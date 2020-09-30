@@ -122,7 +122,7 @@ public:
   String name;
   String userName;
   int longPoll = 0;
-  int waitForResponse = 1500;
+  unsigned int waitForResponse = 1500;
   int _lastError;
   int last_sent_message_id = 0;
   int maxMessageLength = 1500;

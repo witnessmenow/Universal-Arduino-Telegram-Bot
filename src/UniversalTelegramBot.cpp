@@ -64,7 +64,6 @@ String UniversalTelegramBot::buildCommand(const String& cmd) {
 
 String UniversalTelegramBot::sendGetToTelegram(const String& command) {
   String body, headers;
-  bool avail;
   
   // Connect with api.telegram.org if not already connected
   if (!client->connected()) {
@@ -99,7 +98,7 @@ String UniversalTelegramBot::sendGetToTelegram(const String& command) {
 
 bool UniversalTelegramBot::readHTTPAnswer(String &body, String &headers) {
   int ch_count = 0;
-  long now = millis();
+  unsigned long now = millis();
   bool finishedHeaders = false;
   bool currentLineIsBlank = true;
   bool responseReceived = false;
@@ -268,7 +267,7 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
         #endif
         byte buffer[512];
         int count = 0;
-        char ch;
+
         while (moreDataAvailableCallback()) {
             buffer[count] = getNextByteCallback();
             count++;
@@ -335,7 +334,7 @@ bool UniversalTelegramBot::setMyCommands(const String& commandArray) {
   #endif  // defined(_debug)
   unsigned long sttime = millis();
 
-  while (millis() < sttime + 8000ul) { // loop for a while to send the message
+  while (millis() - sttime < 8000ul) { // loop for a while to send the message
     response = sendPostToTelegram(BOT_CMD("setMyCommands"), payload.as<JsonObject>());
     #ifdef _debug  
     Serial.println("setMyCommands response" + response);
@@ -533,10 +532,10 @@ bool UniversalTelegramBot::sendSimpleMessage(const String& chat_id, const String
   #ifdef TELEGRAM_DEBUG  
     Serial.println(F("sendSimpleMessage: SEND Simple Message"));
   #endif
-  long sttime = millis();
+  unsigned long sttime = millis();
 
   if (text != "") {
-    while (millis() < sttime + 8000) { // loop for a while to send the message
+    while (millis() - sttime < 8000ul) { // loop for a while to send the message
       String command = BOT_CMD("sendMessage?chat_id=");
       command += chat_id;
       command += F("&text=");
@@ -626,10 +625,10 @@ bool UniversalTelegramBot::sendPostMessage(JsonObject payload) {
     serializeJson(payload, Serial);
     Serial.println();
   #endif 
-  long sttime = millis();
+  unsigned long sttime = millis();
 
   if (payload.containsKey("text")) {
-    while (millis() < sttime + 8000) { // loop for a while to send the message
+    while (millis() - sttime < 8000ul) { // loop for a while to send the message
       String response = sendPostToTelegram(BOT_CMD("sendMessage"), payload);
       #ifdef TELEGRAM_DEBUG  
         Serial.println(response);
@@ -650,10 +649,10 @@ String UniversalTelegramBot::sendPostPhoto(JsonObject payload) {
   #ifdef TELEGRAM_DEBUG  
     Serial.println(F("sendPostPhoto: SEND Post Photo"));
   #endif
-  long sttime = millis();
+  unsigned long sttime = millis();
 
   if (payload.containsKey("photo")) {
-    while (millis() < sttime + 8000) { // loop for a while to send the message
+    while (millis() - sttime < 8000ul) { // loop for a while to send the message
       response = sendPostToTelegram(BOT_CMD("sendPhoto"), payload);
       #ifdef TELEGRAM_DEBUG  
         Serial.println(response);
@@ -733,10 +732,10 @@ bool UniversalTelegramBot::sendChatAction(const String& chat_id, const String& t
   #ifdef TELEGRAM_DEBUG  
     Serial.println(F("SEND Chat Action Message"));
   #endif
-  long sttime = millis();
+  unsigned long sttime = millis();
 
   if (text != "") {
-    while (millis() < sttime + 8000) { // loop for a while to send the message
+    while (millis() - sttime < 8000ul) { // loop for a while to send the message
       String command = BOT_CMD("sendChatAction?chat_id=");
       command += chat_id;
       command += F("&action=");
