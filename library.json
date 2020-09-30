@@ -13,7 +13,7 @@
     "url": "https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot"
   },
   "version": "1.2.0",
-  "license": "GPL-2.0-or-later",
+  "license": "MIT",
   "frameworks": "arduino",
   "platforms": "*",
   "dependencies": [

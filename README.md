@@ -1,5 +1,9 @@
 # Universal Telegram Bot Library
 
+![Travis CI status](https://api.travis-ci.org/witnessmenow/Universal-Arduino-Telegram-Bot.svg?branch=master)
+![License](https://img.shields.io/github/license/witnessmenow/Universal-Arduino-Telegram-Bot)
+![Release stable](https://badgen.net/github/release/witnessmenow/Universal-Arduino-Telegram-Bot/stable)
+
 An Arduino IDE library for using Telegram Bot API. It's designed to be used with multiple Arduino architectures.
 
 Join the [Arduino Telegram Library Group Chat](https://t.me/arduino_telegram_library) if you have any questions/feedback or would just like to be kept up to date with the library's progress.
@@ -42,10 +46,11 @@ Include UniversalTelegramBot in your project:
 and pass it a Bot token and a SSL Client (See the [examples](https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot/tree/master/examples) for more details)
 
 ```ino
-#define BOTtoken "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+// Telegram BOT Token (Get from Botfather)
+#define BOT_TOKEN "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 // WiFiSSLClient client; //For 101 boards
-WiFiClientSecure client; //For ESP8266 boards
-UniversalTelegramBot bot(BOTtoken, client);
+WiFiClientSecure secured_client;
+UniversalTelegramBot bot(BOT_TOKEN, secured_client);
 ```
 
 *NOTE:* This library has not been tested with the 101 boards as I do not have a compatible board. [If you can help please let us know!](https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot/issues/2)
@@ -83,4 +88,6 @@ The full Telegram Bot API documentation can be read [here](https://core.telegram
 
 ## License
 
-You may copy, distribute and modify the software provided that modifications are described and licensed for free under [LGPL-3](http://www.gnu.org/licenses/lgpl-3.0.html). Derivatives works (including modifications or anything statically linked to the library) can only be redistributed under [LGPL-3](http://www.gnu.org/licenses/lgpl-3.0.html), but applications that use the library don't have to be.
+![License](https://img.shields.io/github/license/witnessmenow/Universal-Arduino-Telegram-Bot)
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
