@@ -58,7 +58,7 @@ struct telegramMessage {
   float longitude;
   float latitude;
   int update_id;
-  int message_id;   // added message id
+  int message_id;  
 
   int reply_to_message_id;
   String reply_to_text;
@@ -85,17 +85,17 @@ public:
   bool getMe();
 
   bool sendSimpleMessage(const String& chat_id, const String& text, const String& parse_mode);
-  bool sendMessage(const String& chat_id, const String& text, const String& parse_mode = "", int message_id = 0); // added message id 
+  bool sendMessage(const String& chat_id, const String& text, const String& parse_mode = "", int message_id = 0);
   bool sendMessageWithReplyKeyboard(const String& chat_id, const String& text,
                                     const String& parse_mode, const String& keyboard,
                                     bool resize = false, bool oneTime = false,
                                     bool selective = false);
   bool sendMessageWithInlineKeyboard(const String& chat_id, const String& text,
-                                     const String& parse_mode, const String& keyboard, int message_id = 0); // added message id 
+                                     const String& parse_mode, const String& keyboard, int message_id = 0);
 
   bool sendChatAction(const String& chat_id, const String& text);
 
-  bool sendPostMessage(JsonObject payload, bool edit = false); // added message id option to send an editMessageText command
+  bool sendPostMessage(JsonObject payload, bool edit = false); 
   String sendPostPhoto(JsonObject payload);
   String sendPhotoByBinary(const String& chat_id, const String& contentType, int fileSize,
                            MoreDataAvailable moreDataAvailableCallback,
