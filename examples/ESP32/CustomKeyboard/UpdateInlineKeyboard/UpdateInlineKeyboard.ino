@@ -18,7 +18,7 @@ const char *password = "myPASSWORD";
 // Initialize Telegram BOT
 #define BOTtoken "xxxxxxxxxx:xxxxxxxxxxxxxxxxxxxxxxxxxx" // your Bot Token (Get from Botfather)
 WiFiClientSecure client;
-UniversalTelegramBot bot(BOTtoken2, client);
+UniversalTelegramBot bot(BOTtoken, client);
 
 int Bot_mtbs = 1000; //mean time between scan messages
 long Bot_lasttime;   //last time messages' scan has been done
