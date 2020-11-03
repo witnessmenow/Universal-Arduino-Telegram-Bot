@@ -32,3 +32,6 @@
 .gcc-flags.json
 .pio/
 .vscode/
+
+# MacOS
+.DS_Store

@@ -757,6 +757,101 @@ bool UniversalTelegramBot::sendChatAction(const String& chat_id, const String& t
   return sent;
 }
 
+
+bool UniversalTelegramBot::getChatDescription(String chat_id, String & text)
+{
+  String command = "bot" + _token + "/getChat?chat_id=" + chat_id;
+  String response = sendGetToTelegram(command); // receive reply from telegram.org
+  DynamicJsonDocument doc(maxMessageLength);
+  DeserializationError error = deserializeJson(doc, response);
+  JsonObject obj = doc.as<JsonObject>(); //there is nothing better right now to use obj.containsKey("result")
+  closeClient();
+
+  if (!error)
+  {
+    if (obj.containsKey("result"))
+    {
+      String descr = doc["result"]["description"];
+      text = descr;
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+
+bool UniversalTelegramBot::setChatDescription(String chat_id, String text)
+{
+  bool sent = false;
+  #ifdef TELEGRAM_DEBUG  
+	Serial.println(F("SEND Chat Description"));
+  #endif
+  long sttime = millis();
+
+  if (text != "")
+  {
+    while (millis() < sttime + 8000)
+    { // loop for a while to send the message
+      String command = "bot" + _token + "/setChatDescription?chat_id=" + chat_id + "&description=" + text;
+      String response = sendGetToTelegram(command);
+
+      #ifdef TELEGRAM_DEBUG  
+		Serial.println(response);
+	  #endif
+      sent = checkForOkResponse(response);
+
+      if (sent) break;      
+    }
+  }
+
+  closeClient();
+  return sent;
+}
+
+
+
+bool UniversalTelegramBot::restrictChatMember(String chat_id, String user_id, bool permit, String until_date)
+{
+  bool sent = false;
+  long sttime = millis();
+
+  DynamicJsonDocument doc(maxMessageLength);
+  doc["chat_id"] = chat_id;
+  doc["user_id"] = user_id;
+  JsonObject permissions = doc.createNestedObject("permissions");
+  permissions["can_send_messages"] = permit ? "True" : "False";
+  doc["until_date"] = until_date;
+  //  DeserializationError error = deserializeJson(doc, response);
+  JsonObject payload = doc.as<JsonObject>(); //there is nothing better right now to use obj.containsKey("result")
+
+  #ifdef TELEGRAM_DEBUG
+    Serial.print(F("SEND User Restriction"));
+	serializeJson(payload, Serial);
+	Serial.println();
+  #endif 
+
+  if (payload.containsKey("text"))
+  {
+    while (millis() < sttime + 8000)
+    { // loop for a while to send the message
+      String command = "bot" + _token + "/restrictChatMember";
+      String response = sendPostToTelegram(command, payload);
+      #ifdef TELEGRAM_DEBUG  
+		Serial.println(response);
+      #endif
+      sent = checkForOkResponse(response);
+      if (sent) break;
+    }
+  }
+
+  closeClient();
+  return sent;
+}
+
+
+
 void UniversalTelegramBot::closeClient() {
   if (client->connected()) {
     #ifdef TELEGRAM_DEBUG  
