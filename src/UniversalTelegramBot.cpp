@@ -319,6 +319,29 @@ bool UniversalTelegramBot::getMe() {
 }
 
 /*********************************************************************************
+ * GetMyCommands - Get the command list of the bot from the telegram server      *
+ * Returns the JSON string with the command list for the key "result" in the     *
+ * server response                                                               *
+ ********************************************************************************/
+String UniversalTelegramBot::getMyCommands()
+{
+  #ifdef TELEGRAM_DEBUG  
+    Serial.println(F("GET getMyCommands"));
+  #endif
+  String command = BOT_CMD("getMyCommands");
+  String response = sendGetToTelegram(command); // receive reply from telegram.org
+  #ifdef TELEGRAM_DEBUG  
+      Serial.print(F("incoming message length "));
+      Serial.println(response.length());
+      Serial.println(F("Creating DynamicJsonBuffer"));
+  #endif
+  closeClient();
+
+  return response;
+}
+
+
+/*********************************************************************************
  * SetMyCommands - Update the command list of the bot on the telegram server     *
  * (Argument to pass: Serialied array of BotCommand)                             *
  * CAUTION: All commands must be lower-case                                      *

@@ -112,6 +112,7 @@ public:
                            const String &url = "",
                            int cache_time = 0);
 
+  String getMyCommands();
   bool setMyCommands(const String& commandArray);
 
   String buildCommand(const String& cmd);
