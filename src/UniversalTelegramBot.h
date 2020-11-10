@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #ifndef UniversalTelegramBot_h
 #define UniversalTelegramBot_h
 
-//#define TELEGRAM_DEBUG 1
+#define TELEGRAM_DEBUG 1
 #define ARDUINOJSON_DECODE_UNICODE 1
 #define ARDUINOJSON_USE_LONG_LONG 1
 #include <Arduino.h>
@@ -114,6 +114,7 @@ public:
 
   String getMyCommands();
   bool setMyCommands(const String& commandArray);
+  bool setMyCommandsStr(String commands);
 
   String buildCommand(const String& cmd);
 

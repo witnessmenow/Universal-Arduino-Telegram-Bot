@@ -371,6 +371,30 @@ bool UniversalTelegramBot::setMyCommands(const String& commandArray) {
 }
 
 
+bool UniversalTelegramBot::setMyCommandsStr(String commands)
+{
+  bool sent = false;
+  String response = "";
+  #if defined(_debug)
+  Serial.println(F("sendSetMyCommands: SEND Post /setMyCommands"));
+  #endif  // defined(_debug)
+  unsigned long sttime = millis();
+
+  while (millis() - sttime < 8000ul)
+  { // loop for a while to send the message
+    response = sendGetToTelegram(BOT_CMD("setMyCommands") + commands);
+    #ifdef _debug  
+    Serial.println("setMyCommands response" + response);
+    #endif
+    sent = checkForOkResponse(response);
+    if (sent) break;
+  }
+
+  closeClient();
+  return sent;
+}
+
+
 /***************************************************************
  * GetUpdates - function to receive messages from telegram *
  * (Argument to pass: the last+1 message to read)             *
