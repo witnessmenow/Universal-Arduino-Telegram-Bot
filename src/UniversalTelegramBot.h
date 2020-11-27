@@ -30,9 +30,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #include <Client.h>
 #include <TelegramCertificate.h>
 
+#define TELEGRAM_MAX_MESSAGE_LENGTH 10500
 #define TELEGRAM_HOST "api.telegram.org"
 #define TELEGRAM_SSL_PORT 443
 #define HANDLE_MESSAGES 1
+#define EDIT_TEXT true
 
 //unmark following line to enable debug mode
 //#define _debug
@@ -54,6 +56,7 @@ struct telegramMessage {
   String file_path;
   String file_name;
   bool hasDocument;
+  bool hasPhoto;
   long file_size;
   float longitude;
   float latitude;
@@ -86,6 +89,8 @@ public:
 
   bool sendSimpleMessage(const String& chat_id, const String& text, const String& parse_mode);
   bool sendMessage(const String& chat_id, const String& text, const String& parse_mode = "");
+  bool editMessage(const String& chat_id, const String & message_id, const String& text,
+		   const String& parse_mode = "");
   bool sendMessageWithReplyKeyboard(const String& chat_id, const String& text,
                                     const String& parse_mode, const String& keyboard,
                                     bool resize = false, bool oneTime = false,
@@ -95,7 +100,7 @@ public:
 
   bool sendChatAction(const String& chat_id, const String& text);
 
-  bool sendPostMessage(JsonObject payload);
+  bool sendPostMessage(JsonObject payload, const bool editMessage=false);
   String sendPostPhoto(JsonObject payload);
   String sendPhotoByBinary(const String& chat_id, const String& contentType, int fileSize,
                            MoreDataAvailable moreDataAvailableCallback,
@@ -123,6 +128,7 @@ public:
   bool restrictChatMember(String chat_id, String user_id, bool permit, String until_date);
   int getUpdates(long offset);
   bool checkForOkResponse(const String& response);
+  int getLastSentMessageId() { return last_sent_message_id; }
   telegramMessage messages[HANDLE_MESSAGES];
   long last_message_received;
   String name;
@@ -131,7 +137,7 @@ public:
   unsigned int waitForResponse = 1500;
   int _lastError;
   int last_sent_message_id = 0;
-  int maxMessageLength = 10500;
+  int maxMessageLength = TELEGRAM_MAX_MESSAGE_LENGTH;
 
 private:
   // JsonObject * parseUpdates(String response);

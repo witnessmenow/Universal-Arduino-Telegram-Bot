@@ -492,6 +492,8 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
     messages[messageIndex].text = F("");
     messages[messageIndex].from_id = F("");
     messages[messageIndex].from_name = F("");
+    messages[messageIndex].hasPhoto = false;
+    messages[messageIndex].file_caption = F("");
     messages[messageIndex].longitude = 0;
     messages[messageIndex].latitude = 0;
     messages[messageIndex].reply_to_message_id = 0;
@@ -509,7 +511,10 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
       messages[messageIndex].hasDocument = false;
       if (message.containsKey("text")) {
         messages[messageIndex].text = message["text"].as<String>();
-          
+
+      } else if (message.containsKey("photo")) {
+        messages[messageIndex].hasPhoto = true;
+        messages[messageIndex].file_caption = message["caption"].as<String>();
       } else if (message.containsKey("location")) {
         messages[messageIndex].longitude = message["location"]["longitude"].as<float>();
         messages[messageIndex].latitude  = message["location"]["latitude"].as<float>();
@@ -614,6 +619,22 @@ bool UniversalTelegramBot::sendMessage(const String& chat_id, const String& text
   return sendPostMessage(payload.as<JsonObject>());
 }
 
+
+bool UniversalTelegramBot::editMessage(const String& chat_id, const String & message_id, const String& text,
+                                       const String& parse_mode)
+{
+  DynamicJsonDocument payload(maxMessageLength);
+  payload["chat_id"] = chat_id;
+  payload["text"] = text;
+  payload["message_id"] = message_id;
+
+  if (parse_mode != "")
+    payload["parse_mode"] = parse_mode;
+
+  return sendPostMessage(payload.as<JsonObject>(), EDIT_TEXT);
+}
+
+
 bool UniversalTelegramBot::sendMessageWithReplyKeyboard(
     const String& chat_id, const String& text, const String& parse_mode, const String& keyboard,
     bool resize, bool oneTime, bool selective) {
@@ -664,7 +685,7 @@ bool UniversalTelegramBot::sendMessageWithInlineKeyboard(const String& chat_id,
  * SendPostMessage - function to send message to telegram                  *
  * (Arguments to pass: chat_id, text to transmit and markup(optional)) *
  ***********************************************************************/
-bool UniversalTelegramBot::sendPostMessage(JsonObject payload) {
+bool UniversalTelegramBot::sendPostMessage(JsonObject payload, const bool editMessage) {
 
   bool sent = false;
   #ifdef TELEGRAM_DEBUG 
@@ -674,9 +695,15 @@ bool UniversalTelegramBot::sendPostMessage(JsonObject payload) {
   #endif 
   unsigned long sttime = millis();
 
-  if (payload.containsKey("text")) {
-    while (millis() - sttime < 8000ul) { // loop for a while to send the message
-      String response = sendPostToTelegram(BOT_CMD("sendMessage"), payload);
+  if (payload.containsKey("text"))
+  {
+    String response;
+    while (millis() - sttime < 8000ul)
+    { // loop for a while to send the message
+      if (editMessage)
+	response = sendPostToTelegram(BOT_CMD("editMessageText"), payload);
+      else
+	response = sendPostToTelegram(BOT_CMD("sendMessage"), payload);
       #ifdef TELEGRAM_DEBUG  
         Serial.println(response);
       #endif
