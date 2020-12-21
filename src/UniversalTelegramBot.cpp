@@ -247,7 +247,7 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
     client->println(String(contentLength));
     client->print(F("Content-Type: multipart/form-data; boundary="));
     client->println(boundary);
-    client->println(F(""));
+    client->print("\r\n"); // bugfix for [E][ssl_client.cpp:36] _handle_error(): [send_ssl_data():294]: (0)
     client->print(start_request);
 
     #ifdef TELEGRAM_DEBUG  
