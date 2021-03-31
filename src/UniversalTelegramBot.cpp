@@ -247,7 +247,7 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
     client->println(String(contentLength));
     client->print(F("Content-Type: multipart/form-data; boundary="));
     client->println(boundary);
-    client->println(F(""));
+    client->println();
     client->print(start_request);
 
     #ifdef TELEGRAM_DEBUG  
