@@ -102,15 +102,29 @@ bool UniversalTelegramBot::readHTTPAnswer(String &body, String &headers) {
   bool finishedHeaders = false;
   bool currentLineIsBlank = true;
   bool responseReceived = false;
+  int toRead = 0;
 
   while (millis() - now < longPoll * 1000 + waitForResponse) {
     while (client->available()) {
       char c = client->read();
-      responseReceived = true;
 
       if (!finishedHeaders) {
         if (currentLineIsBlank && c == '\n') {
           finishedHeaders = true;
+            String headerLC = String(headers);
+            headerLC.toLowerCase();
+            int ind1 = headerLC.indexOf("content-length");
+            if (ind1 != -1) {
+              int ind2 = headerLC.indexOf("\r", ind1 + 15);
+              if (ind2 != -1) {
+                toRead = headerLC.substring(ind1 + 15, ind2).toInt();
+                #ifdef TELEGRAM_DEBUG
+                  Serial.print("Content-Length: ");
+                  Serial.println(toRead);
+                  Serial.println();
+                #endif
+              }
+            }
         } else {
           headers += c;
         }
@@ -118,6 +132,7 @@ bool UniversalTelegramBot::readHTTPAnswer(String &body, String &headers) {
         if (ch_count < maxMessageLength) {
           body += c;
           ch_count++;
+          responseReceived = toRead > 0 ? ch_count == toRead : true;
         }
       }
 
@@ -126,14 +141,14 @@ bool UniversalTelegramBot::readHTTPAnswer(String &body, String &headers) {
     }
 
     if (responseReceived) {
-      #ifdef TELEGRAM_DEBUG  
-        Serial.println();
-        Serial.println(body);
-        Serial.println();
-      #endif
       break;
     }
   }
+  #ifdef TELEGRAM_DEBUG
+    Serial.println();
+    Serial.println(body);
+    Serial.println();
+  #endif
   return responseReceived;
 }
 
