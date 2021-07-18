@@ -18,7 +18,7 @@
   "platforms": "*",
   "dependencies": [
     {
-      "name": "ArduinoJson"
+      "name": "bblanchon/ArduinoJson"
     }
   ],
   "build": {
