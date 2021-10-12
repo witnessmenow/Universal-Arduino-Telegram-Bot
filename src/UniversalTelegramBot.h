@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #ifndef UniversalTelegramBot_h
 #define UniversalTelegramBot_h
 
-#define TELEGRAM_DEBUG 1
+//#define TELEGRAM_DEBUG 1
 #define ARDUINOJSON_DECODE_UNICODE 1
 #define ARDUINOJSON_USE_LONG_LONG 1
 #include <Arduino.h>
@@ -34,7 +34,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #define TELEGRAM_HOST "api.telegram.org"
 #define TELEGRAM_SSL_PORT 443
 #define HANDLE_MESSAGES 1
-#define EDIT_TEXT true
+
 
 //unmark following line to enable debug mode
 //#define _debug
@@ -61,6 +61,7 @@ struct telegramMessage {
   float longitude;
   float latitude;
   int update_id;
+  int message_id;  
 
   int reply_to_message_id;
   String reply_to_text;
@@ -88,19 +89,19 @@ public:
   String GetName() { return name; }
 
   bool sendSimpleMessage(const String& chat_id, const String& text, const String& parse_mode);
-  bool sendMessage(const String& chat_id, const String& text, const String& parse_mode = "");
-  bool editMessage(const String& chat_id, const String & message_id, const String& text,
-		   const String& parse_mode = "");
+  bool sendMessage(const String& chat_id, const String& text, const String& parse_mode = "", int message_id = 0);
+  //  bool editMessage(const String& chat_id, const String & message_id, const String& text,
+  //		   const String& parse_mode = "");
   bool sendMessageWithReplyKeyboard(const String& chat_id, const String& text,
                                     const String& parse_mode, const String& keyboard,
                                     bool resize = false, bool oneTime = false,
-                                    bool selective = false);
+                                    bool selective = false, bool removeKeyboard = false);
   bool sendMessageWithInlineKeyboard(const String& chat_id, const String& text,
-                                     const String& parse_mode, const String& keyboard);
+                                     const String& parse_mode, const String& keyboard, int message_id = 0);
 
   bool sendChatAction(const String& chat_id, const String& text);
 
-  bool sendPostMessage(JsonObject payload, const bool editMessage=false);
+  bool sendPostMessage(JsonObject payload, bool edit = false); 
   String sendPostPhoto(JsonObject payload);
   String sendPhotoByBinary(const String& chat_id, const String& contentType, int fileSize,
                            MoreDataAvailable moreDataAvailableCallback,
