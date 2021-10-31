@@ -85,7 +85,8 @@ public:
   bool getMe();
 
   bool sendSimpleMessage(const String& chat_id, const String& text, const String& parse_mode);
-  bool sendMessage(const String& chat_id, const String& text, const String& parse_mode = "", int message_id = 0);
+  bool sendMessage(const String& chat_id, const String& text, const String& parse_mode = "", int message_id = 0,
+                  bool disable_web_page_preview = false);
   bool sendMessageWithReplyKeyboard(const String& chat_id, const String& text,
                                     const String& parse_mode, const String& keyboard,
                                     bool resize = false, bool oneTime = false,
