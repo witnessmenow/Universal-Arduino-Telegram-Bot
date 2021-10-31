@@ -560,7 +560,7 @@ bool UniversalTelegramBot::sendSimpleMessage(const String& chat_id, const String
 }
 
 bool UniversalTelegramBot::sendMessage(const String& chat_id, const String& text,
-                                       const String& parse_mode, int message_id) { // added message_id
+                                       const String& parse_mode, int message_id, bool disable_web_page_preview) { // added message_id
 
   DynamicJsonDocument payload(maxMessageLength);
   payload["chat_id"] = chat_id;
