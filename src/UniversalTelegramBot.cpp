@@ -38,9 +38,10 @@
 #define ZERO_COPY(STR)    ((char*)STR.c_str())
 #define BOT_CMD(STR)      buildCommand(F(STR))
 
-UniversalTelegramBot::UniversalTelegramBot(const String& token, Client &client) {
+UniversalTelegramBot::UniversalTelegramBot(const String& token, Client &client, int maxMessageLength) {
   updateToken(token);
   this->client = &client;
+  this->maxMessageLength = maxMessageLength;
 }
 
 void UniversalTelegramBot::updateToken(const String& token) {
@@ -328,15 +329,15 @@ bool UniversalTelegramBot::setMyCommands(const String& commandArray) {
   payload["commands"] = serialized(commandArray);
   bool sent = false;
   String response = "";
-  #if defined(_debug)
-  Serial.println(F("sendSetMyCommands: SEND Post /setMyCommands"));
-  #endif  // defined(_debug)
+  #ifdef TELEGRAM_DEBUG
+    Serial.println(F("sendSetMyCommands: SEND Post /setMyCommands"));
+  #endif
   unsigned long sttime = millis();
 
   while (millis() - sttime < 8000ul) { // loop for a while to send the message
     response = sendPostToTelegram(BOT_CMD("setMyCommands"), payload.as<JsonObject>());
-    #ifdef _debug  
-    Serial.println("setMyCommands response" + response);
+    #ifdef TELEGRAM_DEBUG
+      Serial.println("setMyCommands response" + response);
     #endif
     sent = checkForOkResponse(response);
     if (sent) break;
@@ -560,7 +561,7 @@ bool UniversalTelegramBot::sendSimpleMessage(const String& chat_id, const String
 }
 
 bool UniversalTelegramBot::sendMessage(const String& chat_id, const String& text,
-                                       const String& parse_mode, int message_id, bool disable_web_page_preview) { // added message_id
+                                       const String& parse_mode, int message_id, bool disable_web_page_preview) {
 
   DynamicJsonDocument payload(maxMessageLength);
   payload["chat_id"] = chat_id;
@@ -572,7 +573,45 @@ bool UniversalTelegramBot::sendMessage(const String& chat_id, const String& text
   if (parse_mode != "")
     payload["parse_mode"] = parse_mode;
 
+  if (disable_web_page_preview)
+    payload["disable_web_page_preview"] = disable_web_page_preview;
+
   return sendPostMessage(payload.as<JsonObject>(), message_id); // if message id == 0 then edit is false, else edit is true
+}
+
+/***********************************************************************
+ * DeleteMessage - function to delete message by message_id            *
+ * Function description and limitations:                               *
+ * https://core.telegram.org/bots/api#deletemessage                    *
+ ***********************************************************************/
+bool UniversalTelegramBot::deleteMessage(const String& chat_id, int message_id) {
+  if (message_id == 0)
+  {
+    #ifdef TELEGRAM_DEBUG
+	  Serial.println(F("deleteMessage: message_id not passed for deletion"));
+	#endif
+    return false;
+  }
+
+  DynamicJsonDocument payload(maxMessageLength);
+  payload["chat_id"] = chat_id;
+  payload["message_id"] = message_id;
+
+  #ifdef TELEGRAM_DEBUG
+    Serial.print(F("deleteMessage: SEND Post Message: "));
+    serializeJson(payload, Serial);
+    Serial.println();
+  #endif
+
+  String response = sendPostToTelegram(BOT_CMD("deleteMessage"), payload.as<JsonObject>());
+  #ifdef TELEGRAM_DEBUG
+     Serial.print(F("deleteMessage response:"));
+     Serial.println(response);
+  #endif
+
+  bool sent = checkForOkResponse(response);
+  closeClient();
+  return sent;
 }
 
 bool UniversalTelegramBot::sendMessageWithReplyKeyboard(
@@ -809,7 +848,7 @@ bool UniversalTelegramBot::answerCallbackQuery(const String &query_id, const Str
   if (url.length() > 0) payload["url"] = url;
 
   String response = sendPostToTelegram(BOT_CMD("answerCallbackQuery"), payload.as<JsonObject>());
-  #ifdef _debug  
+  #ifdef TELEGRAM_DEBUG
      Serial.print(F("answerCallbackQuery response:"));
      Serial.println(response);
   #endif

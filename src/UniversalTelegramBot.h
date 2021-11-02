@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #ifndef UniversalTelegramBot_h
 #define UniversalTelegramBot_h
 
+//unmark following line to enable debug mode
 //#define TELEGRAM_DEBUG 1
 #define ARDUINOJSON_DECODE_UNICODE 1
 #define ARDUINOJSON_USE_LONG_LONG 1
@@ -33,9 +34,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #define TELEGRAM_HOST "api.telegram.org"
 #define TELEGRAM_SSL_PORT 443
 #define HANDLE_MESSAGES 1
-
-//unmark following line to enable debug mode
-//#define _debug
 
 typedef bool (*MoreDataAvailable)();
 typedef byte (*GetNextByte)();
@@ -67,7 +65,7 @@ struct telegramMessage {
 
 class UniversalTelegramBot {
 public:
-  UniversalTelegramBot(const String& token, Client &client);
+  UniversalTelegramBot(const String& token, Client &client, int maxMessageLength = 1500);
   void updateToken(const String& token);
   String getToken();
   String sendGetToTelegram(const String& command);
@@ -86,7 +84,8 @@ public:
 
   bool sendSimpleMessage(const String& chat_id, const String& text, const String& parse_mode);
   bool sendMessage(const String& chat_id, const String& text, const String& parse_mode = "", int message_id = 0,
-                  bool disable_web_page_preview = false);
+                   bool disable_web_page_preview = false);
+  bool deleteMessage(const String& chat_id, int message_id = 0);
   bool sendMessageWithReplyKeyboard(const String& chat_id, const String& text,
                                     const String& parse_mode, const String& keyboard,
                                     bool resize = false, bool oneTime = false,
