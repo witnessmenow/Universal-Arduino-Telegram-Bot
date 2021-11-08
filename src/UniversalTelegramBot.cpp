@@ -561,7 +561,8 @@ bool UniversalTelegramBot::sendSimpleMessage(const String& chat_id, const String
 }
 
 bool UniversalTelegramBot::sendMessage(const String& chat_id, const String& text,
-                                       const String& parse_mode, int message_id, bool disable_web_page_preview) {
+                                       const String& parse_mode, int message_id, bool disable_web_page_preview,
+                                       bool disable_notification) {
 
   DynamicJsonDocument payload(maxMessageLength);
   payload["chat_id"] = chat_id;
@@ -575,6 +576,9 @@ bool UniversalTelegramBot::sendMessage(const String& chat_id, const String& text
 
   if (disable_web_page_preview)
     payload["disable_web_page_preview"] = disable_web_page_preview;
+
+  if (disable_notification)
+    payload["disable_notification"] = disable_notification;
 
   return sendPostMessage(payload.as<JsonObject>(), message_id); // if message id == 0 then edit is false, else edit is true
 }
