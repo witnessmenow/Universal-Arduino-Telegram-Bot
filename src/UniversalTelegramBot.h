@@ -58,7 +58,7 @@ struct telegramMessage {
   float longitude;
   float latitude;
   int update_id;
-  int message_id;  
+  int message_id;
 
   int reply_to_message_id;
   String reply_to_text;
@@ -77,15 +77,16 @@ public:
                                   const String& fileName, const String& contentType,
                                   const String& chat_id, int fileSize,
                                   MoreDataAvailable moreDataAvailableCallback,
-                                  GetNextByte getNextByteCallback, 
-                                  GetNextBuffer getNextBufferCallback, 
+                                  GetNextByte getNextByteCallback,
+                                  GetNextBuffer getNextBufferCallback,
                                   GetNextBufferLen getNextBufferLenCallback);
 
   bool readHTTPAnswer(String &body, String &headers);
   bool getMe();
 
   bool sendSimpleMessage(const String& chat_id, const String& text, const String& parse_mode);
-  bool sendMessage(const String& chat_id, const String& text, const String& parse_mode = "", int message_id = 0);
+  bool sendMessage(const String& chat_id, const String& text, const String& parse_mode = "", int message_id = 0,
+                   bool disable_notification = false);
   bool sendMessageWithReplyKeyboard(const String& chat_id, const String& text,
                                     const String& parse_mode, const String& keyboard,
                                     bool resize = false, bool oneTime = false,
@@ -95,12 +96,12 @@ public:
 
   bool sendChatAction(const String& chat_id, const String& text);
 
-  bool sendPostMessage(JsonObject payload, bool edit = false); 
+  bool sendPostMessage(JsonObject payload, bool edit = false);
   String sendPostPhoto(JsonObject payload);
   String sendPhotoByBinary(const String& chat_id, const String& contentType, int fileSize,
                            MoreDataAvailable moreDataAvailableCallback,
-                           GetNextByte getNextByteCallback, 
-                           GetNextBuffer getNextBufferCallback, 
+                           GetNextByte getNextByteCallback,
+                           GetNextBuffer getNextBufferCallback,
                            GetNextBufferLen getNextBufferLenCallback);
   String sendPhoto(const String& chat_id, const String& photo, const String& caption = "",
                    bool disable_notification = false,
