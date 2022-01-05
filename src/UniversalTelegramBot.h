@@ -79,7 +79,7 @@ public:
                                   GetNextBuffer getNextBufferCallback, 
                                   GetNextBufferLen getNextBufferLenCallback);
 
-  bool readHTTPAnswer(String &body, String &headers);
+  bool readHTTPAnswer(String &body);
   bool getMe();
 
   bool sendSimpleMessage(const String& chat_id, const String& text, const String& parse_mode);
@@ -135,6 +135,7 @@ private:
   void closeClient();
   bool getFile(String& file_path, long& file_size, const String& file_id);
   bool processResult(JsonObject result, int messageIndex);
+  long getUpdateIdFromResponse(String response);
 };
 
 #endif
