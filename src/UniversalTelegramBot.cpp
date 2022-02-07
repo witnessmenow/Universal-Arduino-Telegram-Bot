@@ -346,6 +346,21 @@ bool UniversalTelegramBot::setMyCommands(const String& commandArray) {
   return sent;
 }
 
+/*********************************************************************************
+ * GetMyCommands - Gets the command list from the bot on the telegram server     *
+ * (Argument to pass: String to store the result)                                *
+ ********************************************************************************/
+void UniversalTelegramBot::getMyCommands(String &cmdList) {
+  String response = sendGetToTelegram(BOT_CMD("getMyCommands"));
+  DynamicJsonDocument doc(maxMessageLength);
+  DeserializationError error = deserializeJson(doc, ZERO_COPY(response));
+  closeClient();
+  cmdList = "";
+  if (!error && doc.containsKey("result")) {
+      serializeJson(doc["result"], cmdList);
+  }
+}
+
 
 /***************************************************************
  * GetUpdates - function to receive messages from telegram *
