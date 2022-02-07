@@ -113,7 +113,8 @@ public:
                            int cache_time = 0);
 
   bool setMyCommands(const String& commandArray);
-
+  void getMyCommands(String &cmdList);
+  
   String buildCommand(const String& cmd);
 
   int getUpdates(long offset);
