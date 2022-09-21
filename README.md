@@ -8,10 +8,6 @@ An Arduino IDE library for using Telegram Bot API. It's designed to be used with
 
 Join the [Arduino Telegram Library Group Chat](https://t.me/arduino_telegram_library) if you have any questions/feedback or would just like to be kept up to date with the library's progress.
 
-## Help support what I do!
-
-I have created a lot of different Arduino libraries that I hope people can make use of. [If you enjoy my work, please consider becoming a Github sponsor!](https://github.com/sponsors/witnessmenow/)
-
 ## Introduction
 
 This library provides an interface for [Telegram Bot API](https://core.telegram.org/bots/api).
@@ -23,6 +19,12 @@ This is a library forked from [one library](https://github.com/Gianbacchio/ESP82
 Each library only supported a single type of Arduino and had different features implemented. The only thing that needs to be different for each board is the actual sending of requests to Telegram so I thought a library that additional architectures or boards could be configured easily would be useful, although this springs to mind:
 
 ![alt text](https://imgs.xkcd.com/comics/standards.png "standards")
+
+Finally I have forked this library, which is since years no more under development, from witnessmenow and I have implemented the fix of [issue #275](https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot/issues/275) by glorious developer [RobertGnz](https://github.com/RobertGnz) (Thank you!).
+
+Furhter I have implemented a new API-Call deleteMessage (see UniversalTelegramBot::deleteMessage in the src), to easier ban a chat_id if some flooding attack would happen.
+
+There is still much work to do: the strings in the library will crash the ESP8266 after a while of running, because of memory issues, see: [Taming Arduino Strings -- How to Avoid Memory Issues](https://www.instructables.com/Taming-Arduino-Strings-How-to-Avoid-Memory-Issues/). J-Rios has already done good work here with his [fork](https://github.com/J-Rios/Universal-Arduino-Telegram-Bot) but it is back in commits (compared to witnessmenow's repo) a lot. Maybe it is possible to use some special string library, e.g. [SafeString](https://www.forward.com.au/pfod/ArduinoProgramming/SafeString/index.html). At the moment I do [daily reset](https://www.forward.com.au/pfod/ArduinoProgramming/ArduinoStrings/index.html#reboot) to avoid memory issues.
 
 ## Installing
 
