@@ -37,6 +37,8 @@
 
 #define ZERO_COPY(STR)    ((char*)STR.c_str())
 #define BOT_CMD(STR)      buildCommand(F(STR))
+// fcw: 2022-07-13: DEBUG
+// #define TELEGRAM_DEBUG
 
 UniversalTelegramBot::UniversalTelegramBot(const String& token, Client &client) {
   updateToken(token);
@@ -368,6 +370,36 @@ int UniversalTelegramBot::getUpdates(long offset) {
   }
   String response = sendGetToTelegram(command); // receive reply from telegram.org
 
+// fcw: 2022-07-13: Bug bei zu grossen Nachrichten, die werden immer wieder abgerufen und blockieren die Abfrage
+// so gemacht mit einer 1500 Zeichen grossen Nachricht von Cat (5306541440), danach ging es nicht mehr.
+// RobertGnz hat dazu schon einen issue geoeffnet, siehe:
+// https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot/issues/275
+// Aenderungen sind mit // Robert und // End Robert gerahmt (hier und weiter unten noch eine Zeile).
+// Nach der Aenderung von Robert ging es wieder.
+// Siehe auch: https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot/issues/266#issuecomment-985013894
+
+// Robert:
+// If deserializeJson happen to endup with an error for instance update to big for
+// the buffer, then last_message_received will not be updated.
+// Subsequent calls to getUpdates uses last_message_received + 1 for the offset value.
+// But as last_message_received was not updated we will allways read the same message.
+// Here we try to find the update_id and store it to update last_message_received if necessary.
+  char * pt1; char * pt2; long candidate;
+  candidate = -1;
+  pt1 = strstr_P( response.c_str(), (const char *) F("update_id"));
+  if ( pt1 != NULL ) {
+    pt1 = strstr_P( pt1, (const char *) F(":"));
+    if ( pt1 != NULL ) {
+      pt1++;
+      pt2 = strstr_P( pt1, (const char *) F(","));
+      if ( pt2 != NULL ) {
+        if ( pt2 - pt1 < 12 ) { // for safety 
+          sscanf( pt1, "%ld", &candidate );
+        }
+      }
+    }
+  }
+// End Robert
   if (response == "") {
     #ifdef TELEGRAM_DEBUG  
         Serial.println(F("Received empty string in response!"));
@@ -415,20 +447,24 @@ int UniversalTelegramBot::getUpdates(long offset) {
         #endif
       }
     } else { // Parsing failed
-      if (response.length() < 2) { // Too short a message. Maybe a connection issue
-        #ifdef TELEGRAM_DEBUG  
+        // Robert: try to update last_message_received 
+	    if ( candidate != -1 ) last_message_received = candidate;	  	  
+	    // End Robert
+	  
+        if (response.length() < 2) { // Too short a message. Maybe a connection issue
+          #ifdef TELEGRAM_DEBUG  
             Serial.println(F("Parsing error: Message too short"));
-        #endif
-      } else {
+          #endif
+        } else {
         // Buffer may not be big enough, increase buffer or reduce max number of
         // messages
-        #ifdef TELEGRAM_DEBUG 
+          #ifdef TELEGRAM_DEBUG 
             Serial.print(F("Failed to parse update, the message could be too "
                            "big for the buffer. Error code: "));
             Serial.println(error.c_str()); // debug print of parsing error
-        #endif     
+          #endif     
+        }
       }
-    }
     // Close the client as no response is to be given
     closeClient();
     return 0;
@@ -816,4 +852,30 @@ bool UniversalTelegramBot::answerCallbackQuery(const String &query_id, const Str
   bool answer = checkForOkResponse(response);
   closeClient();
   return answer;
+}
+
+// fcw: 2022-09-19: um Nachrichten zu loeschen, kopiert und angepasst von sendSimpleMessage(...)
+bool UniversalTelegramBot::deleteMessage(const String& chat_id, int message_id) {
+  bool sent = false;
+  #ifdef TELEGRAM_DEBUG  
+    Serial.println(F("deleteMessage: DELETE Message"));
+  #endif
+  unsigned long sttime = millis();
+
+  if (chat_id != "" && message_id != 0) {
+    while (millis() - sttime < 8000ul) { // loop for a while to send the message
+      String command = BOT_CMD("deleteMessage?chat_id=");
+      command += chat_id;
+      command += F("&message_id=");
+      command += String(message_id);
+      String response = sendGetToTelegram(command);
+      #ifdef TELEGRAM_DEBUG  
+        Serial.println(response);
+      #endif
+      sent = checkForOkResponse(response);
+      if (sent) break;
+    }
+  }
+  closeClient();
+  return sent;
 }
