@@ -22,7 +22,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #ifndef UniversalTelegramBot_h
 #define UniversalTelegramBot_h
 
-//#define TELEGRAM_DEBUG 1
+// fcw: hier wird der Bibliotheks Debug-Schalter gesetzt (entkommentiert fuer seriellen DEBUG)
+// #define TELEGRAM_DEBUG 1
 #define ARDUINOJSON_DECODE_UNICODE 1
 #define ARDUINOJSON_USE_LONG_LONG 1
 #include <Arduino.h>
@@ -128,7 +129,10 @@ public:
   unsigned int waitForResponse = 1500;
   int _lastError;
   int last_sent_message_id = 0;
+// fcw: 2022-09-27: wenn maxMessageLength kleiner geht es aber nicht mehr.
   int maxMessageLength = 1500;
+// fcw: Antwort Laenge beschraenken, damit Flooding nicht auch noch zurueck gesendet wird. Laenge der Antwort: siehe response.length() Achtung: ohne Inhalt (text) ist die Laenge schon 356 gross. Maximaler Befehl (/open_with_supercode...) ist 391 Zeichen insgesamt
+unsigned int maxResponseLength = 400;
 
 private:
   // JsonObject * parseUpdates(String response);
