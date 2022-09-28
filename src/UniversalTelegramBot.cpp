@@ -379,7 +379,7 @@ int UniversalTelegramBot::getUpdates(long offset) {
 // Siehe auch: https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot/issues/266#issuecomment-985013894
 
 // Robert:
-// If deserializeJson happen to endup with an error for instance update to big for
+// If deserializeJson happen to endup with an error for instance update too big for
 // the buffer, then last_message_received will not be updated.
 // Subsequent calls to getUpdates uses last_message_received + 1 for the offset value.
 // But as last_message_received was not updated we will allways read the same message.
@@ -407,7 +407,8 @@ int UniversalTelegramBot::getUpdates(long offset) {
     // close the client as there's nothing to do with an empty string
     closeClient();
     return 0;
-  } else {
+  } 
+  else {
     #ifdef TELEGRAM_DEBUG  
       Serial.print(F("incoming message length "));
       Serial.println(response.length());
@@ -418,11 +419,12 @@ int UniversalTelegramBot::getUpdates(long offset) {
     DynamicJsonDocument doc(maxMessageLength);
     DeserializationError error = deserializeJson(doc, ZERO_COPY(response));
       
-    if (!error) {
+// fcw: 2022-09-28: Hack. Nicht, wenn response zu lang (maxResponseLength in der Header Z135)
+    if ((!error) && (response.length() < maxResponseLength)) {
       #ifdef TELEGRAM_DEBUG  
         Serial.print(F("GetUpdates parsed jsonObj: "));
         serializeJson(doc, Serial);
-        Serial.println();
+        Serial.println();        
       #endif
       if (doc.containsKey("result")) {
         int resultArrayLength = doc["result"].size();
@@ -447,6 +449,17 @@ int UniversalTelegramBot::getUpdates(long offset) {
         #endif
       }
     } else { // Parsing failed
+		// fcw: fuer Seriellen Debug 
+		if (response.length() >= maxResponseLength) {
+    	#ifdef TELEGRAM_DEBUG  
+	        Serial.print(F("Received too long string in response! response.length(): "));
+	        Serial.println(response.length());
+	        Serial.print(F("last_message_received: "));
+	        Serial.println(last_message_received);        
+	        Serial.print(F("candidate: "));
+	        Serial.println(candidate);          
+    	#endif
+    	}
         // Robert: try to update last_message_received 
 	    if ( candidate != -1 ) last_message_received = candidate;	  	  
 	    // End Robert
