@@ -56,7 +56,7 @@ void handleNewMessages(int numNewMessages)
       delay(4000);
       bot.sendMessage(chat_id, "Did you see the action message?");
 
-      // You can't use own message, just choose from one of bellow
+      // You must select one of the below messages, you cannot use your own.
 
       //typing for text messages
       //upload_photo for photos
