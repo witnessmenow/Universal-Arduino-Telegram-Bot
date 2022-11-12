@@ -587,8 +587,11 @@ bool UniversalTelegramBot::sendMessageWithReplyKeyboard(
     payload["parse_mode"] = parse_mode;
 
   JsonObject replyMarkup = payload.createNestedObject("reply_markup");
-    
-  replyMarkup["keyboard"] = serialized(keyboard);
+  
+  if (keyboard.isEmpty())
+    replyMarkup["remove_keyboard"] = true;
+  else
+    replyMarkup["keyboard"] = serialized(keyboard);
 
   // Telegram defaults these values to false, so to decrease the size of the
   // payload we will only send them if needed
