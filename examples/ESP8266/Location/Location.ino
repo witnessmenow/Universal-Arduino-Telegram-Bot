@@ -42,6 +42,7 @@ void handleNewMessages(int numNewMessages)
       String message = "Long: " + String(bot.messages[i].longitude, 6) + "\n";
       message += "Lat: " + String(bot.messages[i].latitude, 6) + "\n";
       bot.sendMessage(chat_id, message, "Markdown");
+      bot.sendLocation(chat_id,bot.messages[i].latitude,bot.messages[i].longitude);
     }
     else if (text == "/start")
     {
