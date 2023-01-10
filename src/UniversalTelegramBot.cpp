@@ -769,6 +769,40 @@ bool UniversalTelegramBot::sendChatAction(const String& chat_id, const String& t
   return sent;
 }
 
+bool UniversalTelegramBot::sendLocation(const String& chat_id, const float latitude, const float longitude, uint16_t live_period) {
+
+  bool sent = false;
+  #ifdef TELEGRAM_DEBUG
+    Serial.println(F("SEND Location Message"));
+  #endif
+  unsigned long sttime = millis();
+
+    while (millis() - sttime < 8000ul) { // loop for a while to send the message
+      String command = BOT_CMD("sendLocation?chat_id=");
+      command += chat_id;
+      command += F("&latitude=");
+      command += String(latitude,6);
+      command += F("&longitude=");
+      command += String(longitude,6);
+      if ((live_period >= 60) && (live_period <= 86400)) {
+          command += F("&live_period=");
+          command += String(live_period);
+      }
+
+      String response = sendGetToTelegram(command);
+
+      #ifdef TELEGRAM_DEBUG
+        Serial.println(response);
+      #endif
+      sent = checkForOkResponse(response);
+
+      if (sent) break;
+    }
+
+  closeClient();
+  return sent;
+}
+
 void UniversalTelegramBot::closeClient() {
   if (client->connected()) {
     #ifdef TELEGRAM_DEBUG  
