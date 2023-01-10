@@ -94,7 +94,8 @@ public:
                                      const String& parse_mode, const String& keyboard, int message_id = 0);
 
   bool sendChatAction(const String& chat_id, const String& text);
-
+  bool sendLocation(const String& chat_id, const float latitude, const float longitude, const uint16_t live_period=0);
+  
   bool sendPostMessage(JsonObject payload, bool edit = false); 
   String sendPostPhoto(JsonObject payload);
   String sendPhotoByBinary(const String& chat_id, const String& contentType, int fileSize,
