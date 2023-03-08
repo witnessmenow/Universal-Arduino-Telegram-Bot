@@ -48,6 +48,7 @@ struct telegramMessage {
   String chat_title;
   String from_id;
   String from_name;
+  String username;
   String date;
   String type;
   String file_caption;
