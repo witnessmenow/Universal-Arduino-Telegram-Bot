@@ -444,6 +444,7 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
     messages[messageIndex].text = F("");
     messages[messageIndex].from_id = F("");
     messages[messageIndex].from_name = F("");
+    messages[messageIndex].username= F("");
     messages[messageIndex].longitude = 0;
     messages[messageIndex].latitude = 0;
     messages[messageIndex].reply_to_message_id = 0;
@@ -455,6 +456,7 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
       messages[messageIndex].type = F("message");
       messages[messageIndex].from_id = message["from"]["id"].as<String>();
       messages[messageIndex].from_name = message["from"]["first_name"].as<String>();
+      messages[messageIndex].username= message["from"]["username"].as<String>();
       messages[messageIndex].date = message["date"].as<String>();
       messages[messageIndex].chat_id = message["chat"]["id"].as<String>();
       messages[messageIndex].chat_title = message["chat"]["title"].as<String>();
@@ -495,6 +497,7 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
       messages[messageIndex].type = F("callback_query");
       messages[messageIndex].from_id = message["from"]["id"].as<String>();
       messages[messageIndex].from_name = message["from"]["first_name"].as<String>();
+      messages[messageIndex].username= message["from"]["username"].as<String>();
       messages[messageIndex].text = message["data"].as<String>();
       messages[messageIndex].date = message["date"].as<String>();
       messages[messageIndex].chat_id = message["message"]["chat"]["id"].as<String>();
@@ -508,6 +511,7 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
       messages[messageIndex].type = F("edited_message");
       messages[messageIndex].from_id = message["from"]["id"].as<String>();
       messages[messageIndex].from_name = message["from"]["first_name"].as<String>();
+      messages[messageIndex].username= message["from"]["username"].as<String>();
       messages[messageIndex].date = message["date"].as<String>();
       messages[messageIndex].chat_id = message["chat"]["id"].as<String>();
       messages[messageIndex].chat_title = message["chat"]["title"].as<String>();
