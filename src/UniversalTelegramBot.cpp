@@ -436,7 +436,7 @@ int UniversalTelegramBot::getUpdates(long offset) {
 }
 
 bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
-  int update_id = result["update_id"];
+  long update_id = result["update_id"];
   // Check have we already dealt with this message (this shouldn't happen!)
   if (last_message_received != update_id) {
     last_message_received = update_id;
