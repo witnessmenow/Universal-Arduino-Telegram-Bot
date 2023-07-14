@@ -641,7 +641,7 @@ bool UniversalTelegramBot::sendPostMessage(JsonObject payload, bool edit) { // a
 
   if (payload.containsKey("text")) {
     while (millis() < sttime + 8000) { // loop for a while to send the message
-        String response = sendPostToTelegram((edit ? BOT_CMD("editMessageText") : BOT_CMD("sendMessage")), payload); // if edit is true we send a editMessageText CMD
+        String response = sendPostToTelegram((edit ? payload["text"] == "" ? BOT_CMD("editMessageReplyMarkup") : BOT_CMD("editMessageText") : BOT_CMD("sendMessage")), payload); // if edit is true we send a editMessageText CMD
          #ifdef TELEGRAM_DEBUG  
         Serial.println(response);
       #endif
