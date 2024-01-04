@@ -3,7 +3,7 @@
     with whatever message you send it.
 
     Parts:
-    ESP32 D1 Mini stlye Dev board* - http://s.click.aliexpress.com/e/C6ds4my
+    ESP32 D1 Mini style Dev board* - http://s.click.aliexpress.com/e/C6ds4my
     (or any ESP32 board)
 
       = Affilate

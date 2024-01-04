@@ -72,7 +72,7 @@ String UniversalTelegramBot::sendGetToTelegram(const String& command) {
     #endif
     if (!client->connect(TELEGRAM_HOST, TELEGRAM_SSL_PORT)) {
       #ifdef TELEGRAM_DEBUG  
-        Serial.println(F("[BOT]Conection error"));
+        Serial.println(F("[BOT]Connection error"));
       #endif
     }
   }
@@ -149,7 +149,7 @@ String UniversalTelegramBot::sendPostToTelegram(const String& command, JsonObjec
     #endif
     if (!client->connect(TELEGRAM_HOST, TELEGRAM_SSL_PORT)) {
       #ifdef TELEGRAM_DEBUG  
-        Serial.println(F("[BOT Client]Conection error"));
+        Serial.println(F("[BOT Client]Connection error"));
       #endif
     }
   }
@@ -204,7 +204,7 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
     #endif
     if (!client->connect(TELEGRAM_HOST, TELEGRAM_SSL_PORT)) {
       #ifdef TELEGRAM_DEBUG  
-        Serial.println(F("[BOT Client]Conection error"));
+        Serial.println(F("[BOT Client]Connection error"));
       #endif
     }
   }
@@ -319,7 +319,7 @@ bool UniversalTelegramBot::getMe() {
 
 /*********************************************************************************
  * SetMyCommands - Update the command list of the bot on the telegram server     *
- * (Argument to pass: Serialied array of BotCommand)                             *
+ * (Argument to pass: Serialized array of BotCommand)                            *
  * CAUTION: All commands must be lower-case                                      *
  * Returns true, if the command list was updated successfully                    *
  ********************************************************************************/
@@ -348,9 +348,9 @@ bool UniversalTelegramBot::setMyCommands(const String& commandArray) {
 
 
 /***************************************************************
- * GetUpdates - function to receive messages from telegram *
- * (Argument to pass: the last+1 message to read)             *
- * Returns the number of new messages           *
+ * GetUpdates - function to receive messages from telegram     *
+ * (Argument to pass: the last+1 message to read)              *
+ * Returns the number of new messages                          *
  ***************************************************************/
 int UniversalTelegramBot::getUpdates(long offset) {
 
