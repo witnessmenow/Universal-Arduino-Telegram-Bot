@@ -444,6 +444,7 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
     messages[messageIndex].text = F("");
     messages[messageIndex].from_id = F("");
     messages[messageIndex].from_name = F("");
+    messages[messageIndex].username= F("");
     messages[messageIndex].longitude = 0;
     messages[messageIndex].latitude = 0;
     messages[messageIndex].reply_to_message_id = 0;
@@ -455,6 +456,7 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
       messages[messageIndex].type = F("message");
       messages[messageIndex].from_id = message["from"]["id"].as<String>();
       messages[messageIndex].from_name = message["from"]["first_name"].as<String>();
+      messages[messageIndex].username= message["from"]["username"].as<String>();
       messages[messageIndex].date = message["date"].as<String>();
       messages[messageIndex].chat_id = message["chat"]["id"].as<String>();
       messages[messageIndex].chat_title = message["chat"]["title"].as<String>();
@@ -495,6 +497,7 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
       messages[messageIndex].type = F("callback_query");
       messages[messageIndex].from_id = message["from"]["id"].as<String>();
       messages[messageIndex].from_name = message["from"]["first_name"].as<String>();
+      messages[messageIndex].username= message["from"]["username"].as<String>();
       messages[messageIndex].text = message["data"].as<String>();
       messages[messageIndex].date = message["date"].as<String>();
       messages[messageIndex].chat_id = message["message"]["chat"]["id"].as<String>();
@@ -508,6 +511,7 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
       messages[messageIndex].type = F("edited_message");
       messages[messageIndex].from_id = message["from"]["id"].as<String>();
       messages[messageIndex].from_name = message["from"]["first_name"].as<String>();
+      messages[messageIndex].username= message["from"]["username"].as<String>();
       messages[messageIndex].date = message["date"].as<String>();
       messages[messageIndex].chat_id = message["chat"]["id"].as<String>();
       messages[messageIndex].chat_title = message["chat"]["title"].as<String>();
@@ -764,6 +768,40 @@ bool UniversalTelegramBot::sendChatAction(const String& chat_id, const String& t
       
     }
   }
+
+  closeClient();
+  return sent;
+}
+
+bool UniversalTelegramBot::sendLocation(const String& chat_id, const float latitude, const float longitude, uint16_t live_period) {
+
+  bool sent = false;
+  #ifdef TELEGRAM_DEBUG
+    Serial.println(F("SEND Location Message"));
+  #endif
+  unsigned long sttime = millis();
+
+    while (millis() - sttime < 8000ul) { // loop for a while to send the message
+      String command = BOT_CMD("sendLocation?chat_id=");
+      command += chat_id;
+      command += F("&latitude=");
+      command += String(latitude,6);
+      command += F("&longitude=");
+      command += String(longitude,6);
+      if ((live_period >= 60) && (live_period <= 86400)) {
+          command += F("&live_period=");
+          command += String(live_period);
+      }
+
+      String response = sendGetToTelegram(command);
+
+      #ifdef TELEGRAM_DEBUG
+        Serial.println(response);
+      #endif
+      sent = checkForOkResponse(response);
+
+      if (sent) break;
+    }
 
   closeClient();
   return sent;
