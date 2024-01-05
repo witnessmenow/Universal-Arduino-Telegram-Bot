@@ -77,6 +77,11 @@ void setup()
   }
   Serial.println(now);
 
+  Serial.println("Print command list");
+  String cmdList;
+  bot.getMyCommands(cmdList);
+  Serial.println(cmdList);  
+  
   bot_setup();
 }
 
