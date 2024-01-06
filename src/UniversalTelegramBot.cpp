@@ -38,9 +38,10 @@
 #define ZERO_COPY(STR)    ((char*)STR.c_str())
 #define BOT_CMD(STR)      buildCommand(F(STR))
 
-UniversalTelegramBot::UniversalTelegramBot(const String& token, Client &client) {
+UniversalTelegramBot::UniversalTelegramBot(const String& token, Client &client, int maxMessageLength) {
   updateToken(token);
   this->client = &client;
+  this->maxMessageLength = maxMessageLength;
 }
 
 void UniversalTelegramBot::updateToken(const String& token) {
@@ -63,7 +64,7 @@ String UniversalTelegramBot::buildCommand(const String& cmd) {
 }
 
 String UniversalTelegramBot::sendGetToTelegram(const String& command) {
-  String body, headers;
+  String body;
   
   // Connect with api.telegram.org if not already connected
   if (!client->connected()) {
@@ -90,27 +91,43 @@ String UniversalTelegramBot::sendGetToTelegram(const String& command) {
     client->println(F("Cache-Control: no-cache"));
     client->println();
 
-    readHTTPAnswer(body, headers);
+    readHTTPAnswer(body);
   }
 
   return body;
 }
 
-bool UniversalTelegramBot::readHTTPAnswer(String &body, String &headers) {
+bool UniversalTelegramBot::readHTTPAnswer(String &body) {
   int ch_count = 0;
   unsigned long now = millis();
   bool finishedHeaders = false;
   bool currentLineIsBlank = true;
   bool responseReceived = false;
+  int toRead = 0;
+  String headers;
 
   while (millis() - now < longPoll * 1000 + waitForResponse) {
     while (client->available()) {
       char c = client->read();
-      responseReceived = true;
 
       if (!finishedHeaders) {
         if (currentLineIsBlank && c == '\n') {
           finishedHeaders = true;
+
+		  String headerLC = String(headers);
+          headerLC.toLowerCase();
+          int ind1 = headerLC.indexOf("content-length");
+          if (ind1 != -1) {
+            int ind2 = headerLC.indexOf("\r", ind1 + 15);
+            if (ind2 != -1) {
+              toRead = headerLC.substring(ind1 + 15, ind2).toInt();
+              headers = "";
+              #ifdef TELEGRAM_DEBUG
+                Serial.print(F("Content-Length: "));
+                Serial.println(toRead);
+              #endif
+            }
+          }
         } else {
           headers += c;
         }
@@ -118,6 +135,7 @@ bool UniversalTelegramBot::readHTTPAnswer(String &body, String &headers) {
         if (ch_count < maxMessageLength) {
           body += c;
           ch_count++;
+          responseReceived = toRead > 0 ? ch_count == toRead : true;
         }
       }
 
@@ -126,21 +144,23 @@ bool UniversalTelegramBot::readHTTPAnswer(String &body, String &headers) {
     }
 
     if (responseReceived) {
-      #ifdef TELEGRAM_DEBUG  
-        Serial.println();
-        Serial.println(body);
-        Serial.println();
-      #endif
       break;
     }
   }
+
+  #ifdef TELEGRAM_DEBUG
+    Serial.println(F("Body:"));
+    Serial.println(body);
+    Serial.print(F("ch_count: "));
+    Serial.println(ch_count);
+  #endif
+
   return responseReceived;
 }
 
 String UniversalTelegramBot::sendPostToTelegram(const String& command, JsonObject payload) {
 
   String body;
-  String headers;
 
   // Connect with api.telegram.org if not already connected
   if (!client->connected()) {
@@ -175,10 +195,11 @@ String UniversalTelegramBot::sendPostToTelegram(const String& command, JsonObjec
     
     client->println(out);
     #ifdef TELEGRAM_DEBUG
-        Serial.println(String("Posting:") + out);
+      Serial.print(F("Posting: "));
+      Serial.println(out);
     #endif
 
-    readHTTPAnswer(body, headers);
+    readHTTPAnswer(body);
   }
 
   return body;
@@ -193,7 +214,6 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
     GetNextBufferLen getNextBufferLenCallback) {
 
   String body;
-  String headers;
   
   const String boundary = F("------------------------b8f610217e83e29b");
 
@@ -251,7 +271,8 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
     client->print(start_request);
 
     #ifdef TELEGRAM_DEBUG  
-     Serial.print("Start request: " + start_request);
+     Serial.print(F("Start request: "));
+     Serial.println(start_request);
     #endif
 
     if (getNextByteCallback == nullptr) {
@@ -290,9 +311,10 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
 
     client->print(end_request);
     #ifdef TELEGRAM_DEBUG  
-        Serial.print("End request: " + end_request);
+      Serial.print(F("End request: "));
+      Serial.println(end_request);
     #endif
-    readHTTPAnswer(body, headers);
+    readHTTPAnswer(body);
   }
 
   closeClient();
@@ -328,15 +350,16 @@ bool UniversalTelegramBot::setMyCommands(const String& commandArray) {
   payload["commands"] = serialized(commandArray);
   bool sent = false;
   String response = "";
-  #if defined(_debug)
-  Serial.println(F("sendSetMyCommands: SEND Post /setMyCommands"));
-  #endif  // defined(_debug)
+  #ifdef TELEGRAM_DEBUG
+    Serial.println(F("sendSetMyCommands: SEND Post /setMyCommands"));
+  #endif
   unsigned long sttime = millis();
 
   while (millis() - sttime < 8000ul) { // loop for a while to send the message
     response = sendPostToTelegram(BOT_CMD("setMyCommands"), payload.as<JsonObject>());
-    #ifdef _debug  
-    Serial.println("setMyCommands response" + response);
+    #ifdef TELEGRAM_DEBUG
+      Serial.println(F("setMyCommands response:"));
+      Serial.println(response);
     #endif
     sent = checkForOkResponse(response);
     if (sent) break;
@@ -367,6 +390,7 @@ int UniversalTelegramBot::getUpdates(long offset) {
     command += String(longPoll);
   }
   String response = sendGetToTelegram(command); // receive reply from telegram.org
+  long updateId = getUpdateIdFromResponse(response);
 
   if (response == "") {
     #ifdef TELEGRAM_DEBUG  
@@ -415,6 +439,9 @@ int UniversalTelegramBot::getUpdates(long offset) {
         #endif
       }
     } else { // Parsing failed
+      Serial.print(F("Update ID with error: "));
+      Serial.println(updateId);
+
       if (response.length() < 2) { // Too short a message. Maybe a connection issue
         #ifdef TELEGRAM_DEBUG  
             Serial.println(F("Parsing error: Message too short"));
@@ -431,6 +458,15 @@ int UniversalTelegramBot::getUpdates(long offset) {
     }
     // Close the client as no response is to be given
     closeClient();
+
+    if (error && response.length() == (unsigned) maxMessageLength) {
+        Serial.print(F("The message with update ID "));
+        Serial.print(updateId);
+        Serial.println(F(" is too long and was skipped. The next update ID has been sent for processing."));
+
+        return getUpdates(updateId + 1);
+    }
+
     return 0;
   }
 }
@@ -560,7 +596,8 @@ bool UniversalTelegramBot::sendSimpleMessage(const String& chat_id, const String
 }
 
 bool UniversalTelegramBot::sendMessage(const String& chat_id, const String& text,
-                                       const String& parse_mode, int message_id) { // added message_id
+                                       const String& parse_mode, int message_id, bool disable_web_page_preview,
+                                       bool disable_notification) {
 
   DynamicJsonDocument payload(maxMessageLength);
   payload["chat_id"] = chat_id;
@@ -572,7 +609,48 @@ bool UniversalTelegramBot::sendMessage(const String& chat_id, const String& text
   if (parse_mode != "")
     payload["parse_mode"] = parse_mode;
 
+  if (disable_web_page_preview)
+    payload["disable_web_page_preview"] = disable_web_page_preview;
+
+  if (disable_notification)
+    payload["disable_notification"] = disable_notification;
+
   return sendPostMessage(payload.as<JsonObject>(), message_id); // if message id == 0 then edit is false, else edit is true
+}
+
+/***********************************************************************
+ * DeleteMessage - function to delete message by message_id            *
+ * Function description and limitations:                               *
+ * https://core.telegram.org/bots/api#deletemessage                    *
+ ***********************************************************************/
+bool UniversalTelegramBot::deleteMessage(const String& chat_id, int message_id) {
+  if (message_id == 0)
+  {
+    #ifdef TELEGRAM_DEBUG
+	  Serial.println(F("deleteMessage: message_id not passed for deletion"));
+	#endif
+    return false;
+  }
+
+  DynamicJsonDocument payload(maxMessageLength);
+  payload["chat_id"] = chat_id;
+  payload["message_id"] = message_id;
+
+  #ifdef TELEGRAM_DEBUG
+    Serial.print(F("deleteMessage: SEND Post Message: "));
+    serializeJson(payload, Serial);
+    Serial.println();
+  #endif
+
+  String response = sendPostToTelegram(BOT_CMD("deleteMessage"), payload.as<JsonObject>());
+  #ifdef TELEGRAM_DEBUG
+     Serial.print(F("deleteMessage response:"));
+     Serial.println(response);
+  #endif
+
+  bool sent = checkForOkResponse(response);
+  closeClient();
+  return sent;
 }
 
 bool UniversalTelegramBot::sendMessageWithReplyKeyboard(
@@ -608,7 +686,7 @@ bool UniversalTelegramBot::sendMessageWithInlineKeyboard(const String& chat_id,
                                                          const String& text,
                                                          const String& parse_mode,
                                                          const String& keyboard,
-                                                         int message_id) {   // added message_id
+                                                         int message_id) {
 
   DynamicJsonDocument payload(maxMessageLength);
   payload["chat_id"] = chat_id;
@@ -809,11 +887,37 @@ bool UniversalTelegramBot::answerCallbackQuery(const String &query_id, const Str
   if (url.length() > 0) payload["url"] = url;
 
   String response = sendPostToTelegram(BOT_CMD("answerCallbackQuery"), payload.as<JsonObject>());
-  #ifdef _debug  
+  #ifdef TELEGRAM_DEBUG
      Serial.print(F("answerCallbackQuery response:"));
      Serial.println(response);
   #endif
   bool answer = checkForOkResponse(response);
   closeClient();
   return answer;
+}
+
+long UniversalTelegramBot::getUpdateIdFromResponse(String response) {
+  response.remove(response.indexOf("\n"));
+
+  char updateId[20];
+  const char *str = response.c_str();
+
+  while(*str != '\0')
+  {
+    if (*str == '\r') {
+      break;
+    }
+
+    str++;
+
+    int i = 0;
+    while('0' <= *str && *str <= '9')
+    {
+      updateId[i] = *str;
+      i++;
+      str++;
+    }
+  }
+
+  return atol(updateId);
 }
