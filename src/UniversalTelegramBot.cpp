@@ -256,11 +256,33 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
 
     if (getNextByteCallback == nullptr) {
         while (moreDataAvailableCallback()) {
-            client->write((const uint8_t *)getNextBufferCallback(), getNextBufferLenCallback());
-            #ifdef TELEGRAM_DEBUG  
-             Serial.println(F("Sending photo from buffer"));
-            #endif
+           //split the buffer into chunks 512b for big buffers (example for framebuffer higher resolution photos (>320x240))
+            unsigned int fbSize = getNextBufferLenCallback() ;
+            uint8_t* fBuffer = getNextBufferCallback();
+           
+            uint8_t buffer[512];
+            unsigned int count = 0;
+            unsigned int i = 0;
+            while (i <= fbSize) {
+                buffer[count] = fBuffer[i];
+                i++;
+                count++;
+                if (count == 512) {
+                    #ifdef TELEGRAM_DEBUG  
+                        Serial.println(F("Sending photo from buffer - chunk"));
+                    #endif
+                    client->write((const uint8_t *)buffer, 512);
+                    count = 0;
+                }
             }
+            if (count > 0) {
+                #ifdef TELEGRAM_DEBUG  
+                    Serial.println(F("Sending photo from buffer - remaining chunk"));
+                    Serial.println(count);
+                #endif
+                client->write((const uint8_t *)buffer, count);
+            }
+        }
     } else {
         #ifdef TELEGRAM_DEBUG  
             Serial.println(F("Sending photo by binary"));
