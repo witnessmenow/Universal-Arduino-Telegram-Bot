@@ -35,7 +35,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #define HANDLE_MESSAGES 1
 
 //unmark following line to enable debug mode
-//#define _debug
+//#define TELEGRAM_DEBUG
 
 typedef bool (*MoreDataAvailable)();
 typedef byte (*GetNextByte)();
