@@ -1,5 +1,5 @@
 /*******************************************************************
-    A telegram bot for your ESP32 that controls the 
+    A telegram bot for your ESP32 that controls the
     onboard LED. The LED in this example is active low.
 
     Parts:
@@ -54,7 +54,7 @@ void handleNewMessages(int numNewMessages)
 
     if (text == "/ledon")
     {
-      digitalWrite(ledPin, LOW); // turn the LED on (HIGH is the voltage level)
+      digitalWrite(ledPin, HIGH); // turn the LED on (HIGH is the voltage level)
       ledStatus = 1;
       bot.sendMessage(chat_id, "Led is ON", "");
     }
@@ -62,7 +62,7 @@ void handleNewMessages(int numNewMessages)
     if (text == "/ledoff")
     {
       ledStatus = 0;
-      digitalWrite(ledPin, HIGH); // turn the LED off (LOW is the voltage level)
+      digitalWrite(ledPin, LOW); // turn the LED off (LOW is the voltage level)
       bot.sendMessage(chat_id, "Led is OFF", "");
     }
 
