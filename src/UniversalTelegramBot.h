@@ -22,7 +22,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #ifndef UniversalTelegramBot_h
 #define UniversalTelegramBot_h
 
-//#define TELEGRAM_DEBUG 1
 #define ARDUINOJSON_DECODE_UNICODE 1
 #define ARDUINOJSON_USE_LONG_LONG 1
 #include <Arduino.h>
@@ -35,7 +34,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #define HANDLE_MESSAGES 1
 
 //unmark following line to enable debug mode
-//#define _debug
+// #define TELEGRAM_DEBUG
 
 typedef bool (*MoreDataAvailable)();
 typedef byte (*GetNextByte)();
@@ -86,6 +85,7 @@ public:
 
   bool sendSimpleMessage(const String& chat_id, const String& text, const String& parse_mode);
   bool sendMessage(const String& chat_id, const String& text, const String& parse_mode = "", int message_id = 0);
+  bool deleteMessage(const String& chat_id, int message_id);
   bool sendMessageWithReplyKeyboard(const String& chat_id, const String& text,
                                     const String& parse_mode, const String& keyboard,
                                     bool resize = false, bool oneTime = false,
@@ -127,6 +127,7 @@ public:
   int _lastError;
   int last_sent_message_id = 0;
   int maxMessageLength = 1500;
+  unsigned int maxResponseLength = 1500;
 
 private:
   // JsonObject * parseUpdates(String response);
