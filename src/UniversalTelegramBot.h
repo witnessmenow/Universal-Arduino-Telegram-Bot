@@ -22,8 +22,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #ifndef UniversalTelegramBot_h
 #define UniversalTelegramBot_h
 
-// fcw: hier wird der Bibliotheks Debug-Schalter gesetzt (entkommentiert fuer seriellen DEBUG)
-// #define TELEGRAM_DEBUG 1
 #define ARDUINOJSON_DECODE_UNICODE 1
 #define ARDUINOJSON_USE_LONG_LONG 1
 #include <Arduino.h>
@@ -36,7 +34,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #define HANDLE_MESSAGES 1
 
 //unmark following line to enable debug mode
-//#define _debug
+// #define TELEGRAM_DEBUG
 
 typedef bool (*MoreDataAvailable)();
 typedef byte (*GetNextByte)();
@@ -87,7 +85,6 @@ public:
 
   bool sendSimpleMessage(const String& chat_id, const String& text, const String& parse_mode);
   bool sendMessage(const String& chat_id, const String& text, const String& parse_mode = "", int message_id = 0);
-// fcw: 2022-09-19: Nachrichten loeschen...
   bool deleteMessage(const String& chat_id, int message_id);
   bool sendMessageWithReplyKeyboard(const String& chat_id, const String& text,
                                     const String& parse_mode, const String& keyboard,
@@ -129,10 +126,8 @@ public:
   unsigned int waitForResponse = 1500;
   int _lastError;
   int last_sent_message_id = 0;
-// fcw: 2022-09-27: wenn maxMessageLength kleiner geht es aber nicht mehr.
   int maxMessageLength = 1500;
-// fcw: Antwort Laenge beschraenken, damit Flooding nicht auch noch zurueck gesendet wird. Laenge der Antwort: siehe response.length() Achtung: ohne Inhalt (text) ist die Laenge schon 356 gross. Maximaler Befehl (/open_with_supercode...) ist 391 Zeichen insgesamt
-unsigned int maxResponseLength = 400;
+  unsigned int maxResponseLength = 1500;
 
 private:
   // JsonObject * parseUpdates(String response);

@@ -37,8 +37,6 @@
 
 #define ZERO_COPY(STR)    ((char*)STR.c_str())
 #define BOT_CMD(STR)      buildCommand(F(STR))
-// fcw: 2022-07-13: DEBUG
-// #define TELEGRAM_DEBUG
 
 UniversalTelegramBot::UniversalTelegramBot(const String& token, Client &client) {
   updateToken(token);
@@ -330,14 +328,14 @@ bool UniversalTelegramBot::setMyCommands(const String& commandArray) {
   payload["commands"] = serialized(commandArray);
   bool sent = false;
   String response = "";
-  #if defined(_debug)
+  #ifdef TELEGRAM_DEBUG
   Serial.println(F("sendSetMyCommands: SEND Post /setMyCommands"));
-  #endif  // defined(_debug)
+  #endif
   unsigned long sttime = millis();
 
   while (millis() - sttime < 8000ul) { // loop for a while to send the message
     response = sendPostToTelegram(BOT_CMD("setMyCommands"), payload.as<JsonObject>());
-    #ifdef _debug  
+    #ifdef TELEGRAM_DEBUG
     Serial.println("setMyCommands response" + response);
     #endif
     sent = checkForOkResponse(response);
@@ -369,21 +367,13 @@ int UniversalTelegramBot::getUpdates(long offset) {
     command += String(longPoll);
   }
   String response = sendGetToTelegram(command); // receive reply from telegram.org
-
-// fcw: 2022-07-13: Bug bei zu grossen Nachrichten, die werden immer wieder abgerufen und blockieren die Abfrage
-// so gemacht mit einer 1500 Zeichen grossen Nachricht von Cat (5306541440), danach ging es nicht mehr.
-// RobertGnz hat dazu schon einen issue geoeffnet, siehe:
-// https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot/issues/275
-// Aenderungen sind mit // Robert und // End Robert gerahmt (hier und weiter unten noch eine Zeile).
-// Nach der Aenderung von Robert ging es wieder.
-// Siehe auch: https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot/issues/266#issuecomment-985013894
-
-// Robert:
-// If deserializeJson happen to endup with an error for instance update too big for
+// RobertGnz: If deserializeJson happen to endup with an error for instance update too big for
 // the buffer, then last_message_received will not be updated.
 // Subsequent calls to getUpdates uses last_message_received + 1 for the offset value.
 // But as last_message_received was not updated we will allways read the same message.
 // Here we try to find the update_id and store it to update last_message_received if necessary.
+// See: https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot/issues/275
+// and: https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot/issues/266#issuecomment-985013894
   char * pt1; char * pt2; long candidate;
   candidate = -1;
   pt1 = strstr_P( response.c_str(), (const char *) F("update_id"));
@@ -419,7 +409,7 @@ int UniversalTelegramBot::getUpdates(long offset) {
     DynamicJsonDocument doc(maxMessageLength);
     DeserializationError error = deserializeJson(doc, ZERO_COPY(response));
       
-// fcw: 2022-09-28: Hack. Nicht, wenn response zu lang (maxResponseLength in der Header Z135)
+// Not, if response is too long (maxResponseLength in UniversalTelegramBot.h in L135)
     if ((!error) && (response.length() < maxResponseLength)) {
       #ifdef TELEGRAM_DEBUG  
         Serial.print(F("GetUpdates parsed jsonObj: "));
@@ -449,7 +439,7 @@ int UniversalTelegramBot::getUpdates(long offset) {
         #endif
       }
     } else { // Parsing failed
-		// fcw: fuer Seriellen Debug 
+		// serial Debug 
 		if (response.length() >= maxResponseLength) {
     	#ifdef TELEGRAM_DEBUG  
 	        Serial.print(F("Received too long string in response! response.length(): "));
@@ -460,9 +450,9 @@ int UniversalTelegramBot::getUpdates(long offset) {
 	        Serial.println(candidate);          
     	#endif
     	}
-        // Robert: try to update last_message_received 
+        // RobertGnz: try to update last_message_received 
 	    if ( candidate != -1 ) last_message_received = candidate;	  	  
-	    // End Robert
+	    // End RobertGnz
 	  
         if (response.length() < 2) { // Too short a message. Maybe a connection issue
           #ifdef TELEGRAM_DEBUG  
@@ -858,7 +848,7 @@ bool UniversalTelegramBot::answerCallbackQuery(const String &query_id, const Str
   if (url.length() > 0) payload["url"] = url;
 
   String response = sendPostToTelegram(BOT_CMD("answerCallbackQuery"), payload.as<JsonObject>());
-  #ifdef _debug  
+  #ifdef TELEGRAM_DEBUG
      Serial.print(F("answerCallbackQuery response:"));
      Serial.println(response);
   #endif
@@ -867,28 +857,37 @@ bool UniversalTelegramBot::answerCallbackQuery(const String &query_id, const Str
   return answer;
 }
 
-// fcw: 2022-09-19: um Nachrichten zu loeschen, kopiert und angepasst von sendSimpleMessage(...)
+/***********************************************************************
+ * DeleteMessage - function to delete message by message_id            *
+ * Function description and limitations:                               *
+ * https://core.telegram.org/bots/api#deletemessage                    *
+ ***********************************************************************/
 bool UniversalTelegramBot::deleteMessage(const String& chat_id, int message_id) {
-  bool sent = false;
-  #ifdef TELEGRAM_DEBUG  
-    Serial.println(F("deleteMessage: DELETE Message"));
-  #endif
-  unsigned long sttime = millis();
-
-  if (chat_id != "" && message_id != 0) {
-    while (millis() - sttime < 8000ul) { // loop for a while to send the message
-      String command = BOT_CMD("deleteMessage?chat_id=");
-      command += chat_id;
-      command += F("&message_id=");
-      command += String(message_id);
-      String response = sendGetToTelegram(command);
-      #ifdef TELEGRAM_DEBUG  
-        Serial.println(response);
-      #endif
-      sent = checkForOkResponse(response);
-      if (sent) break;
-    }
+  if (message_id == 0)
+  {
+    #ifdef TELEGRAM_DEBUG
+	  Serial.println(F("deleteMessage: message_id not passed for deletion"));
+	#endif
+    return false;
   }
+
+  DynamicJsonDocument payload(maxMessageLength);
+  payload["chat_id"] = chat_id;
+  payload["message_id"] = message_id;
+
+  #ifdef TELEGRAM_DEBUG
+    Serial.print(F("deleteMessage: SEND Post Message: "));
+    serializeJson(payload, Serial);
+    Serial.println();
+  #endif
+
+  String response = sendPostToTelegram(BOT_CMD("deleteMessage"), payload.as<JsonObject>());
+  #ifdef TELEGRAM_DEBUG
+     Serial.print(F("deleteMessage response:"));
+     Serial.println(response);
+  #endif
+
+  bool sent = checkForOkResponse(response);
   closeClient();
   return sent;
 }
