@@ -8,10 +8,6 @@ An Arduino IDE library for using Telegram Bot API. It's designed to be used with
 
 Join the [Arduino Telegram Library Group Chat](https://t.me/arduino_telegram_library) if you have any questions/feedback or would just like to be kept up to date with the library's progress.
 
-## Help support what I do!
-
-I have created a lot of different Arduino libraries that I hope people can make use of. [If you enjoy my work, please consider becoming a Github sponsor!](https://github.com/sponsors/witnessmenow/)
-
 ## Introduction
 
 This library provides an interface for [Telegram Bot API](https://core.telegram.org/bots/api).
@@ -23,6 +19,7 @@ This is a library forked from [one library](https://github.com/Gianbacchio/ESP82
 Each library only supported a single type of Arduino and had different features implemented. The only thing that needs to be different for each board is the actual sending of requests to Telegram so I thought a library that additional architectures or boards could be configured easily would be useful, although this springs to mind:
 
 ![alt text](https://imgs.xkcd.com/comics/standards.png "standards")
+
 
 ## Installing
 
