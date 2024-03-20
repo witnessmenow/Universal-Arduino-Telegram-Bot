@@ -53,6 +53,9 @@ struct telegramMessage {
   String file_caption;
   String file_path;
   String file_name;
+  String contact_phone_number;
+  String contact_name;
+  String contact_id;
   bool hasDocument;
   long file_size;
   float longitude;

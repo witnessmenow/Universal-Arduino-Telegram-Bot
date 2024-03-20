@@ -449,6 +449,9 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
     messages[messageIndex].reply_to_message_id = 0;
     messages[messageIndex].reply_to_text = F("");
     messages[messageIndex].query_id = F("");
+    messages[messageIndex].contact_phone_number = F("");
+    messages[messageIndex].contact_name = F("");
+    messages[messageIndex].contact_id = F("");    
 
     if (result.containsKey("message")) {
       JsonObject message = result["message"];
@@ -474,6 +477,10 @@ bool UniversalTelegramBot::processResult(JsonObject result, int messageIndex) {
           messages[messageIndex].hasDocument = true;
         else
           messages[messageIndex].hasDocument = false;
+      } else if (message.containsKey("contact")) {
+          messages[messageIndex].contact_phone_number = message["contact"]["phone_number"].as<String>();
+          messages[messageIndex].contact_name = message["contact"]["first_name"].as<String>();
+          messages[messageIndex].contact_id = message["contact"]["user_id"].as<String>();
       }
       if (message.containsKey("reply_to_message")) {
         messages[messageIndex].reply_to_message_id = message["reply_to_message"]["message_id"];
