@@ -25,7 +25,7 @@
 // Additional Libraries - each one of these will need to be installed.
 // ----------------------------
 #include <WiFiNINA.h>
-// Library for using network deatures of the official Arudino
+// Library for using network features of the official Arduino
 // Wifi Boards (MKR WiFi 1010, Nano 33 IOT etc)
 
 // Search for "nina" in the Arduino Library Manager

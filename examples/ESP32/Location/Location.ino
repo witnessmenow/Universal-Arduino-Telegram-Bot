@@ -1,5 +1,5 @@
 /*******************************************************************
- *  An example of recieving location Data
+ *  An example of receiving location Data
  *
  *
  *  By Brian Lough

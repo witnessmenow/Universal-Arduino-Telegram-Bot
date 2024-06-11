@@ -10,7 +10,7 @@
    Note:
    - Make sure that you have either selected ESP32 Wrover Module,
            or another board which has PSRAM enabled
-   - Choose "Huge App" partion scheme
+   - Choose "Huge App" partition scheme
 
    Some of the camera code comes from Rui Santos:
    https://randomnerdtutorials.com/esp32-cam-take-photo-save-microsd-card/
