@@ -302,7 +302,7 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
 
 bool UniversalTelegramBot::getMe() {
   String response = sendGetToTelegram(BOT_CMD("getMe")); // receive reply from telegram.org
-  DynamicJsonDocument doc(maxMessageLength);
+  JsonDocument doc;
   DeserializationError error = deserializeJson(doc, ZERO_COPY(response));
   closeClient();
 
@@ -324,7 +324,7 @@ bool UniversalTelegramBot::getMe() {
  * Returns true, if the command list was updated successfully                    *
  ********************************************************************************/
 bool UniversalTelegramBot::setMyCommands(const String& commandArray) {
-  DynamicJsonDocument payload(maxMessageLength);
+  JsonDocument payload;
   payload["commands"] = serialized(commandArray);
   bool sent = false;
   String response = "";
@@ -383,7 +383,7 @@ int UniversalTelegramBot::getUpdates(long offset) {
     #endif
 
     // Parse response into Json object
-    DynamicJsonDocument doc(maxMessageLength);
+    JsonDocument doc;
     DeserializationError error = deserializeJson(doc, ZERO_COPY(response));
       
     if (!error) {
@@ -562,7 +562,7 @@ bool UniversalTelegramBot::sendSimpleMessage(const String& chat_id, const String
 bool UniversalTelegramBot::sendMessage(const String& chat_id, const String& text,
                                        const String& parse_mode, int message_id) { // added message_id
 
-  DynamicJsonDocument payload(maxMessageLength);
+  JsonDocument payload;
   payload["chat_id"] = chat_id;
   payload["text"] = text;
 
@@ -579,14 +579,14 @@ bool UniversalTelegramBot::sendMessageWithReplyKeyboard(
     const String& chat_id, const String& text, const String& parse_mode, const String& keyboard,
     bool resize, bool oneTime, bool selective) {
     
-  DynamicJsonDocument payload(maxMessageLength);
+  JsonDocument payload;
   payload["chat_id"] = chat_id;
   payload["text"] = text;
 
   if (parse_mode != "")
     payload["parse_mode"] = parse_mode;
 
-  JsonObject replyMarkup = payload.createNestedObject("reply_markup");
+  JsonObject replyMarkup = payload["reply_markup"].to<JsonObject>();
     
   replyMarkup["keyboard"] = serialized(keyboard);
 
@@ -610,7 +610,7 @@ bool UniversalTelegramBot::sendMessageWithInlineKeyboard(const String& chat_id,
                                                          const String& keyboard,
                                                          int message_id) {   // added message_id
 
-  DynamicJsonDocument payload(maxMessageLength);
+  JsonDocument payload;
   payload["chat_id"] = chat_id;
   payload["text"] = text;
 
@@ -620,7 +620,7 @@ bool UniversalTelegramBot::sendMessageWithInlineKeyboard(const String& chat_id,
   if (parse_mode != "")
     payload["parse_mode"] = parse_mode;
 
-  JsonObject replyMarkup = payload.createNestedObject("reply_markup");
+  JsonObject replyMarkup = payload["reply_markup"].to<JsonObject>();
   replyMarkup["inline_keyboard"] = serialized(keyboard);
   return sendPostMessage(payload.as<JsonObject>(), message_id); // if message id == 0 then edit is false, else edit is true
 }
@@ -705,7 +705,7 @@ String UniversalTelegramBot::sendPhoto(const String& chat_id, const String& phot
                                        int reply_to_message_id,
                                        const String& keyboard) {
 
-  DynamicJsonDocument payload(maxMessageLength);
+  JsonDocument payload;
   payload["chat_id"] = chat_id;
   payload["photo"] = photo;
 
@@ -719,7 +719,7 @@ String UniversalTelegramBot::sendPhoto(const String& chat_id, const String& phot
       payload["reply_to_message_id"] = reply_to_message_id;
 
   if (keyboard.length() > 0) {
-    JsonObject replyMarkup = payload.createNestedObject("reply_markup");
+    JsonObject replyMarkup = payload["reply_markup"].to<JsonObject>();
     replyMarkup["keyboard"] = serialized(keyboard);
   }
 
@@ -728,7 +728,7 @@ String UniversalTelegramBot::sendPhoto(const String& chat_id, const String& phot
 
 bool UniversalTelegramBot::checkForOkResponse(const String& response) {
   int last_id;
-  DynamicJsonDocument doc(response.length());
+  JsonDocument doc;
   deserializeJson(doc, response);
 
   // Save last sent message_id
@@ -783,7 +783,7 @@ bool UniversalTelegramBot::getFile(String& file_path, long& file_size, const Str
   String command = BOT_CMD("getFile?file_id=");
   command += file_id;
   String response = sendGetToTelegram(command); // receive reply from telegram.org
-  DynamicJsonDocument doc(maxMessageLength);
+  JsonDocument doc;
   DeserializationError error = deserializeJson(doc, ZERO_COPY(response));
   closeClient();
 
@@ -799,7 +799,7 @@ bool UniversalTelegramBot::getFile(String& file_path, long& file_size, const Str
 }
 
 bool UniversalTelegramBot::answerCallbackQuery(const String &query_id, const String &text, bool show_alert, const String &url, int cache_time) {
-  DynamicJsonDocument payload(maxMessageLength);
+  JsonDocument payload;
 
   payload["callback_query_id"] = query_id;
   payload["show_alert"] = show_alert;

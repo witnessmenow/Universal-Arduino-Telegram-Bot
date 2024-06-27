@@ -44,7 +44,7 @@ void handleNewMessages(int numNewMessages)
 
       if (bot.checkForOkResponse(response))
       {
-        DynamicJsonDocument images(1500);
+        JsonDocument images;
         DeserializationError error = deserializeJson(images, response);
 
         // There are 3 image sizes after Telegram has process photo

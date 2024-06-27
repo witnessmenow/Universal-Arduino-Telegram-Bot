@@ -23,7 +23,7 @@ const unsigned long BOT_MTBS = 1000;                              // Mean time b
 WiFiClientSecure secured_client;
 X509List cert(TELEGRAM_CERTIFICATE_ROOT);
 UniversalTelegramBot bot(BOT_TOKEN, secured_client);
-DynamicJsonDocument usersDoc(1500);
+JsonDocument usersDoc;
 unsigned long bot_lasttime; // last time messages' scan has been done
 
 JsonObject getSubscribedUsers()
