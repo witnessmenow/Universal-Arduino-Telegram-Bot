@@ -560,7 +560,7 @@ bool UniversalTelegramBot::sendSimpleMessage(const String& chat_id, const String
 }
 
 bool UniversalTelegramBot::sendMessage(const String& chat_id, const String& text,
-                                       const String& parse_mode, int message_id) { // added message_id
+                                       const String& parse_mode, int message_id, bool silent) { // added message_id
 
   DynamicJsonDocument payload(maxMessageLength);
   payload["chat_id"] = chat_id;
@@ -571,6 +571,9 @@ bool UniversalTelegramBot::sendMessage(const String& chat_id, const String& text
 
   if (parse_mode != "")
     payload["parse_mode"] = parse_mode;
+
+  if (silent) // if the message should be sent silently (no ringtone) - default is not silent
+    payload["disable_notification"] = true;
 
   return sendPostMessage(payload.as<JsonObject>(), message_id); // if message id == 0 then edit is false, else edit is true
 }
