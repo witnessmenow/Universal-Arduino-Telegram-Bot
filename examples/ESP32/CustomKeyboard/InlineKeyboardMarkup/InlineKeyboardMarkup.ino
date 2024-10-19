@@ -27,10 +27,13 @@ void handleNewMessages(int numNewMessages)
     // Inline buttons with callbacks when pressed will raise a callback_query message
     if (bot.messages[i].type == "callback_query")
     {
+      // acknowledge the callback (it will display Thank you text in place of the Loading... toast at top)
+      bot.answerCallbackQuery(bot.messages[i].query_id, "Thank you!", true );
+
       Serial.print("Call back button pressed by: ");
       Serial.println(bot.messages[i].from_id);
       Serial.print("Data on the button: ");
-      Serial.println(bot.messages[i].text);
+      Serial.println(bot.messages[i].text); // 'data' field is saved as 'text' in UTB
       bot.sendMessage(bot.messages[i].from_id, bot.messages[i].text, "");
     }
     else

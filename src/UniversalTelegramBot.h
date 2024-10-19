@@ -34,9 +34,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #define TELEGRAM_SSL_PORT 443
 #define HANDLE_MESSAGES 1
 
-//unmark following line to enable debug mode
-//#define _debug
-
 typedef bool (*MoreDataAvailable)();
 typedef byte (*GetNextByte)();
 typedef byte* (*GetNextBuffer)();
@@ -68,6 +65,8 @@ struct telegramMessage {
 class UniversalTelegramBot {
 public:
   UniversalTelegramBot(const String& token, Client &client);
+  UniversalTelegramBot() {}; // allows setting token/client later.
+  void updateClient(Client &_client);
   void updateToken(const String& token);
   String getToken();
   String sendGetToTelegram(const String& command);

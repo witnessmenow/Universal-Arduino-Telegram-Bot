@@ -43,6 +43,10 @@ UniversalTelegramBot::UniversalTelegramBot(const String& token, Client &client) 
   this->client = &client;
 }
 
+void UniversalTelegramBot::updateClient(Client &_client) {
+  client = &_client;
+}
+
 void UniversalTelegramBot::updateToken(const String& token) {
   _token = token;
 }
@@ -66,17 +70,17 @@ String UniversalTelegramBot::sendGetToTelegram(const String& command) {
   String body, headers;
   
   // Connect with api.telegram.org if not already connected
-  if (!client->connected()) {
+  if (client && !client->connected()) {
     #ifdef TELEGRAM_DEBUG  
         Serial.println(F("[BOT]Connecting to server"));
     #endif
-    if (!client->connect(TELEGRAM_HOST, TELEGRAM_SSL_PORT)) {
+    if (client && !client->connect(TELEGRAM_HOST, TELEGRAM_SSL_PORT)) {
       #ifdef TELEGRAM_DEBUG  
         Serial.println(F("[BOT]Connection error"));
       #endif
     }
   }
-  if (client->connected()) {
+  if (client && client->connected()) {
 
     #ifdef TELEGRAM_DEBUG  
         Serial.println("sending: " + command);
@@ -104,7 +108,7 @@ bool UniversalTelegramBot::readHTTPAnswer(String &body, String &headers) {
   bool responseReceived = false;
 
   while (millis() - now < longPoll * 1000 + waitForResponse) {
-    while (client->available()) {
+    while (client && client->available()) {
       char c = client->read();
       responseReceived = true;
 
@@ -143,17 +147,17 @@ String UniversalTelegramBot::sendPostToTelegram(const String& command, JsonObjec
   String headers;
 
   // Connect with api.telegram.org if not already connected
-  if (!client->connected()) {
+  if (client && !client->connected()) {
     #ifdef TELEGRAM_DEBUG  
         Serial.println(F("[BOT Client]Connecting to server"));
     #endif
-    if (!client->connect(TELEGRAM_HOST, TELEGRAM_SSL_PORT)) {
+    if (client && !client->connect(TELEGRAM_HOST, TELEGRAM_SSL_PORT)) {
       #ifdef TELEGRAM_DEBUG  
         Serial.println(F("[BOT Client]Connection error"));
       #endif
     }
   }
-  if (client->connected()) {
+  if (client && client->connected()) {
     // POST URI
     client->print(F("POST /"));
     client->print(command);
@@ -198,17 +202,17 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
   const String boundary = F("------------------------b8f610217e83e29b");
 
   // Connect with api.telegram.org if not already connected
-  if (!client->connected()) {
+  if (client && !client->connected()) {
     #ifdef TELEGRAM_DEBUG  
         Serial.println(F("[BOT Client]Connecting to server"));
     #endif
-    if (!client->connect(TELEGRAM_HOST, TELEGRAM_SSL_PORT)) {
+    if (client && !client->connect(TELEGRAM_HOST, TELEGRAM_SSL_PORT)) {
       #ifdef TELEGRAM_DEBUG  
         Serial.println(F("[BOT Client]Connection error"));
       #endif
     }
   }
-  if (client->connected()) {
+  if (client && client->connected()) {
     String start_request;
     String end_request;
     
@@ -328,14 +332,14 @@ bool UniversalTelegramBot::setMyCommands(const String& commandArray) {
   payload["commands"] = serialized(commandArray);
   bool sent = false;
   String response = "";
-  #if defined(_debug)
+  #ifdef TELEGRAM_DEBUG  
   Serial.println(F("sendSetMyCommands: SEND Post /setMyCommands"));
-  #endif  // defined(_debug)
+  #endif
   unsigned long sttime = millis();
 
   while (millis() - sttime < 8000ul) { // loop for a while to send the message
     response = sendPostToTelegram(BOT_CMD("setMyCommands"), payload.as<JsonObject>());
-    #ifdef _debug  
+    #ifdef TELEGRAM_DEBUG  
     Serial.println("setMyCommands response" + response);
     #endif
     sent = checkForOkResponse(response);
@@ -357,6 +361,12 @@ int UniversalTelegramBot::getUpdates(long offset) {
   #ifdef TELEGRAM_DEBUG  
     Serial.println(F("GET Update Messages"));
   #endif
+  if( !client ){
+    #ifdef TELEGRAM_DEBUG  
+        Serial.println(F("Sorry invalid client (use updateClient())! Cannot fetch updates!"));
+    #endif
+    return -1; // only time a -1 returned, is when client not set up.
+  }
   String command = BOT_CMD("getUpdates?offset=");
   command += offset;
   command += F("&limit=");
@@ -770,7 +780,7 @@ bool UniversalTelegramBot::sendChatAction(const String& chat_id, const String& t
 }
 
 void UniversalTelegramBot::closeClient() {
-  if (client->connected()) {
+  if (client && client->connected()) {
     #ifdef TELEGRAM_DEBUG  
         Serial.println(F("Closing client"));
     #endif
@@ -809,7 +819,7 @@ bool UniversalTelegramBot::answerCallbackQuery(const String &query_id, const Str
   if (url.length() > 0) payload["url"] = url;
 
   String response = sendPostToTelegram(BOT_CMD("answerCallbackQuery"), payload.as<JsonObject>());
-  #ifdef _debug  
+  #ifdef TELEGRAM_DEBUG  
      Serial.print(F("answerCallbackQuery response:"));
      Serial.println(response);
   #endif
