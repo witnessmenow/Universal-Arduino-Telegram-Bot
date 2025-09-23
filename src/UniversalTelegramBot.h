@@ -38,103 +38,127 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 //#define _debug
 
 typedef bool (*MoreDataAvailable)();
+
 typedef byte (*GetNextByte)();
-typedef byte* (*GetNextBuffer)();
+
+typedef byte * (*GetNextBuffer)();
+
 typedef int (GetNextBufferLen)();
 
 struct telegramMessage {
-  String text;
-  String chat_id;
-  String chat_title;
-  String from_id;
-  String from_name;
-  String date;
-  String type;
-  String file_caption;
-  String file_path;
-  String file_name;
-  bool hasDocument;
-  long file_size;
-  float longitude;
-  float latitude;
-  int update_id;
-  int message_id;  
+    String text;
+    String chat_id;
+    String chat_title;
+    String from_id;
+    String from_name;
+    String date;
+    String type;
+    String file_caption;
+    String file_path;
+    String file_name;
+    bool hasDocument;
+    long file_size;
+    float longitude;
+    float latitude;
+    int update_id;
+    int message_id;
 
-  int reply_to_message_id;
-  String reply_to_text;
-  String query_id;
+    int reply_to_message_id;
+    String reply_to_text;
+    String query_id;
 };
 
 class UniversalTelegramBot {
 public:
-  UniversalTelegramBot(const String& token, Client &client);
-  void updateToken(const String& token);
-  String getToken();
-  String sendGetToTelegram(const String& command);
-  String sendPostToTelegram(const String& command, JsonObject payload);
-  String
-  sendMultipartFormDataToTelegram(const String& command, const String& binaryPropertyName,
-                                  const String& fileName, const String& contentType,
-                                  const String& chat_id, int fileSize,
-                                  MoreDataAvailable moreDataAvailableCallback,
-                                  GetNextByte getNextByteCallback, 
-                                  GetNextBuffer getNextBufferCallback, 
-                                  GetNextBufferLen getNextBufferLenCallback);
+    UniversalTelegramBot(const String &token, Client &client);
 
-  bool readHTTPAnswer(String &body, String &headers);
-  bool getMe();
+    void updateToken(const String &token);
 
-  bool sendSimpleMessage(const String& chat_id, const String& text, const String& parse_mode);
-  bool sendMessage(const String& chat_id, const String& text, const String& parse_mode = "", int message_id = 0);
-  bool sendMessageWithReplyKeyboard(const String& chat_id, const String& text,
-                                    const String& parse_mode, const String& keyboard,
-                                    bool resize = false, bool oneTime = false,
-                                    bool selective = false);
-  bool sendMessageWithInlineKeyboard(const String& chat_id, const String& text,
-                                     const String& parse_mode, const String& keyboard, int message_id = 0);
+    String getToken();
 
-  bool sendChatAction(const String& chat_id, const String& text);
+    String sendGetToTelegram(const String &command);
 
-  bool sendPostMessage(JsonObject payload, bool edit = false); 
-  String sendPostPhoto(JsonObject payload);
-  String sendPhotoByBinary(const String& chat_id, const String& contentType, int fileSize,
-                           MoreDataAvailable moreDataAvailableCallback,
-                           GetNextByte getNextByteCallback, 
-                           GetNextBuffer getNextBufferCallback, 
-                           GetNextBufferLen getNextBufferLenCallback);
-  String sendPhoto(const String& chat_id, const String& photo, const String& caption = "",
-                   bool disable_notification = false,
-                   int reply_to_message_id = 0, const String& keyboard = "");
+    String sendPostToTelegram(const String &command, JsonObject payload);
 
-  bool answerCallbackQuery(const String &query_id,
-                           const String &text = "",
-                           bool show_alert = false,
-                           const String &url = "",
-                           int cache_time = 0);
+    String
+    sendMultipartFormDataToTelegram(const String &command, const String &binaryPropertyName,
+                                    const String &fileName, const String &contentType,
+                                    const String &chat_id, int fileSize,
+                                    MoreDataAvailable moreDataAvailableCallback,
+                                    GetNextByte getNextByteCallback,
+                                    GetNextBuffer getNextBufferCallback,
+                                    GetNextBufferLen getNextBufferLenCallback);
 
-  bool setMyCommands(const String& commandArray);
+    bool readHTTPAnswer(String &body, String &headers);
 
-  String buildCommand(const String& cmd);
+    bool getMe();
 
-  int getUpdates(long offset);
-  bool checkForOkResponse(const String& response);
-  telegramMessage messages[HANDLE_MESSAGES];
-  long last_message_received;
-  String name;
-  String userName;
-  int longPoll = 0;
-  unsigned int waitForResponse = 1500;
-  int _lastError;
-  int last_sent_message_id = 0;
-  int maxMessageLength = 1500;
+    bool sendSimpleMessage(const String &chat_id, const String &text, const String &parse_mode);
+
+    bool sendMessage(const String &chat_id, const String &text, const String &parse_mode = "", int message_id = 0);
+
+    bool sendVenue(const String &chat_id, String latitude, String longitude, String title = "");
+
+    bool sendMessageWithReplyKeyboard(const String &chat_id, const String &text,
+                                      const String &parse_mode, const String &keyboard,
+                                      bool resize = false, bool oneTime = false,
+                                      bool selective = false);
+
+    bool sendMessageWithInlineKeyboard(const String &chat_id, const String &text,
+                                       const String &parse_mode, const String &keyboard, int message_id = 0);
+
+    bool sendChatAction(const String &chat_id, const String &text);
+
+    bool sendPostMessage(JsonObject payload, bool edit = false);
+
+    bool sendPostVenue(JsonObject payload);
+
+    String sendPostPhoto(JsonObject payload);
+
+    String sendPhotoByBinary(const String &chat_id, const String &contentType, int fileSize,
+                             MoreDataAvailable moreDataAvailableCallback,
+                             GetNextByte getNextByteCallback,
+                             GetNextBuffer getNextBufferCallback,
+                             GetNextBufferLen getNextBufferLenCallback);
+
+    String sendPhoto(const String &chat_id, const String &photo, const String &caption = "",
+                     bool disable_notification = false,
+                     int reply_to_message_id = 0, const String &keyboard = "");
+
+    bool answerCallbackQuery(const String &query_id,
+                             const String &text = "",
+                             bool show_alert = false,
+                             const String &url = "",
+                             int cache_time = 0);
+
+    bool setMyCommands(const String &commandArray);
+
+    String buildCommand(const String &cmd);
+
+    int getUpdates(long offset);
+
+    bool checkForOkResponse(const String &response);
+
+    telegramMessage messages[HANDLE_MESSAGES];
+    long last_message_received;
+    String name;
+    String userName;
+    int longPoll = 0;
+    unsigned int waitForResponse = 1500;
+    int _lastError;
+    int last_sent_message_id = 0;
+    int maxMessageLength = 1500;
 
 private:
-  // JsonObject * parseUpdates(String response);
-  String _token;
-  Client *client;
-  void closeClient();
-  bool getFile(String& file_path, long& file_size, const String& file_id);
-  bool processResult(JsonObject result, int messageIndex);
+    // JsonObject * parseUpdates(String response);
+    String _token;
+    Client *client;
+
+    void closeClient();
+
+    bool getFile(String &file_path, long &file_size, const String &file_id);
+
+    bool processResult(JsonObject result, int messageIndex);
 };
 
 #endif
