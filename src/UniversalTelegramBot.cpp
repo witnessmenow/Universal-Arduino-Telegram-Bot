@@ -63,7 +63,7 @@ String UniversalTelegramBot::buildCommand(const String &cmd) {
 }
 
 String UniversalTelegramBot::sendGetToTelegram(const String &command) {
-    String body, headers;
+    String body;
 
     // Connect with api.telegram.org if not already connected
     if (!client->connected()) {
@@ -77,6 +77,7 @@ String UniversalTelegramBot::sendGetToTelegram(const String &command) {
         }
     }
     if (client->connected()) {
+        String headers;
 #ifdef TELEGRAM_DEBUG
         Serial.println("sending: " + command);
 #endif
@@ -138,7 +139,6 @@ bool UniversalTelegramBot::readHTTPAnswer(String &body, String &headers) {
 
 String UniversalTelegramBot::sendPostToTelegram(const String &command, JsonObject payload) {
     String body;
-    String headers;
 
     // Connect with api.telegram.org if not already connected
     if (!client->connected()) {
@@ -152,6 +152,7 @@ String UniversalTelegramBot::sendPostToTelegram(const String &command, JsonObjec
         }
     }
     if (client->connected()) {
+        String headers;
         // POST URI
         client->print(F("POST /"));
         client->print(command);
@@ -190,7 +191,6 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
     GetNextBuffer getNextBufferCallback,
     GetNextBufferLen getNextBufferLenCallback) {
     String body;
-    String headers;
 
     const String boundary = F("------------------------b8f610217e83e29b");
 
@@ -206,6 +206,7 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
         }
     }
     if (client->connected()) {
+        String headers;
         String start_request;
         String end_request;
 
