@@ -575,6 +575,17 @@ bool UniversalTelegramBot::sendMessage(const String& chat_id, const String& text
   return sendPostMessage(payload.as<JsonObject>(), message_id); // if message id == 0 then edit is false, else edit is true
 }
 
+bool UniversalTelegramBot::sendLocation(const String& chat_id, String latitude, String longitude, String title){
+
+  DynamicJsonDocument payload(maxMessageLength);
+  payload["chat_id"] = chat_id;
+  payload["latitude"] = latitude;
+  payload["longitude"] = longitude;
+  payload["title"] = title;
+
+  return sendPostLocation(payload.as<JsonObject>()); // if message id == 0 then edit is false, else edit is true
+}
+
 bool UniversalTelegramBot::sendMessageWithReplyKeyboard(
     const String& chat_id, const String& text, const String& parse_mode, const String& keyboard,
     bool resize, bool oneTime, bool selective) {
@@ -645,6 +656,31 @@ bool UniversalTelegramBot::sendPostMessage(JsonObject payload, bool edit) { // a
          #ifdef TELEGRAM_DEBUG  
         Serial.println(response);
       #endif
+      sent = checkForOkResponse(response);
+      if (sent) break;
+    }
+  }
+
+  closeClient();
+  return sent;
+}
+
+bool UniversalTelegramBot::sendPostLocation(JsonObject payload) { // added message_id
+
+  bool sent = false;
+#ifdef TELEGRAM_DEBUG
+  Serial.print(F("sendPostLocation: SEND Post Location: "));
+  serializeJson(payload, Serial);
+  Serial.println();
+#endif
+  unsigned long sttime = millis();
+
+  if (payload.containsKey("latitude")) {
+    while (millis() < sttime + 8000) { // loop for a while to send the message
+      String response = sendPostToTelegram(BOT_CMD("sendVenue"), payload);
+#ifdef TELEGRAM_DEBUG
+      Serial.println(response);
+#endif
       sent = checkForOkResponse(response);
       if (sent) break;
     }
