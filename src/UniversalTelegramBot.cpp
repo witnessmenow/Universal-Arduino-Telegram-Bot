@@ -573,14 +573,14 @@ bool UniversalTelegramBot::sendMessage(const String &chat_id, const String &text
     // if message id == 0 then edit is false, else edit is true
 }
 
-bool UniversalTelegramBot::sendLocation(const String &chat_id, String latitude, String longitude, String title) {
+bool UniversalTelegramBot::sendVenue(const String &chat_id, String latitude, String longitude, String title) {
     DynamicJsonDocument payload(maxMessageLength);
     payload["chat_id"] = chat_id;
     payload["latitude"] = latitude;
     payload["longitude"] = longitude;
     payload["title"] = title;
 
-    return sendPostLocation(payload.as<JsonObject>()); // if message id == 0 then edit is false, else edit is true
+    return sendPostVenue(payload.as<JsonObject>()); // if message id == 0 then edit is false, else edit is true
 }
 
 bool UniversalTelegramBot::sendMessageWithReplyKeyboard(

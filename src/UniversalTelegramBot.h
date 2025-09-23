@@ -97,7 +97,7 @@ public:
 
     bool sendMessage(const String &chat_id, const String &text, const String &parse_mode = "", int message_id = 0);
 
-    bool sendLocation(const String &chat_id, String latitude, String longitude, String title = "Unknown Location");
+    bool sendVenue(const String &chat_id, String latitude, String longitude, String title = "");
 
     bool sendMessageWithReplyKeyboard(const String &chat_id, const String &text,
                                       const String &parse_mode, const String &keyboard,
@@ -111,7 +111,7 @@ public:
 
     bool sendPostMessage(JsonObject payload, bool edit = false);
 
-    bool sendPostLocation(JsonObject payload);
+    bool sendPostVenue(JsonObject payload);
 
     String sendPostPhoto(JsonObject payload);
 
