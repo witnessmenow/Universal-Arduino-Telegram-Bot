@@ -65,6 +65,14 @@ struct telegramMessage {
   String query_id;
 };
 
+struct DroppedUpdate {
+  bool active;
+  long update_id;
+  String from_id;
+  String from_name;
+  String chat_id;
+};
+
 class UniversalTelegramBot {
 public:
   UniversalTelegramBot(const String& token, Client &client);
@@ -117,6 +125,11 @@ public:
   String buildCommand(const String& cmd);
 
   int getUpdates(long offset);
+  int getUpdatesPoisonDrop(long offset);
+  // Return true if the last getUpdatesPoisonDrop call dropped the poison drop
+  bool didGetUpdatesDropPoison();
+  DroppedUpdate getLastDroppedUpdate();
+
   bool checkForOkResponse(const String& response);
   telegramMessage messages[HANDLE_MESSAGES];
   long last_message_received;
@@ -129,6 +142,8 @@ public:
   int maxMessageLength = 1500;
 
 private:
+  // State of the last getUpdatesPoisonDrop call
+  DroppedUpdate lastDroppedUpdate = {false, 0, "", "", ""};
   // JsonObject * parseUpdates(String response);
   String _token;
   Client *client;
